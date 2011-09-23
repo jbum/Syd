@@ -1,0 +1,30 @@
+MODS 7
+MOD mOut1 out (528 139 592 203)
+IN mAmp6 -> sig
+OUTPUT 2.0 22050.0 2 0 0 farttest.wav
+MOD mNoise2 noise (36 113 100 177)
+RND 1 1
+MOD mButter3 butter (123 112 187 176)
+IN mNoise2 -> sig
+BUTTER 2
+BUTTERF 80*(1+t*10)
+BUTTERB 10
+MOD mOsc4 osc (215 149 279 213)
+IN mOsc5 -> am
+OSCI 3
+OSCF 80+t*10*10*am
+OSCA .5*am
+OSCP 0
+MOD mOsc5 osc (109 159 173 223)
+OSCI 0
+OSCF 30+t
+OSCA 1
+OSCP 0
+MOD mAmp6 amp (329 138 393 202)
+IN mOsc4 -> sig
+IN mEnv7 -> ctl
+AMPS ctl
+AMPO 0.0
+MOD mEnv7 env (146 192 210 256)
+ADSR 0.1 1.0 0.2 0.7 0.6 0.6 0.1
+ADSRD 2

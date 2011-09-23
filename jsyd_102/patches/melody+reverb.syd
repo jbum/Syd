@@ -1,0 +1,48 @@
+MODS 12
+MOD mOut1 out (670 209 734 273)
+IN mDelay6 -> sig
+OUTPUT 12.0 22000.0 2 0 0 melody_reverb.wav
+MOD mShold2 shold (104 206 168 270)
+IN mOsc9 -> trig
+IN mNoise10 -> sig
+MOD mNoise3 noise (132 84 196 148)
+RND 1 0
+MOD mShold4 shold (299 130 363 194)
+IN mNoise3 -> sig
+IN mShold2 -> trig
+MOD mOsc5 osc (389 181 453 245)
+IN mShold4 -> fm
+IN mOsc7 -> am
+OSCI 0
+OSCF 220*2**(fm*2)
+OSCA am
+OSCP 0
+MOD mDelay6 delay (586 209 650 273)
+IN mMix12 -> sig
+DELF 1
+DELd 0.2
+DELa0 0.5
+DELa1 0.8
+MOD mOsc7 osc (300 214 364 278)
+IN mThresh8 -> am
+OSCI 0
+OSCF 8
+OSCA am
+OSCP 0
+MOD mThresh8 thresh (180 276 244 340)
+IN mShold2 -> sig
+THR 0.5
+MOD mOsc9 osc (19 145 83 209)
+OSCI 2
+OSCF 8
+OSCA 1
+OSCP 0
+MOD mNoise10 noise (33 249 97 313)
+RND 1 0
+MOD mAmp11 amp (298 311 362 375)
+IN mThresh8 -> sig
+AMPS 0.08
+AMPO 0
+MOD mMix12 mix (495 214 559 278)
+IN mOsc5 -> sig
+IN mAmp11 -> sig

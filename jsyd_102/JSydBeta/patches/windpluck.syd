@@ -1,0 +1,36 @@
+MODS 6
+MOD mOut1 out (463 162 495 194)
+IN mRscore6 -> sig
+OUTPUT 5 5000 2 0 0 windpluck.wav
+MOD mPluck2 pluck (222 211 254 243)
+PLKI 0
+PLKF cpsoct(octcps(p5)-0.1)
+PLKD p3
+PLKA p4
+PLKd p6
+MOD mPluck3 pluck (219 148 251 180)
+PLKI 0
+PLKF cpsoct(octcps(p5)+0.1)
+PLKD p3
+PLKA p4
+PLKd p6
+MOD mPluck4 pluck (216 90 248 122)
+PLKI 0
+PLKF p5
+PLKD p3
+PLKA p4
+PLKd p6
+MOD mMix5 mix (297 152 329 184)
+IN mPluck4 -> sig
+IN mPluck3 -> sig
+IN mPluck2 -> sig
+MOD mRscore6 rscore (382 145 414 177)
+IN mMix5 -> i1
+RSCO 6
+RSCON 24*p3+1
+RSCO1 1
+RSCO2 ?*p3
+RSCO3 0.2
+RSCO4 0.25
+RSCO5 110*2**(?*3)
+RSCO6 5+?*10

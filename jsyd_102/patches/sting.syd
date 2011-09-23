@@ -1,0 +1,10 @@
+MODS 2
+MOD mOut1 out (432 174 464 206)
+IN mOsc2 -> sig
+OUT 8 22000
+MOD mOsc2 osc (227 180 259 212)
+OSCI 5
+OSCF p5
+OSCA p4*(1-t/p3)
+OSCP 0
+WEXP turb(t/(n+.01),g*3)*sin(t*2*¹)

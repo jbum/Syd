@@ -1,0 +1,35 @@
+MODS 6
+MOD mOut1 out (599 174 663 238)
+IN mRscore6 -> sig
+OUTS 1 4.0 22050.0 2 epiano.wav
+MOD mOsc2 osc (142 128 206 192)
+OSCI 0
+OSCF p5*2
+OSCA 1
+OSCP 0
+MOD mOsc3 osc (143 207 207 271)
+OSCI 0
+OSCF p5
+OSCA 1
+OSCP 0
+MOD mAmp4 amp (348 170 412 234)
+IN mOsc3 -> sig
+IN mOsc5 -> ctl
+IN mOsc2 -> sig
+AMPP ctl
+AMPS .4*(1-t/p3)^2
+AMPO 0.0
+MOD mOsc5 osc (232 111 296 175)
+OSCI 0
+OSCF 3
+OSCA 1
+OSCP 0
+MOD mRscore6 rscore (474 176 538 240)
+IN mAmp4 -> i1
+RSCO 5
+RSCON 6
+RSCO1 1
+RSCO2 i*p3/m
+RSCO3 p3*2/m
+RSCO4 0.25 + ?*0.25
+RSCO5 fnote(minor,i,50)

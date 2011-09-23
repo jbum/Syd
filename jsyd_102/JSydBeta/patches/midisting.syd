@@ -1,0 +1,20 @@
+MODS 4
+MOD mOut1 out (432 174 464 206)
+IN mOsc2 -> sig
+OUT 8 22000
+MOD mOsc2 osc (227 180 259 212)
+IN mPinput3 -> fm
+IN mPinput4 -> am
+OSCI 5
+OSCF cpsmidi(fm)
+OSCA am/100*(1-t/p3)
+OSCP 0
+WEXP turb(t/(n+.2),g*3)*sin(t*2*¹)
+MOD mPinput3 pinput (95 87 127 119)
+PIDEF 50
+PINN 5
+PIND midipitch
+MOD mPinput4 pinput (86 207 118 239)
+PIDEF 90
+PINN 4
+PIND midiamp

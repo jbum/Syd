@@ -1,0 +1,9 @@
+MODS 2
+MOD mOut1 out (600 200 640 240)
+IN mOsc2 -> sig
+OUTPUT 20.0 44100.0 2 0 0 testsine.wav
+MOD mOsc2 osc (301 193 341 233)
+OSCI 0
+OSCF 440
+OSCA .1
+OSCP 0

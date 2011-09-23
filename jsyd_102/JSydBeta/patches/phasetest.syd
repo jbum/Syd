@@ -1,0 +1,11 @@
+MODS 4
+MOD mOut1 out (432 174 464 206)
+IN mMix4 -> sig
+OUT 8 22000
+MOD mExp2 exp (189 83 221 115)
+EXP sin3(440*t*2*¹)
+MOD mExp3 exp (192 189 224 221)
+EXP sin2(440*t*2*¹+t)
+MOD mMix4 mix (338 149 370 181)
+IN mExp2 -> sig
+IN mExp3 -> sig

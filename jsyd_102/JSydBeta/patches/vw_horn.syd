@@ -1,0 +1,46 @@
+MODS 7
+MOD mOut1 out (632 172 696 236)
+IN mRscore5 -> sig
+OUTPUT 1.0 22050.0 2 0 0 C:\dev\Music\jsyd\JSydBeta\vw_horn.wav
+MOD mRscore2 rscore (292 169 356 233)
+IN mAmp6 -> i1
+RSCO 5
+RSCON 10
+RSCO1 1
+RSCO2 0
+RSCO3 p3
+RSCO4 1/m
+RSCO5 360*(i+1)
+MOD mOsc3 osc (61 156 125 220)
+OSCI 0
+OSCF p5
+OSCA p4
+OSCP 0
+MOD mButter4 butter (403 168 467 232)
+IN mRscore2 -> sig
+BUTTER 3
+BUTTERF 360*4
+BUTTERB 360*5*limit(t*4,0,1)
+MOD mRscore5 rscore (505 165 569 229)
+IN mButter4 -> i1
+RSCO 4
+RSCON 2
+RSCO1 1
+RSCO2 i*p3/(m+1)
+RSCO3 p3*(i+1)/m/2
+RSCO4 0
+MOD mAmp6 amp (189 164 253 228)
+IN mOsc3 -> sig
+IN mEnv7 -> ctl
+AMPS ctl
+AMPO 0.0
+MOD mEnv7 env (94 85 158 149)
+ADSR2 0
+ADSRAT 0.05
+ADSRAL 1.0
+ADSRDT 0.2
+ADSRDL 0.7
+ADSRST 0.6
+ADSRSL 0.6
+ADSRRT 0.1
+ADSRD p3

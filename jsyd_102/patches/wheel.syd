@@ -1,0 +1,39 @@
+MODS 8
+MOD mOut1 out (592 179 624 211)
+IN mDelay3 -> sig
+OUTPUT 65 44100 2 0 0 wheel.wav
+MOD mAmp2 amp (419 174 451 206)
+IN mCscore4 -> sig
+AMPS .666
+AMPO 0.0
+MOD mDelay3 delay (494 174 526 206)
+IN mAmp2 -> sig
+DELF 1
+DELd 0.025
+DELa0 1.0
+DELa1 0.5
+MOD mCscore4 cscore (321 143 353 175)
+IN mMix8 -> i1
+CSCO wheelmusic.sco 0 0
+MOD mPluck5 pluck (127 127 159 159)
+PLKI 0
+PLKF cpsmidi(p5)
+PLKD p3
+PLKA p4/255
+PLKd p6
+MOD mPluck6 pluck (129 165 161 197)
+PLKI 0
+PLKF cpsmidi(p5)/2
+PLKD p3
+PLKA p4/255
+PLKd p6/2
+MOD mPluck7 pluck (129 85 161 117)
+PLKI 0
+PLKF cpsmidi(p5)*2
+PLKD p3
+PLKA p4/255
+PLKd p6*2
+MOD mMix8 mix (226 145 258 177)
+IN mPluck7 -> sig
+IN mPluck5 -> sig
+IN mPluck6 -> sig

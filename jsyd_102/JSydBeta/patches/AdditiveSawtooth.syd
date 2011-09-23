@@ -1,0 +1,18 @@
+MODS 3
+MOD mOut1 out (600 200 664 264)
+IN mRscore2 -> sig
+OUTPUT 2.0 22050.0 2 0 0 additive_sawtooth.wav
+MOD mRscore2 rscore (456 201 520 265)
+IN mOsc3 -> i1
+RSCO 5
+RSCON 24
+RSCO1 1
+RSCO2 0
+RSCO3 d
+RSCO4 .25/(i+1)
+RSCO5 440*(i+1)
+MOD mOsc3 osc (327 194 391 258)
+OSCI 0
+OSCF p5
+OSCA p4
+OSCP 0

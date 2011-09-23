@@ -1,0 +1,75 @@
+MODS 11
+MOD mOut1 out (676 183 740 247)
+IN mRscore2 -> sig
+OUTPUT 4.0 22050.0 2 0 0 choir.wav
+MOD mRscore2 rscore (553 184 617 248)
+IN mRscore3 -> i1
+RSCO 8
+RSCON 1
+RSCO1 1
+RSCO2 0
+RSCO3 p3
+RSCO4 1
+RSCO5 cpspch(7.0)
+RSCO6 570
+RSCO7 840
+RSCO8 2600
+MOD mRscore3 rscore (444 186 508 250)
+IN mAmp4 -> i1
+RSCO 15
+RSCON 16
+RSCO1 1
+RSCO2 0
+RSCO3 p3
+RSCO4 p4
+RSCO5 p5*2**(?/40)
+RSCO6 p6+?*200
+RSCO7 p7+?*200
+RSCO8 p8+?*400
+RSCO9 ?*2*pi
+RSCO10 2+?*4
+RSCO11 ?*2*pi
+RSCO12 ?/12
+RSCO13 0.04+?*0.02
+RSCO14 0.03+?*0.02
+RSCO15 0.02+?*0.02
+MOD mAmp4 amp (338 183 402 247)
+IN mButter9 -> sig
+IN mAmp5 -> sig
+IN mAmp6 -> sig
+AMPS 1.0
+AMPO 0.0
+MOD mAmp5 amp (242 189 306 253)
+IN mButter8 -> sig
+AMPS 1/2
+AMPO 0.0
+MOD mAmp6 amp (223 279 287 343)
+IN mButter7 -> sig
+AMPS 1/3
+AMPO 0.0
+MOD mButter7 butter (144 327 208 391)
+IN mOsc10 -> sig
+BUTTER 2
+BUTTERF p8
+BUTTERB p8*p15
+MOD mButter8 butter (151 205 215 269)
+IN mOsc10 -> sig
+BUTTER 2
+BUTTERF p7
+BUTTERB p7*p14
+MOD mButter9 butter (149 98 213 162)
+IN mOsc10 -> sig
+BUTTER 2
+BUTTERF p6
+BUTTERB p6*p13
+MOD mOsc10 osc (47 251 111 315)
+IN mOsc11 -> fm
+OSCI 1
+OSCF p5*2**(fm*p12)
+OSCA p4
+OSCP p9
+MOD mOsc11 osc (29 108 93 172)
+OSCI 0
+OSCF p10
+OSCA 1
+OSCP p11

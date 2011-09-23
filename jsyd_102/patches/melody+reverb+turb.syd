@@ -1,0 +1,29 @@
+MODS 7
+MOD mOut1 out (579 145 643 209)
+IN mDelay4 -> sig
+OUTPUT 8.0 22000.0 2 0 0 melody_reverb_turb.wav
+MOD mExp2 exp (329 144 393 208)
+IN mOsc3 -> sig
+EXP turb(t,sig)
+MOD mOsc3 osc (243 140 307 204)
+IN mShold6 -> fm
+OSCI 0
+OSCF 440*2**fm
+OSCA 1
+OSCP 0
+MOD mDelay4 delay (446 145 510 209)
+IN mExp2 -> sig
+DELF 1
+DELd 0.25
+DELa0 0.058823529411764705
+DELa1 0.9411764705882353
+MOD mNoise5 noise (75 173 139 237)
+RND 1 0
+MOD mShold6 shold (157 137 221 201)
+IN mOsc7 -> trig
+IN mNoise5 -> sig
+MOD mOsc7 osc (72 100 136 164)
+OSCI 2
+OSCF 8
+OSCA 1
+OSCP 0

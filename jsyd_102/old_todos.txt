@@ -1,0 +1,114 @@
+Fix stereo to work if amp goes into score module or something else.
+
+* Consider whitney time fix - move 360 degrees into future after 180 point.
+
+* Fix Graphics Display
+  * Playback is broken.
+  
+* Fix graphics & mem-storage to work with stereo
+   * Add stereo reverb and stereo filtering
+   * To save processing, track if we're in stereo via patchowner.
+
+* Work on Jon's stuff - check into possibility of using cswf for
+  generating slide shows...
+
+* Consider module for storing editable curves (spline-like which go from 0-1).
+* Referenced as ctab(0,t) - useful for additive synthesis.
+
+* Also consider module for sequencer values (stab(n,t))
+
+* Add version numbers for Syd - display it at startup.
+
+* Debug filetab problem - try to simplify bug reproduction.
+  
+* Continue looking for interesting free audio software.
+  * Look for new popular free audio projects (in linux community?)
+  * Look for interesting vsts.
+  * Play with KRISTAL.
+
+* Work on methods for storing tables of arbitrary values (Sequencer Module).
+  Function with var arg list?
+  
+  seq(i,p1,p2,p3,p4,p5,p6,p7,p8)
+  
+* Analyse use of reset in patch activation, see why
+  SSPluck got initialized incorrectly.
+
+   KP appears to be pulling parameters from outer-nested score module.  Why?
+   (callingMod appears to be incorrect...)
+
+   (Seems to happen from initial cloning of note in outer score - needlessly calls pluck-reset)
+    Consider fixing reset for nested scores...   
+
+* Continue testing patches
+  * problem with sound playback after time (window activiation?)
+
+* Consider making an applet version which synthesizes to memory only,
+and can load patches.
+
+* Force patches to output to patchfile name + .wav/.aiff etc.
+
+* Work on slow renders - see if we can get graphing working.
+
+* Finish functions
+	CalcMandel, CalcMandelCPM, CalcMandel3,CalcJulia, CalcDragon, fBm, gnoise, GTurbulence3D, 
+
+* Finish toolbar functions.
+	Add Toolbar/Menus
+		File: new,open,save,saveas
+		Synth: Synthesize, Play, AbortSynth (or Stopplay)
+		Options: ListenDuringSynth, ShowGraph
+		Help: HelpTopics/AboutSyd
+
+* Test on Mac.
+
+* Research stand-alone app distribution for PC & Mac.
+
+* Work on HELP.
+
+* Add CSound Override.
+
+* Add support stereo panning (using amplifier?)
+   * Add stereo checkbox to output
+
+* Dig up, and reproduce some classic star-trek and videogame effects.
+
+(low) Reorganize units in better order.
+
+(low) When closing a patch, stop playback.
+
+(low) - get better synthesize and play icons
+
+(low) Hide tools when windows are deactivated
+
+(low) Finish rectangle group selection.
+  * Add support for ctrl key.
+
+(low) Continue working on file-save/file-open dialogs.  Don't use full-path name if it corresponds
+to current patch directory for window.
+
+(low) Consider adding labels for column headers in ParamDefs.
+
+(low) * Consider adding new icon type for abstract parameter units (ftab, p, g, folder input)
+
+(low) * Make tests for SSMaraca, SSGAssign, SSSampleFile.
+
+* * *
+
+Three independent compondents.
+
+1) Front end - for building patches.  Can output patch as Syd Patch data, or XML data.
+
+Consider using XML data for describing the modules available, what their parameters are,
+and how do edit & output them.  This will allow module definitions to be changed to work
+with future versions of CSyd.
+
+2) Sound Renderer - gets input patch as Syd Patch data or XML data.
+  2a) Local Sound Renderer
+  2b) Command-line Sound Renderer (works with CSyd) - compare timings with Local
+  2c) Network Sound Renderer
+
+3) Graphical sound display / preview - gets input from sound renderer.
+Presents waveform preview/zooming and has playback button.
+
+

@@ -1,0 +1,2570 @@
+<html><head><title>Syd User Manual</title>
+
+<link rel=stylesheet type="text/css" href="base_sm.css">
+</head>
+<body alink="#000000" bgcolor="#ffffff" link="#980003" text="#000000" vlink="#581d8d">
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr>
+<td width="60">&nbsp;</td>
+<td width="5%">&nbsp;</td>
+<td width="75%">
+
+
+
+<center><h2>JSyd 1.0<p>
+
+User Manual</p><p>
+</p></h2>
+<h3>Jim Bumgardner<br>
+1997, 2006
+</h3>
+</center>
+<p>
+<br><br><br></p><center><h1>Table of Contents</h1></center><p><br>
+</p><center>
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr><td colspan="2">
+<a href="#preface">0.0 Preface</a><br>
+<p>
+<a href="#intro">1.0 Introduction to Syd</a><br>
+</p></td></tr>
+<tr><td width="40">&nbsp;</td><td align="left">
+	<a href="#tutorial">1.1 A Syd Tutorial</a><br>
+	<a href="#wheretogo">1.2 Where to go from here</a><br>
+<p>
+</p></td></tr>
+<tr><td colspan="2">
+<a href="#basicunitdescriptions">2.0 Basic Unit Descriptions</a><br>
+</td></tr>
+<tr><td width="40">&nbsp;</td><td align="left">
+	<a href="#soundgeneratingunits">2.1 Sound Generating Units</a><br>
+	<a href="#soundmodifierunits">2.2 Sound Modifier Units</a><br>
+	<a href="#structureunits">2.3 Structure Units</a><br>
+	<a href="#scoreunits">2.4 Score Units</a><br>
+<p>
+</p></td></tr>
+<tr><td colspan="2">
+<a href="#expressions">3.0 Expressions</a><br>
+</td></tr>
+<tr><td width="40">&nbsp;</td><td align="left">
+	<a href="#variables">3.1 Variables</a><br>
+	<a href="#operators">3.2 Operators</a><br>
+	<a href="#functions">3.3 Functions</a><br>
+<p>
+</p></td></tr>
+<tr><td colspan="2">
+<a href="#menucommands">4.0 Menu Commands</a><br>
+<p>
+</p></td></tr>
+<tr><td colspan="2">
+<a href="#versionhistory">Version History</a><br>
+<p>
+</p></td></tr></tbody></table></center>
+<hr>
+
+<a name="preface">&nbsp;<br></a>
+
+
+<h1>0.0 Foreward (2006)</h1><p>
+</p><p>
+JSyd is an update to Syd, a program I wrote in C on both
+Macintosh and Windows computers.  Since I first wrote the Macintosh version of Syd in 1997,
+Macintosh computers have changed significantly (changing CPUs and Operating Systems) and the original
+version of Syd no longer works.  I decided to simplify my life by rewriting Syd in Java, so that
+it will work on Macs, Windows and Linux machines.
+<p>
+JSyd is fundamentally the same as the original Syd with only a few (mostly cosmetic) changes.
+It reads and writes the same patch file format.
+<p>
+When you modify a unit, options no longer appear in pop-up windows, instead there is a
+properties panel for editing units.
+<p>
+I have increased the size of the icons from 32 pixels to 64 pixels, and redrawn the interface
+artwork.
+<p>
+A new Module "SkiniScore" will read score files in the Skini format.
+<p>
+I have added a new "zap-link" feature which causes modules to automatically connect
+to nearby modules when you drag them around.  This can make it simpler to set up patches.
+To disconnect two modules, drag the module on the left quickly to the left.
+<p>
+The Envelope Generator unit (ADSR) now accepts expressions, and triggers.
+<p>
+Output can now be optionally in stereo.  The amplifier unit will acccept
+a panning expression which pans from left (-1) to right (1).
+<p>
+
+<h1>0.1 Original Foreward (1997)</h1><p>
+</p><p>
+First of all, I'd like to say hi to any CalArtians who are reading this
+- I attended that fine institution (music composition) from '80 to '84.
+</p><p>
+Those days were pre-MIDI for CalArts, but they did  have two analog
+electronic music studios which featured Buchla 200 synthesizers, which
+were maintained by John Payne who must have had a love/hate relationship
+with them.
+</p><p>
+I am now a computer programmer with a small collection of digital toys,
+but I miss those days of patch cords, razor blades and 2-track tape
+immensely.
+</p><p>
+One weekend, in late March of '97, in a fit of nostalgia, I decided to
+write a software synthesis program for my Mac that would share some
+interface elements with the Buchla 200.  Working Buchla 200s are hard to
+come by, and I wanted to recreate the experience of patching modules
+together and hearing the results.  So I spent the weekend writing the first
+version of Syd.  By the end of the weekend, I had a simple patchable interface working that was
+capable of generating some interesting sounds.
+</p><p>
+I've since spent considerably more than a weekend working on it, and
+have learned a bit more about digital audio.  After learning about
+CSound and other Music-N languages, I incorporated some of the features
+in those languages, while still trying to retain some of the ease of use
+that the graphical "patch" interface provides.
+</p><p>
+I believe there are a few trends which prevent serious computer music
+tools from reaching  a wider audience.  One of them is that these tools
+have an unnecessary level of complexity, which is primarily due to
+historical precedent - performance considerations forced programmers to
+make systems which are awkward to use.  CSound and similar systems are
+only easily understood if you are nearly knowledgeable enough to have
+programmed them yourself.  Music compilers don't need to be this
+complex.  The increasing speed of desktop computers should enable us to
+rethink how we approach these tools.
+</p><p>
+I'd like to offer the source code of this program to other interested
+amateurs - for any hobbyists who wish to tinker around with a digital
+synthesis program.    You can find the latest version of the source code at the Syd website:
+<br><br>
+www.jbum.com/syd
+<br><br>
+Also, if you develop some interesting sounds, I'd like to hear them - feel free
+to send me a copy of your patches.
+</p><p>
+Enjoy!
+</p><p>
+Jim Bumgardner<br>
+jbum@jbum.com<br>
+http://www.jbum.com
+</p><p>
+</p><hr>
+<a name="intro">&nbsp;<br></a>
+<h1>1.0 Introduction to Syd</h1>
+<p>
+<b>Syd</b>, short for "Synthesis Demonstration" or "Synthesis Donut" is
+an instrument editor and software synthesizer.  You can find the latest
+version of Syd here:
+</p><p>
+</p><center><a href="http://www.jbum.com/syd/">http://www.jbum.com/syd/</a></center>
+<p>
+Features:
+</p><p>
+</p><ul>
+<li>Graphical Interface for patching instruments and creating scores.
+<br></li><li>Some of the same power than can be found in text-based Music-N languages, such as CSound.
+<br></li><li>Provides mechanisms so instruments can be edited and tested without the need to generate a score.
+<br></li><li>Unlike Music-N languages, a score is treated as just
+another sound generating unit, which simplifies many operations. For
+example, one score can play another score as an instrument, and its
+output can be fed to a reverb module or amplifier, for post-processing.
+<br></li><li>The "Random Score" can generate sequences of random
+notes, as well as make permutations to an existing CSound score. For
+example, it can cause each note in a CSound score to trigger 100
+simultaneous notes with slight variations in the parameters. It can
+also be used to augment or rearrange the parameters in a CSound score
+so it can be used with instruments which require alternate parameters.
+</li></ul>
+<br><p>
+Syd is still very much a work in progress.  I am making it with the following goals in mind:
+</p><p>
+</p><ol>
+<li>Keep it simple to use - for example, you can patch an oscillator to a speaker,  and hear a sound.
+<br></li><li>Keep it nearly as flexible as CSound and other text-based music compilers.
+<br></li><li>Avoid unnecessary complexity (e.g. "merge" "kamp" vs
+"amp", separation of "score" and "orchestra") by hiding performance
+issues from the user.
+<br></li><li>Eventual support of such standards as MIDI, CSound, and Java.
+<br></li></ol><p>
+<a name="tutorial">&nbsp;<br></a>
+	</p><h2>1.1 A Syd Tutorial</h2>
+<p>
+The main interface in Syd is graphical.  You create "patches"
+(algorithms for creating sound)  by dragging the "modules" at the top
+into the large central area of the window.  These modules are "patched"
+together using patch cords.
+</p><p>
+The patch cords indicate the direction of signal flow.  In Syd signals
+generally flow either to the right or down.  When a patch cords is
+coming out of a module, depending on the angle of the patch cord, it
+will either be coming out of the right side, or out of the bottom.  On
+the other end, the patch cord will be "going in" to the left side or the
+top of another unit.
+</p><p>
+In this quick tutorial, we're going to create a simple FM-controlled
+oscillator.
+</p><p>
+You'll notice as you slide the mouse over the modules at the top, that
+each one identifies itself in a tool tip that pops up when rest the mouse
+for a few seconds.  Similarly, once you've constructed your patch, each element unit and
+patchcord will identify itself in this way, helping you keep track of
+what's what.
+</p><p>
+You'll notice there is already an output unit (the one with the speaker
+icon) in place.  All patches require an eventual output, so this is
+already placed for you.
+</p><p>
+To add an oscillator, click on the oscillator icon (the second unit from
+the left with the sine wave on it) and drag the oscillator unit down
+into the main working area.
+</p><p>
+To patch the oscillator to the speaker, position the mouse over the
+right edge of the oscillator unit until the cursor changes into a
+phono-plug.  Then click and drag, connecting the oscillator unit to the
+speaker unit.  When you drag over the speaker unit, the speaker unit
+will highlight itself.  Release the mouse.  You'll see that the
+oscillator and speaker are now connected with a patch cord.
+<p>
+<!-- Alternately, if you simply drag the oscillator close to the speaker, a lightning bolt
+will connect it to the speaker.  Release the oscillator to keep this connection.
+<p> -->
+Congratulations!  You've made your first patch.  Let's listen to it.
+</p><p>
+To synthesize the sound, hit the "Synthesize" button (The S Icon on the upper left).
+Synthesis should end fairly quickly, since this is a simple patch.
+</p><p>
+After synthesis is done, you can listen to it by hitting the "play"
+button (the arrow icon next to the Synthesize button).
+</p><p>
+What you're hearing is a sine-wave oscillation beating at 440 times a
+second.  The entire sound lasts for 2 seconds.  If you'd like to make
+the sound last longer, click on the output unit (the "speaker") -
+some options will appear in the properties panel in the bottom-half of the window.
+
+In the properties panel, change the "duration" value to
+some other time (how about 10.53 seconds?).  You'll also notice that the
+sound is being saved to a file called "untitled.wav".  You can change
+the file name here as well.  Then press the synthesize button and play it again.  Aren't
+sine waves lovely?
+</p><p>
+Now, let's lower the pitch of the oscillator.  Click on the
+oscillator again to change it's properties.  In the properties panel, change the "Frequency" value from
+"440" (the default) to "220".   Then synthesize and play again.
+</p><p>
+When you synthesize a sound, a graphical representation of it appears in the bottom panel.
+The waveform panel responds to mouse clicks and a few keystrokes as
+follows:
+</p><p>
+</p><center>
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody>
+<tr>		<td align="left"><i>Click</i>				</td><td align="left">Zoom into the area clicked.  </td></tr>
+<tr>		<td align="left"><i>Click-drag</i>			</td><td align="left">Zoom into the area defined by the drag.  </td></tr>
+<tr>		<td align="left"><i>Ctrl-Click</i>			</td><td align="left">Zoom out </td></tr>
+<tr>		<td align="left"><i>Right-Click</i>			</td><td align="left">Zoom out </td></tr>
+<tr>		<td align="left"><i>Ctrl-Double Click</i>	</td><td align="left">Zoom all the way out </td></tr>
+<tr>		<td align="left"><i>Right-Double Click</i>	</td><td align="left">Zoom all the way out </td></tr>
+<tr>		<td align="left"><i>Alt-Click</i>			</td><td align="left">Scroll left and right </td></tr>
+</tbody></table>
+</center>
+<p>
+Now try creating a second oscillator and patching it to the first
+oscillator.  Drag the second oscillator to the left of the first oscillator.  A lightning-bolt
+will automatically connect it to the first oscillator.  Release it.
+</p><p>
+Modules typically have one output, and one or more inputs.   Different
+color patch cords correspond to differing inputs.
+</p><p>
+Once you've patched the two oscillators together, pass the mouse over
+the patch cord going from the new oscillator to the old oscillator.
+You'll see from the tool tip that the patch cord is going in to the
+Amplitude Modulation (am) input of the first oscillator.  Right-click on the patch cord and use the
+pop-up menu that appears to change it to go into the Frequency Modulation (fm) input of the
+oscillator.  You'll see that once you've changed the assignment from
+"am" to "fm", the color of the patch cord will change from blue to
+green.  Eventually you'll learn to recognize green patch cords at a
+glance as "fm" patch cords.
+</p><p>
+Once the patch cord is assigned to the "fm" input of the right-most oscillator, you
+can refer to it's value within the right-most oscillator by editing that
+oscillator's settings.  Click on the right-most oscillator again.  A
+dialog will appear.
+</p><p>
+Change the "frequency" setting from "220" to "220+fm*10", this will
+cause the oscillator to use the "fm" input to modulate it's frequency.
+Hit the "OK" button, synthesize and play the sound again.
+</p><p>
+It's worth noting at this point that you didn't really need to change
+the patch cord from "am" to "fm".  You could have left it at "am" and
+then used the formula "220+am*10" - this would have had the same effect.
+ The main purpose of changing the patchcord is to provide you with a
+visual understanding of what is going on.  Since we're using the signal
+to modulate the frequency, "fm" is more appropriate.  For some units,
+however, the choice of input does indeed make a difference.  For
+example, on the filter units (and most other signal modifiers) the
+signal that is being filtered must always go in the "sig" input, while
+signals which are used to control the filter should go in the "ctl"
+inputs.
+</p><p>
+<a name="wheretogo">&nbsp;<br></a>
+	</p><h2>1.2 Where to go from here</h2>
+<p>
+At this point, probably the best way to learn more about Syd is to try
+some of the sample patches that have been included.  Some have been
+designed to demonstrate particular features of the program, while others
+were included because they demonstrate particular synthesis styles.  The
+"Patches" folder contains a file called "AAA_READ.ME" that describes
+each of these sample patches.   I recommend reading this file and select
+a patch that sounds interesting to you.
+</p><p>
+You can load any of these patches via the file menu (you may edit
+multiple patches simultaneously in Syd) or simply double-click on the
+patch's icon in the finder.
+</p><p>
+After you load in the patch, listen to the sound it makes, and double
+click on each of it's units to see how they have been set up.  If a
+particular unit being used in the patch mystifies you, look it up in
+this manual, and you'll find more information.
+</p><p>
+There are two units which are particularly interesting in Syd.  One is
+the one that says "f(x)" on the icon - the Expression unit.  This unit
+allows you to generate (or modify) a signal by typing in any
+mathematical expression - this manual describes the mathematical syntax
+that is used in these expressions. In addition, most of the other
+modules (such as the oscillator, the amplifier, the filters, the
+function table, and the random score module) also support expressions
+(in fact, you used one when you made the fm-controlled oscillator).
+</p><p>
+The other unit that is interesting is the "random score" module.  This
+module can make a simple patch far more interesting by playing it with
+random values, and creating multiple notes which sound simultaneously
+(polyphany).
+</p><p>
+Some basic Syd units you should know about:
+</p><p>
+</p><ul>
+<li>Loudness is usually expressed as a value between 0 and 1.
+   dB must be converted if used.
+
+</li><li>Frequency is expressed in Hz (cycles per second)
+
+</li><li>Time is usually expressed in seconds
+</li></ul>
+<p>
+
+</p><hr>
+<a name="basicunitdescriptions">&nbsp;<br></a>
+<h1>2.0 Basic Unit Descriptions</h1>
+<p>
+If you are not sure which unit is which, position the mouse over the unit in question at the top of the window - a pop-up tool tip will indicate the name
+of the unit.
+</p><p>
+<a name="soundgeneratingunits">&nbsp;<br></a>
+	</p><h2>2.1 Sound Generating Units</h2>
+<p>
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr><td colspan="4"><b><font size="+1">Oscillator</font></b></td></tr>
+<tr><td width="40">&nbsp;</td><td colspan="3">
+The oscillator is the basic waveform generator.
+<p>
+It accepts general expressions for frequency, amplitude and phase.  In
+addition you can optionally use an expression to define the waveform, in
+this expression, "<b>t</b>" will represent the position in the waveform from 0
+to 1.  You can create waveforms which vary over time using the variable
+"<b>g</b>" which represents global time.
+</p><p>
+<b>Settings</b>
+</p></td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+Frequency (expression)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+This controls the frequency, or pitch of the oscillation.
+</td></tr>
+
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+Amplitude (expression)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+This controls the amplitude, or loudness of the waveform.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+Phase (expression)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+  This controls the initial phase of the waveform.  It is expressed in
+  radians (0 - 2pi).  Larger values will "wrap over".
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+Wave Type (radio buttons)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+  This controls the type of waveform.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+Waveform Expression (expression)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+  When the Wave Type is set to "Expression" - this expression determines the wave shape.  In
+this expression, "<b>t</b>" represents the position in the waveform from 0
+to 1.  You can create waveforms which vary over time using the variable
+"<b>g</b>" which represents global time.
+
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td colspan="3">
+<b>Inputs</b>
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+am<br>
+fm<br>
+amwidth<br>
+fmwidth<br>
+<p>
+The frequency (like most of the other settings) can either be a
+constant, such as "440" or it can be an expression.  For example,  to
+make an FM controller oscillator, you could set Freq to "440+fm*0.1"
+which would cause it to use the incoming FM signal to modify the
+frequency.
+</p><p>
+There are some pitch conversion functions which allow you to specify
+pitch in different ways, for example, by MIDI note number, or by octave
+and step, see below.
+</p><p>
+The WaveType can either be a fixed waveform such as a sine, square,
+triangle or sawtooth wave; or it can be computed using an expression you
+provide.  For example, the following expression makes a sine wave with
+two harmonics.
+</p><p>
+</p><center>sin(t*2*pi)+sin(2*t*2*pi)/2 + sin(3*t*2*pi)/3</center>
+<p>
+</p></td></tr>
+</tbody></table></p><p>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr><td colspan="4"><b><font size="+1">Pluck</font></b></td></tr>
+<tr><td width="40">&nbsp;</td><td colspan="3">
+Generates a plucked-string sound using the Karplus/Strong algorithm.
+These sounds are generated by filling a buffer with random values and
+then smoothing the values over time.  This generates an interesting
+sound and has the added benefit of being extremely fast.
+<p>
+<b>Settings</b>
+</p></td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+Variant (constant)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Currently no effect - I will eventually support both plucked string sounds and drum sounds.
+</td></tr>
+
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+Frequency (expression)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Frequency (pitch) of the sound.  See the section on oscillators for a discussion of frequency.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+Amplitude (expression)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Amplitude (loudness) of the sound.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+Duration (expression)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+How long the sound should last.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+Decay (expression)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Controls the decay factor, or how quickly the harmonics drop out of the sound.
+</td></tr>
+
+
+<tr><td width="40">&nbsp;</td><td colspan="3">
+<b>Inputs</b>
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+none
+<p>
+</p></td></tr>
+</tbody></table></p><p>
+
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr><td colspan="4"><b><font size="+1">Maraca</font></b></td></tr>
+<tr><td width="40">&nbsp;</td><td colspan="3">
+Generates a maraca-like sound using Perry Cook's Maraca simulation
+algorithm, which appeared in the Fall '97 Computer Music Journal (Vol
+21, #3).
+<p>
+<b>Settings</b>
+</p></td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+ResFreq
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">The
+resonating frequency of the Maraca shell. Raising this frequency will
+make the Maraca sound smaller. Lowering it will make it sound bigger.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+ResPoleExp
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Controls how narrow the resonating frequency band is.  The default
+value works nicely.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+Probability
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Controls how often the "beads" hit the "shell".  Increasing this value will make the maraca sound like it has more beads.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+System Decay
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Controls how fast the "beads" lose energy after the initial "shake".  Raise this value to create an "anti-gravity" maraca.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+Sound Decay
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+		Controls how fast the sound decays after the beads hit the shell.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td colspan="3">
+<b>Inputs</b>
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+none
+<p>
+</p></td></tr>
+</tbody></table></p><p>
+
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr><td colspan="4"><b><font size="+1">SampleFile</font></b></td></tr>
+<tr><td width="40">&nbsp;</td><td colspan="3">
+Reads a sample (AIFF or WAV) file and outputs the sound contained in the file.
+<p>
+<b>Settings</b>
+</p></td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+File (file spec)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Name of the sample file to playback.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+Timescale (expression)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Determines speed of playback.  1.0 is normal speed.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td colspan="3">
+<b>Inputs</b>
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+none
+<p>
+</p></td></tr>
+</tbody></table>
+
+
+
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr><td colspan="4"><b><font size="+1">Noise Generator</font></b></td></tr>
+<tr><td width="40">&nbsp;</td><td colspan="3">
+Generates random values from 0-1.  Note: In an expression, the symbol "?"
+produces the same kind of signal.
+<p>
+<b>Settings</b>
+</p></td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+seed (constant)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Provides a seed for the random number generator.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+randomize (boolean)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+If true, a random seed will be chosen based on the system time.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td colspan="3">
+<b>Inputs</b>
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+none
+<p>
+</p></td></tr>
+</tbody></table></p><p>
+
+
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr><td colspan="4"><b><font size="+1">Expression</font></b></td></tr>
+<tr><td width="40">&nbsp;</td><td colspan="3">
+Expressions can be used both for generating and modifying sounds.
+<p>
+The expression syntax used by the Expression Unit also applies to the input
+fields of most of the other units (unless those fields are described in this
+manual as accepting "Constants").
+</p><p>
+See section 3.0 for more on expressions.
+</p><p>
+<b>Settings</b>
+</p></td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+expression (expression)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+The expression to compute.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td colspan="3">
+<b>Inputs</b>
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+sig<br>
+sig1<br>
+sig2<br>
+(etc.)
+<p>
+These signals can be referred to in the expression.
+</p><p>
+</p></td></tr>
+</tbody></table></p><p>
+
+
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr><td colspan="4"><b><font size="+1">Hammer Bank</font></b></td></tr>
+<tr><td width="40">&nbsp;</td><td colspan="3">
+The HammerBank simulates a piano-like instrument with 128 strings, which
+are activated by hammers, and have dampers.  The action of the hammers
+and dampers is triggered using one or more Hammer Actuator Units, see
+below.  These units can be used to simulate an instrument which has
+sustain properties which are triggered independently of the notes.  Most
+of the fields take expressions which can use the "k" variable (key
+number) to create characteristics which change relative to the register
+of the key.
+</p><p>
+See the "HammerTest" patch for an example of a HammerBank in action.
+</p><p>
+<b>Settings</b>
+</p></td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+Bank# (constant)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+The number to assign to this bank (used by HammerActuators).
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+k-&gt;Freq (expression)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">This
+is used to compute the key to frequency function. cpsmidi(k) will
+produce an equal tempered tuning which corresponds to MIDI note number,
+but you can use alternate tunings if you like.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+k-&gt;Amp (expression)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">This
+is used to compute the relative amplitude of each key. A value of 1.0
+will produce an even amplitude across the whole keyboard. </td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+k-&gt;Attack (expression)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+This is used determine the length of the attack after the hammer strikes the string.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+k-&gt;Decay (expression)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+This is the decay coefficient which represents the amplitude of the
+note 1 second after the hammer has struck, using an exponential decay.
+On a real keyboard, lower notes will have a longer decay. You can
+accomplish this by making this value a function of k. </td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+sustain (expression)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+This is an expression which is computed during signal generation to
+determine if sustain is on, which causes all strings to behave as if
+they are undamped. You can simulate the effect of a sustain pedal by
+triggering this with a G variable from another instrument. Set this to
+1 if you want permanent sustain. </td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+Waveform (expression)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+If no input instruments are used, the module will use this expression
+to generate the waveforms for each string, it is equivalent to an
+internal oscillator. </td></tr>
+
+<tr><td width="40">&nbsp;</td><td colspan="3">
+<b>Inputs</b>
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+i1,i2,i3 etc.<br>
+If provided, this input instrument will be cloned, once per string, to provide
+the sound, rather than using the internal waveform function.  The
+amplitude of this instrument will be automatically scaled by the energy
+value of the string.  Instruments 2 and higher are not yet supported.
+<p>
+ctl,ctl2,ctl3, etc.<br>
+These are control signals which can be used in the other settings.
+</p><p>
+</p></td></tr>
+</tbody></table></p><p>
+
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr><td colspan="4"><b><font size="+1">Hammer Actuator</font></b></td></tr>
+<tr><td width="40">&nbsp;</td><td colspan="3">
+This unit can be used to activate the hammers and dampen/undampen the
+strings of a Hammer Bank unit (see above).  See the "HammerTest" patch
+for an example.  Multiple Hammer Actuators attached to a single note
+event can be used to create "sympathetic resonance" effects.  In a
+typical configuration using a Score unit, a single HammerBank will sound
+throughout the entire piece, while Hammer Actuators will be triggered
+for each note event.
+<p>
+See the "HammerTest" patch for an example.
+</p><p>
+<b>Settings</b>
+</p></td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+bank# (constant)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+The Hammerbank to affect.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+key# (expression)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+The key to strike or undampen.  This should be a number from 0-127.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+trigger (expression)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+A trigger signal which causes this actuator to trigger.  To strike a key
+at the beginning of a note event, use a value of "1".  To cause a key to
+be damped at the end of a note event, provide a value which will go to 1
+near the end of the note event, such as cond(t<p3-.01,0,1).></p3-.01,0,1).></td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+velocity (expression)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+The force with which to strike the key (a value from 0 to 1).  This
+value is added to the key's current energy, over a time interval set by
+the key's attack period.
+ </td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+undamp (expression)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Indicates whether the key should be damped (0) or undamped (1).
+ </td></tr>
+
+
+<tr><td width="40">&nbsp;</td><td colspan="3">
+<b>Inputs</b>
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+sig,sig1,sig2, etc.<br>
+ctl,ctl1,ctl2, etc.
+<p>
+</p></td></tr>
+</tbody></table></p><p>
+
+
+
+<a name="sondmodifierunits">&nbsp;<br></a>
+	</p><h2>2.2 Sound Modifier Units</h2>
+<p>
+
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr><td colspan="4"><b><font size="+1">Amplifier</font></b></td></tr>
+<tr><td width="40">&nbsp;</td><td colspan="3">
+Amplifies or attenuates the input signal, and then adds an offset value.
+<p>
+<b>Settings</b>
+</p></td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+scale (expression)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+			A constant or time varying formula to scale the amplification.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+offset (expression)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+An offset to add after amplification.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td colspan="3">
+<b>Inputs</b>
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+sig
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+The signal to be amplified
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+ctl,ctl1,ctl2 (etc)
+</td></tr><tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Control signals which can be used to create time-varying amplification
+effects.
+<p>
+For example, to scale a sawtooth wave (which normally outputs values
+from -1 to 1) to output values from 0 to 1, use a scale of .5 and an
+offset of .5
+</p><p>
+</p></td></tr>
+</tbody></table></p><p>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr><td colspan="4"><b><font size="+1">Envelope Generator (ADSR)</font></b></td></tr>
+<tr><td width="40">&nbsp;</td><td colspan="3">
+This is a bare bones ADSR envelope generator.
+<p>
+<b>Settings</b>
+</p></td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+Attack Time (expression)<br>
+Attack Level (expression)<br>
+Decay Time (expression)<br>
+Decay Level  (expression)<br>
+Sustain Time  (expression)<br>
+Sustain Level  (expression)<br>
+Release Time  (expression)<br>
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+These control the overall shape of the envelope, determining the timing
+and value for 4 different amplitude levels (the last one is assumed to
+be zero).  All these expressions are evaluated at the time the envelope is triggered.
+ </td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+Duration
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+This is the overall duration.  Typically, the envelope values should be
+expressed so that the envelope takes one second.  Than this value can be
+used to stretch or shrink the envelope.
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+Use Triggers
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+If this is true, then an input signal must be provided to trigger the envelope generator.
+Otherwise, a single envelope will be generated, starting at time 0.
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+Interrupts OK
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+This indicates that a trigger may force a new envelope while a previous envelope is still in
+progress.  This may cause noise in the signal due to sudden drops.
+
+</td></tr>
+<tr><td width="40">&nbsp;</td><td colspan="3">
+<br>
+It is common to patch an Envelope Generator into a function table to
+generate a table with the envelope values in it.  An oscillator can use
+the values in the function table with an expression like:
+"p4*ftab(p5,t/p3)" in which p4 is the overall amplitude of the note, p3
+is the duration of the note and p5 is the function table number.
+</p><p>
+Envelopes used with function tables should have an overall length of 1.
+Envelopes used directly with notes should have an overall length
+equivalent to the duration of the note  (commonly p3).  For the most
+flexibility, the ADSR times should assume an envelope with a length of
+exactly 1 second, so the duration field can be used to scale it to
+arbitrary lengths.
+</p><p>
+</p></td></tr>
+</tbody></table></p><p>
+
+
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr><td colspan="4"><b><font size="+1">Mixer</font></b></td></tr>
+<tr><td width="40">&nbsp;</td><td colspan="3">
+This module is used to mix together and attenuate multiple signals which
+might otherwise cause clipping when added.  The output signal is
+attenuated based on the number of input signals.
+<p>
+<b>Settings</b>
+</p></td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+none
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td colspan="3">
+<b>Inputs</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+sig
+<p>
+The Mixer module will always attentuate the signal if more than one
+signal is coming into it.  If you would simply like to add some signals
+together, you can simply patch them all into the same input.  In some
+cases, it is useful to add them together before patching them somewhere
+(for example before patching into a score, so as to reduce to a single
+instrument).  In this case, you can use an Amplifier with a gain of 1.0
+to add units together.
+</p><p>
+</p></td></tr>
+</tbody></table></p><p>
+
+
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr><td colspan="4"><b><font size="+1">Filter (2nd Order Section)</font></b></td></tr>
+<tr><td width="40">&nbsp;</td><td colspan="3">
+This module is used to create a common kind of filter called a 2nd-order
+Section.  Such a filter can be expressed as outputting a series of vaues
+y[0...N] based on a series of input values x[0...N] with the following
+formula:
+
+y[n] = a0*x[n] + a1*x[n-1] + a2*x[n-2] + b1*y[n-1] + b2*y[n-2]
+
+Note: The "classic" 2nd order section uses subtraction, rather than
+addition for the "b1" and "b2" terms.  If you want this, use negative
+values for the b1 and b2 coefficients.
+
+If you are looking for a more "musical" filter that is easier to
+understand, I suggest using the Butterworth filter (see below).
+
+<p>
+<b>Settings</b>
+</p></td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+a0 (expression)<br>
+a1 (expression)<br>
+a2 (expression)<br>
+b1 (expression)<br>
+b2 (expression)
+
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+These are the coefficient values for the filter.  They can be
+time-varying expressions, or constants.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td colspan="3">
+<b>Inputs</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+sig
+<p>
+</p></td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+This is the signal you wish to filter
+<p>
+</p></td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+		ctl,ctl1,ctl2,ctl3 etc
+<p>
+</p></td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+These are for control signals which can be used to modify the
+coefficients, creating time-varying effects such as filter sweeps.
+<p>
+</p></td></tr>
+</tbody></table></p><p>
+
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr><td colspan="4"><b><font size="+1">Filter (Butterworth)</font></b></td></tr>
+<tr><td width="40">&nbsp;</td><td colspan="3">
+This unit implements lo-pass, hi-pass, band-pass and band-reject
+Butterworth filters.
+
+<p>
+<b>Settings</b>
+</p></td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+Filter Type (pull down menu)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Allows you to select the type of filter you want.  The default is
+band-pass.
+ </td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+Freq (expression)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+For lo-pass and hi-pass filters, this is the cutoff frequency.  For
+band-pass and band-reject filters, this is the center  frequency.
+ </td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+Band (expression)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Only relevent for band-pass and band-reject filters - this is the width
+of the band on each side of the center frequency.  It is commonly
+expressed as a percentage of the center frequency.
+</td></tr>
+
+
+<tr><td width="40">&nbsp;</td><td colspan="3">
+<b>Inputs</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+sig
+<p>
+</p></td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+This is the signal you wish to filter
+<p>
+</p></td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+	 ctl,ctl1,ctl2,ctl3 etc
+<p>
+</p></td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+These are for control signals which can be used to modify the
+coefficients, creating time-varying effects such as filter sweeps.
+<p>
+</p></td></tr>
+</tbody></table></p><p>
+
+
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr><td colspan="4"><b><font size="+1">Reverb/Echo</font></b></td></tr>
+<tr><td width="40">&nbsp;</td><td colspan="3">
+A simple delay unit.  The output y[n] is expressed as (a0*x[n] +
+a1*x[n-delay])
+
+<p>
+<b>Settings</b>
+</p></td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+delay (expression)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Controls the length of the delay between the initial sound and it's first
+reverberation - expressed in seconds.  If the delay
+is too large, you may run out of memory.  You can use time-varying
+expressions (a time-varying delay will cause pitch shifts).
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+a0 (expression)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Controls the gain of the original signal.
+ </td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+a1 (expression)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Controls the gain of the delayed signal.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+feedback (boolean)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+If true, this causes the delayed signal, rather than the original
+signal to be stored in the delay line (making this an IIR rather than a
+FIR filter). This creates multiple repeats, which are useful for
+reverberation effects. However, keep in mind you can overload the
+signal if the delay gain is too high. </td></tr>
+
+
+<tr><td width="40">&nbsp;</td><td colspan="3">
+<b>Inputs</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+signal
+<p>
+</p></td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+This is the signal you wish to delay
+<p>
+</p></td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+ctl1,ctl2,ctl3 etc
+<p>
+</p></td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Control signals which can be used to create time-varing delay effects.
+<p>
+</p></td></tr>
+</tbody></table></p><p>
+
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr><td colspan="4"><b><font size="+1">Threshhold Unit</font></b></td></tr>
+<tr><td width="40">&nbsp;</td><td colspan="3">
+Outputs 1 if the input signal is above a particular threshhold value,
+otherwise, outputs 0.
+<p>
+<b>Settings</b>
+</p></td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+cutoff (expression)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+			This controls the threshhold value - it defaults to 0.5.
+
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td colspan="3">
+<b>Inputs</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+sig
+<p>
+</p></td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+The signal to monitor.
+<p>
+</p></td></tr>
+</tbody></table></p><p>
+
+
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr><td colspan="4"><b><font size="+1">Sample and Hold</font></b></td></tr>
+<tr><td width="40">&nbsp;</td><td colspan="3">
+When a trigger is received, this samples the current intput signal and
+continues to output that value until the next trigger is received.  Try
+using a square wave oscillator for a trigger.
+
+<p>
+<b>Settings</b>
+</p></td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+none
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td colspan="3">
+<b>Inputs</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+sig
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+The signal to sample.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+trig
+<p>
+</p></td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+The trigger signal - when this signal goes over 0.5, it will cause the
+next sample to be stored.
+<p>
+</p></td></tr>
+</tbody></table></p><p>
+
+
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr><td colspan="4"><b><font size="+1">Inverter</font></b></td></tr>
+<tr><td width="40">&nbsp;</td><td colspan="3">
+Inverts the signal by inverting its sign (multiplying  by -1).
+<p>
+<b>Settings</b>
+</p></td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+none
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td colspan="3">
+<b>Inputs</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+sig
+<p>
+</p></td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+The signal to invert.
+<p>
+</p></td></tr>
+</tbody></table></p><p>
+
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr><td colspan="4"><b><font size="+1">Smoother</font></b></td></tr>
+<tr><td width="40">&nbsp;</td><td colspan="3">
+Smoothes the signal by averaging subsequent values.  This is a simple
+lowpass filter where y[n] = (x[n]+x[n-1])/2.  For more predictable and
+controllable effects, use the (slower) Butterworth filter.
+<p>
+<b>Settings</b>
+</p></td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+none
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td colspan="3">
+<b>Inputs</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+sig
+<p>
+</p></td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+The signal to smooth.
+<p>
+</p></td></tr>
+</tbody></table></p><p>
+
+
+<a name="structureunits">&nbsp;<br></a>
+	</p><h2>2.3 Structure Units</h2>
+<p>
+The following units control the overall structure and form of the patch,
+rather than generating or modifying audio signals directly.
+</p><p>
+
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr><td colspan="4"><b><font size="+1">Speaker (Output)</font></b></td></tr>
+<tr><td width="40">&nbsp;</td><td colspan="3">
+There is always at least one speaker unit.  This is meant to be the
+final terminus for the patch.  Any signal being fed into the speaker is
+"heard".  As described below, the settings are only meaningful if the
+patch is being used as the "main instrument". If the patch is being used
+as a folder instrument, the output settings are ignored.
+<p>
+
+<b>Settings</b>
+</p></td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+memory (radio button)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Causes the samples to be stored in a 440k buffer in RAM.  If the
+duration of the sound is larger than the buffer (20 seconds at 22050
+sampling rate), a "sliding window" will be used so you can see the
+results of the whole synthesis in the graph window.
+
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+aiff file (radio button)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Causes the sound to be stored in an AIFF file.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+wav file (radio button)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Causes the sound to be stored in a WAV file.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+mono/stereo (radio buttons)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Causes the sound to be stored either as mono (one channel) or stereo (two channels).
+</td></tr>
+
+
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+duration (constant)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+			The overall time of the sound to be generated.
+<p>
+If you are using a CSound or Skini score, you would probably prefer for the
+score itself to determine how long the piece is.  Use the "Score overrides duration"
+option to get this.
+
+</p></td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+sample rate (constant)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+The sample rate of the sound.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td colspan="3">
+<b>Inputs</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+sig
+<p>
+</p></td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+The signal to output.
+<p>
+</p></td></tr>
+</tbody></table></p><p>
+
+
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr><td colspan="4"><b><font size="+1">Folder</font></b></td></tr>
+<tr><td width="40">&nbsp;</td><td colspan="3">
+Folders are used to encapsulate entire instruments, which are stored in
+separate patch files.  This makes it easier to create complex
+instruments without clutter.  For an example, look at the "combo.syn"
+patch, which combines 2 folder instruments.
+<p>
+Folders are also useful for defining the instruments to be patched into
+a score.  A score might need 10 instruments patched into it, and there
+isn't enough space in the patch window to fit all of them.
+</p><p>
+<b>Settings</b>
+</p></td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+file (filespec)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+The patch file to patch in.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td colspan="3">
+<b>Inputs</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+f1,f2,f3 etc
+<p>
+</p></td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Inputs into the folder instrument. If the folder instrument needs some
+particular parameters, this is how you pass them to it.  The folder
+patch file can use the "Folder Input" units (see below) to retrieve these values, or
+refer to them directly in expressions (e.g. "f1*100").
+<p>
+</p></td></tr>
+</tbody></table></p><p>
+
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr><td colspan="4"><b><font size="+1">Folder Input</font></b></td></tr>
+<tr><td width="40">&nbsp;</td><td colspan="3">
+Folder inputs are used to document the inputs into an instrument which
+is meant to be played as a Folder Instrument.  They also provide default
+values for these inputs so the instrument can be tested on its own,
+without having to being played as a folder instrument.
+<p>
+For an example, see the "quietreverb.syn" patch, which accepts a folder
+input.
+</p><p>
+<b>Settings</b>
+</p></td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+F number (constant)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Specifies which folder input to retreive, when this patch is played as a
+folder instrument.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+description (string)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Provides a comment to identify this signal.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+default (expression)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Provides a default value to use, so this patch can be tested without being played as a folder instrument.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td colspan="3">
+<b>Inputs</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+none
+<p>
+</p></td></tr>
+</tbody></table></p><p>
+
+
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr><td colspan="4"><b><font size="+1">Param (Score) Input</font></b></td></tr>
+<tr><td width="40">&nbsp;</td><td colspan="3">
+Parameter (Score) Inputs are similar to Folder Inputs.  They are used to document
+the inputs into an instrument which are meant to be provided by a Score.  They
+are similar to Folder inputs, but refer to the parameter values (p1,p2,p3 etc)
+which are generated by a Score unit.
+
+They also provide default values for these inputs so an instrument can be tested
+without a score.  See Scores, below.
+
+For an example, see the "shepsco.syn" patch, which reads parameters from a score
+file and passes them to a folder.
+<p>
+<b>Settings</b>
+</p></td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+P number (constant)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Specifies which parameter to retreive, when this patch is played by a score.
+ </td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+description (string)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Provides a comment to identify this parameter.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+default (expression)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Provides a default value to use, so this patch can be tested without being played
+by a score.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td colspan="3">
+<b>Inputs</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+none
+<p>
+</p></td></tr>
+</tbody></table></p><p>
+
+
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr><td colspan="4"><b><font size="+1">Global Variable Assignment</font></b></td></tr>
+<tr><td width="40">&nbsp;</td><td colspan="3">
+These units are used to load values into global variables, which can then be
+accessed from other instruments (using the notation g0,g1,g2 etc.).    These
+units output 0, so they can't be used in a path which is directly generating an
+audible signal (however, you can fork off such a path to create the assignment).
+<p>
+<b>Settings</b>
+</p></td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+G number (constant)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Specifies which global variable to assign.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+value (expression)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Provides the value which is to be loaded into the global variable.
+Typically this is a function of the signal being fed into the unit,
+e.g. "sig". </td></tr>
+
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+description (string)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+			Provides a comment to identify this purpose of this variable.
+</td></tr>
+
+
+<tr><td width="40">&nbsp;</td><td colspan="3">
+<b>Inputs</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+sig,sig1,sig2,sig3
+<p>
+</p></td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Specifies signals which can be fed into the global variable.
+</td></tr>
+</tbody></table></p><p>
+
+
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr><td colspan="4"><b><font size="+1">Function Table (ftab)</font></b></td></tr>
+<tr><td width="40">&nbsp;</td><td colspan="3">
+Function tables are provided as a means of speeding up calculations.  A function
+table's contents are precomputed when the instrument is initialized.
+Subsequently, the table's contents can be accessed from any expression using the
+function ftab(n,t)  where "n" is the function table number, and t is a number
+from 0 to 1 which accesses a particular table element.  The (slower) function
+ftabi() [ not yet supported ] can be used if linear interpolation between table
+values is desired.
+
+All your tables should have different numbers, and ideally, tables should not be
+defined in folder instruments.
+<p>
+<b>Settings</b>
+</p></td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+ftab number (constant)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Assigns this formula to a particular global function table number.  This allows
+the table to be addressed by various instruments using the expression ftab(n,t)
+where "n" is the table number.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+ftab size (constant)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Determines the number of entries in the table.  For control signals, larger
+values will prevent aliasing noise.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+formula (expression)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+The formula used to compute the table's contants.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td colspan="3">
+<b>Inputs</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+ctl
+<p>
+</p></td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+This signal will be generated only when the function table is calculated.  For
+units patched into the function table, the "t" value will go from 0-1 as the
+table is filled in, regardless of the length of the table.  The ADSR units are
+designed to work with function tables, although other units can be used as well.
+<p>
+</p></td></tr>
+
+</tbody></table></p><p>
+
+
+
+<a name="scoreunits">&nbsp;<br></a>
+	</p><h2>2.4 Score Units</h2>
+<p>
+Score units are used to create entire pieces of polyphonic music.  They use the
+instruments that are patched into them to sound each note in a "score".  Although
+you can patch them together as you can the other units, their behavior is
+considerably different.  Each input into a score unit will be treated as a
+separate "instrument".  Whenever a note is played in the score, a unique
+"instance" of the sub-patch that corresponds to the instrument number will be
+temporarily created and sounded for the duration of the note.  Multiple instances
+of instruments allow for multiple notes to sound simultaneously, creating
+polyphony.
+</p><p>
+If the score refers to multiple instrument numbers, you can patch in multiple
+instruments - one for each type used in the score.  I suggest using folder
+instruments (see above) for this purpose, to reduce icon clutter.  In this case,
+you would have one patch for each instrument, and one "master" patch which shows
+how those instruments are assigned to the score.
+</p><p>
+Since scores allocate instances of instruments, they may cause considerable
+amounts of memory to be consumed.  Since Syd is still not very well behaved when
+it runs out of memory, I suggest saving your work before hitting the "Synthesize"
+button.
+</p><p>
+Score modules use the same conventions as CSound score files, where the note
+parameters are provided in variables named p1, p2, p3 etc.  The first three
+parameters have fixed meanings: p1 is the instrument number, p2 is the start time
+of the note, p3 is the duration of the note. Subsequent parameters can be used in
+any way you want.  In a simple instrument, p4 might be amplitude and p5 might be
+frequency or midi note number.
+</p><p>
+Syd treats score modules just like other modules.  This means that a score module
+can "play" another score module as an instrument, and the output can be patched
+into a sound module (e.g. reverb or amplifier) for post processing.
+</p><p>
+The ability to patch two score modules together is particularly  useful when used
+in conjunction with the random score unit, which generates events based on a set
+of formulas.  For example, one way to use the random score unit is to thicken an
+instrument that is being played by a CSound score - the random score can cause
+each note event to trigger multiple note events, each with slightly randomized
+parameters, turning one instrument into a whole chorus.
+</p><p>
+Random scores can also be used to correct, adjust, swap or embellish the
+parameter values in a CSound score, allowing it to be used with an instrument
+which wasn't originally designed to be used with that score.  This means you will
+spend less time modifying instruments to work with different scores, instead, you
+can use the random score unit to "map" a particular score to a particular
+instrument.
+</p><p>
+
+
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr><td colspan="4"><b><font size="+1">CSound Score</font></b></td></tr>
+<tr><td width="40">&nbsp;</td><td colspan="3">
+The CSound Score unit reads a "CSound" score file and plays it using the
+instruments that are patched into it.  At the moment, Syd's support for CSound
+scores is very minimal - function tables and ramps are not yet supported.    The
+sample patch "prelude_pluck.syn" shows an example of CSound score being played.
+<p>
+<b>Settings</b>
+</p></td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+file (file spec)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Specifies the CSound score (.sco) file to use.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td colspan="3">
+<b>Inputs</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+i1,i2,i3 etc...
+<p>
+</p></td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Instruments to patch into the score. Each note event in the score will
+create an instance of the corresponding instrument which will last for
+the duration of the note.
+<p>
+</p></td></tr>
+</tbody></table></p><p>
+
+
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr><td colspan="4"><b><font size="+1">Random Score</font></b></td></tr>
+<tr><td width="40">&nbsp;</td><td colspan="3">
+The random score unit creates a series of notes (or more accurately - "events"),
+which are generated using random numbers or other formula.  It has many uses,
+including  creating aleatoric scores, testing instruments and fattening sounds.
+Various options allow you to specify the number of notes, their starting times,
+durations, and other parameters.
+<p>
+A random score can be played by another random score.  In this case, the formulas
+in the random score can refer to "p2 p3 p4" etc., which refer to the note values
+provided by the parent score which is playing it.
+</p><p>
+If an instrument isn't being played by a score module, the values of p1,p2,p3 are
+assigned reasonable defaults.  In particular:
+</p><p>
+</p><pre>    p1 is 1
+    p2 is 0
+    p3 is the total duration of the sound.
+    p4 is 1.0
+    p5 is 440
+</pre>
+<p>
+By nesting random scores in this manner, you can achieve a great deal of
+complexity.
+</p><p>
+In any of the formulas used in a random score, the variable "i" or "n" refers to event
+number, from 0 to (#events-1).  The variable "m" refers to the number of events.
+</p><p>
+</p><p>
+<b>Settings</b>
+</p></td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+	# Events (expression)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Determines how many notes (or events) will be generated.  A constant like "12"
+will generate 12 notes.  "P3*2" will generate a number of notes relative to the
+duration of the parent event.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+P1 (instrument#) (expression)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Used to select an instrument.  Instrument numbers start at 1.  If you use "0", it
+will select the first instrument available.  To alternate between two
+instruments, you could use "1 + n mod 2".
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+P2 (start) (expression)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Used to set the start time of the note. Examples are "?*p3" which makes a random
+start time, and "n*p3/12" which generates 12 sequential start times.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+P3 (duration) (expression)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Used to set the duration time of the note. Examples are "?*p3" which makes a
+random start time, and "n*p3/12" which generates 12 sequential start times.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+P4-P16 (expression)
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Used to add optional parameters, such as amplitude and frequency, to each event.
+</td></tr>
+
+
+<tr><td width="40">&nbsp;</td><td colspan="3">
+<b>Inputs</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+i1,i2,i3 etc...
+<p>
+</p></td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Instruments to patch into the score.  Each note event in the score will create an
+instance of the corresponding instrument which will last for the duration of the
+note.
+<p>
+</p></td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td colspan="2">
+ctl,ctl1,ctl2... (still to come)
+<p>
+</p></td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+These inputs can be used to provide signals to use in your note generation
+formulas.  These inputs are not "instantiated" in the way the instrument inputs
+are.
+<p>
+</p></td></tr>
+</tbody></table></p><p>
+
+
+</p><hr>
+<a name="expressions">&nbsp;<br></a>
+<h1>3.0 Expressions</h1>
+<p>
+The expression syntax used by the Expression Unit also applies to the input
+fields of most of the other units (unless those fields are described in this
+manual as accepting "Constants").
+</p><p>
+<a name="variables">&nbsp;<br></a>
+	</p><h2>3.1 Variables</h2>
+<p>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+
+<tbody><tr><td width="40">&nbsp;</td><td colspan="2">
+<b>input vars</b>
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Any patches into a unit can be referenced by using the input variable name.  For
+example,  the inputs into an oscillator are "am, fm, amwidth and fmwidth".  These
+names are provided as mnemonics for their suggested uses, the signals can be used
+in any manner you wish.  So for example, the pitch of an oscillator might be
+specified as "440+fm", where "fm" is the input from another oscillator.
+<p>
+See the specific unit definitions for a description of their inputs.
+</p></td></tr>
+
+<tr><td width="40">&nbsp;</td><td colspan="2">
+<b>instrument vars</b>
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+The variables "p1", "p2", "p3" etc. are provided when the instrument feeds into a
+Score generator (such as a Random Score unit or a CScore Score Unit).  These are
+the parameters provided by the instrument events in the score.  Generally, p2 is
+the start time of the note, p3 is the duration of the note.  For the random score
+unit, p4 is the amplitude (0-1) and p5 is the pitch (cps).
+<p>
+You can use the "P-Input" module to assign reasonable defaults to these values as
+a way of testing a particular instrument without a score.  Otherwise, if you are
+not using a score, they will be assigned reasonable defaults as follows:
+</p><p>
+</p><pre>    p1 = 1
+    p2 = 0
+    p3 = duration of sound
+    p4 = 1
+    p5 = 440
+    all others = 0
+</pre>
+<p>
+</p></td></tr>
+
+<tr><td width="40">&nbsp;</td><td colspan="2">
+<b>global vars</b>
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+The variables "g0", "g1", "g2", etc are provided for storage of global variables,
+which allow crosstalk between separate instruments.  You can store a value into a
+global variable using the "Global Variable Assignment" units.
+</td></tr>
+</tbody></table>
+</p><p>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr><td width="40">&nbsp;</td><td colspan="3">
+<b>built-in variables</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td valign="top" width="40">
+<b>d</b></td><td align="left">
+<b>duration of piece in seconds</b><br>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td valign="top" width="40">
+<b>v</b></td><td align="left">
+<b>mix of all input signals (e.g. "sig", "am","fm")</b><br>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td valign="top" width="40">
+<b>t</b></td><td align="left">
+<b>local time</b><br>
+For a note this is note time.<br>
+For an oscillator waveform, this is wave form position (0-1).<br valign="top">
+For a function table, this is table positoin (0-1).<br>
+For anything else this corresponds to global time.<br>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td valign="top" width="40">
+<b>n</b></td><td align="left">
+<b>note time</b><br>
+The time relative to the note being sounded (provided by the score modules).
+<p>
+This has 2 possible values.  For a simple unit, such as an oscillator, this
+refers to the time of the note being sounded.  It starts at 0, at the beginning
+of the note, and then increments as the note progresses.
+</p><p>
+If the unit isn't patched into a score, this value will correspond to g, or
+global time.
+<br>
+</p></td></tr>
+
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td valign="top" width="40">
+<b>i</b></td><td align="left">
+<b>note number</b><br>
+If the expression is being used to generate the notes of the random score, this
+value will correspond to the note number, from 0 thru n-1, which is useful for
+creating linear note spacing.  In versions of Syd prior to 1.0.6, the variable
+"n" was used for this purpose, and this method is still supported for backward
+compatability.<br>
+</td></tr>
+
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td valign="top" width="40">
+<b>k</b></td><td align="left">
+<b>key number</b><br>
+If the expression is being used in a Hammer Bank unit, this value will correspond to the key number, from 0 thru 127.<br>
+</td></tr>
+
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td valign="top" width="40">
+<b>a</b></td><td align="left">
+<b>string amplitude</b><br>If the unit is connected to a HammerBank
+unit, this value contains the string energy, which will start around
+1.0 when the string is struck, and then decay using the decay
+coefficient provided in the HammerBank module.
+<br>
+</td></tr>
+
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td valign="top" width="40">
+<b>g</b></td><td align="left">
+<b>global time</b><br>
+The time relative to the section as a whole.<br>
+</td></tr>
+
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td valign="top" width="40">
+<b>r</b></td><td align="left">
+<b>sample rate</b><br>
+The current sampling rate (determined by the output module).<br>
+</td></tr>
+
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td valign="top" width="40">
+<b>pi</b></td><td align="left">
+<b>3.14159... (pi)</b><br>
+On Macintoshes, the pi symbol may also be used (Option-P).<br>
+</td></tr>
+
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td valign="top" width="40">
+<b>pi2</b></td><td align="left">
+<b>2*3.14159... (pi*2)</b><br>
+The value of pi multiplied by 2.<br>
+</td></tr>
+
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td valign="top" width="40">
+<b>E</b></td><td align="left">
+<b>The constant E</b><br>
+This is the base of natural logarithms.<br>
+It is equivalent to exp(1).<br>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td valign="top" width="40">
+<b>?</b></td><td align="left">
+<b>Random number (0 &gt;= r &lt; 1)</b><br>
+The random number generator used is a fairly decent one, as described in  Stephen
+K. Park and Keith W. Miller, "Random Number Generators:  Good Ones Are Hard to
+Find", Communications of the ACM, vol. 31, p. 1192  (October 1988).
+<p>
+Note: At the moment, I have not designed a good mechanism for controlling random
+number seeds on a module by module basis.  Every time a patch is used, the random
+numbers will be different.
+<br>
+</p></td></tr>
+</tbody></table>
+
+<a name="operators">&nbsp;<br></a>
+	</p><h2>3.2 Operators</h2>
+<p>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+
+<tbody><tr><td width="40">&nbsp;</td><td width="40">
+<b>+</b></td><td align="left">
+<b>addition</b>
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">
+<b>-</b></td><td align="left">
+<b>Subtraction (x - y)</b>
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">
+<b>-</b></td><td align="left">
+<b>Negation (- y)</b>
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">
+<b>*</b></td><td align="left">
+<b>Multiply</b>
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">
+<b>/</b></td><td align="left">
+<b>Divide</b>
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">
+<b>%</b></td><td align="left">
+<b>Modulo (also "mod")</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">
+<b>^</b></td><td align="left">
+<b>Raise to Power</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">
+<b>&amp;</b></td><td align="left">
+<b>Bitwise AND</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">
+<b>|</b></td><td align="left">
+<b>Bitwise OR</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">
+<b>~</b></td><td align="left">
+<b>Bitwise Invert</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">
+<b>xor</b></td><td align="left">
+<b>Bitwise XOR</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">
+<b>and</b></td><td align="left">
+<b>Logical AND (also "&amp;&amp;")</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">
+<b>or</b></td><td align="left">
+<b>Logical OR (also "||")</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">
+<b>not</b></td><td align="left">
+<b>Logical NOT (also "!")</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">
+<b>==</b></td><td align="left">
+<b>Equality</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">
+<b>&gt;</b></td><td align="left">
+<b>Greater than</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">
+<b>&gt;=</b></td><td align="left">
+<b>Greater than or equal</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">
+<b>&lt;</b></td><td align="left">
+<b>Less than</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">
+<b>&lt;=</b></td><td align="left">
+<b>Less than or equal</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">
+<b>&lt;&gt;</b></td><td align="left">
+<b>Not Equal</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="40">
+<b>!=</b></td><td align="left">
+<b>Not Equal</b>
+</td></tr>
+</tbody></table>
+
+</p><p>
+
+
+<a name="functions">&nbsp;<br></a>
+	</p><h2>3.3 Functions</h2>
+<p>
+Syd has a fairly rich set of functions available -most of these were inherited
+from the expression parser that is used in my Image Processing software "Pixel
+Magic".  This means that if you like playing with the Mandelbrot set, you can use
+it to generate sounds too.
+</p><p>
+<b>functions - basic math &amp; trig</b>
+</p><p>
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+
+<tbody><tr><td width="40">&nbsp;</td><td width="80">
+<b>int(x)</b></td><td align="left">
+<b>Convert to Integer</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="80">
+<b>sqrt(x)</b></td><td align="left">
+<b>Square Root</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="80">
+<b>sin(x)</b></td><td align="left">
+<b>sine</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="80">
+<b>cos(x)</b></td><td align="left">
+<b>cosine</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="80">
+<b>sin2</b></td><td align="left">
+<b>sine squared</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="80">
+<b>cos2(x)</b></td><td align="left">
+<b>cosine squared</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="80">
+<b>sin3(x)</b></td><td align="left">
+<b>sine cubed</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="80">
+<b>cos3</b></td><td align="left">
+<b>cosine cubed</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="80">
+<b>tan(x)</b></td><td align="left">
+<b>tangent</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="80">
+<b>asin(x)</b></td><td align="left">
+<b>arc sine</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="80">
+<b>acos(x)</b></td><td align="left">
+<b>arc cosine</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="80">
+<b>atan</b></td><td align="left">
+<b>arc tangent</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="80">
+<b>cosh(x)</b></td><td align="left">
+<b>hyperbolic cosine</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="80">
+<b>sinh(x)</b></td><td align="left">
+<b>hyperbolic sine</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="80">
+<b>tanh(x)</b></td><td align="left">
+<b>hyperbolic tangent</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="80">
+<b>log(x)</b></td><td align="left">
+<b>natural logarithm</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="80">
+<b>log10(x)</b></td><td align="left">
+<b>base 10 logarithm</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="80">
+<b>fabs(x)</b></td><td align="left">
+<b>absolute value</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="80">
+<b>abs(x)</b></td><td align="left">
+<b>absolute value</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="80">
+<b>exp(x)</b></td><td align="left">
+<b>E to the x power</b>
+</td></tr>
+</tbody></table>
+<br>
+</p><p>
+<b>functions - f tables</b>
+</p><p>
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+
+<tbody><tr><td width="40">&nbsp;</td><td width="80">
+<b>ftab(n,t)</b></td><td align="left">
+<b>Access function table N (0+) at position T (0-1)</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="80">
+<b>ftabw(n,t)</b></td><td align="left">
+<b>Access function table N (0+) at position T (0-1), wrap</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="80">
+<b>ftabp(n,t)</b></td><td align="left">
+<b>Access function table N (0+) at position T (0-1), pin</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="80">
+<b>ftabi(n,t)</b></td><td align="left">
+<b>Access function table N (0+) at position T (0-1), interpolate</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="80">
+<b>ftabip(n,t)</b></td><td align="left">
+<b>Access function table N (0+) at position T (0-1), interp+pin</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="80">
+<b>ftabiw(n,t)</b></td><td align="left">
+<b>Access function table N (0+) at position T (0-1), interp+wrap</b>
+</td></tr>
+</tbody></table>
+</p><p>
+These functions are used to access the tables which are created by the "FTAB"
+units.  The basic ftab() function uses the value of T to access the values of
+Funtion Table #N. If T is less than 0 or greater than 1, then a value of 0.0 will
+be returned.  Otherwise, the value of T (from 0 to 1) is used to access a value
+from the beginning to the end of the table.
+</p><p>
+The "Pin" variant will pin to the beginning and ending values of the table, that
+is values less than 0 will be treated like a 0, and values greater than 1 will be
+treated like a 1.
+</p><p>
+The "Wrap" variant will wrap over, using the fractional part of T to access the
+table.  So, for example, 7.1 is treated the same as 0.1.
+</p><p>
+The "Interpolating" units will use linear interpolation, which is slower, but can
+reduce the aliasing caused by short tables.
+</p><p>
+<br>
+<b>functions - pitch converters</b>
+</p><p>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr><td width="40">&nbsp;</td><td colspan="3">
+These functions are typically used for converting a linear representation of
+pitch to oscillator frequency which is supposed to be expressed in cycles per
+second (which is logarithmic).
+<p>
+In the following functions, the pitch of A 440 (A above Middle C) can be
+represented as follows:
+</p><p>
+</p></td></tr>
+<tr><td width="40">&nbsp;</td><td width="80">
+<b>cps</b></td><td width="80">440</td><td align="left">(440 cycles per second)</td></tr>
+<tr><td width="40">&nbsp;</td><td width="80">
+<b>pch</b></td><td width="80">8.09</td><td align="left">(8 octaves + 9/12 of an octave)</td></tr>
+<tr><td width="40">&nbsp;</td><td width="80">
+<b>oct</b></td><td width="80">8.75</td><td align="left">(8 octaves + .75 of an octave)</td></tr>
+<tr><td width="40">&nbsp;</td><td width="80">
+<b>midi</b></td><td width="80">69</td><td align="left">(69th note on keyboard)</td></tr>
+</tbody></table>
+</p><p>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+
+<tbody><tr><td width="40">&nbsp;</td><td width="120">
+<b>cpspch(pitch)</b></td><td align="left">
+<b>Convert pitch to cycles per second</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="120">
+<b>cpsoct(oct)</b></td><td align="left">
+<b>Convert octave to cycles per second</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="120">
+<b>octpch(pitch)</b></td><td align="left">
+<b>Convert pitch to octave</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="120">
+<b>octcps(freq)</b></td><td align="left">
+<b>Convert cycles per second to octave</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="120">
+<b>pchoct(oct)</b></td><td align="left">
+<b>Convert octave to pitch</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="120">
+<b>octmidi(midi)</b></td><td align="left">
+<b>Convert midi note number to octave</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td width="120">
+<b>cpsmidi(x)</b></td><td align="left">
+<b>Convert midi note number to frequency (cycles per second)</b>
+</td></tr>
+</tbody></table>
+</p><p>
+<br>
+<b>functions - signal modifiers</b>
+</p><p>
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr><td width="40">&nbsp;</td><td colspan="2">
+These functions, which are borrowed from CSound, are useful for creating
+envelopes and otherwise modifying signals.
+<p>
+</p></td></tr>
+
+<tr><td width="40">&nbsp;</td><td colspan="2">
+<b>linen(t,attack,duration,decay)</b>
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+This function computes a straight-line envelope which has a total duration of
+<i>duration</i>, an attack time of <i>attack</i> and a decay time of <i>decay</i>.  The values rise
+from 0 to 1, and then back to zero.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td colspan="2">
+<b>linenr(t,attack,decay,decayval)</b>
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+This function computes a simple envelope with a straight-line attack and
+exponential decay, similar to many natural sounds.  The total duration is
+equivalent to <i>attack</i>+<i>decay</i>.  The <i>decayval</i> controls the rate of cutoff, and is
+typically around 0.01.  Values which are too large will produce a noticeable
+click, while values that are too small will shorten the sound.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td colspan="2">
+<b>limit(v,min,max)</b>
+</td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+This function limits the value of <i>v</i> to fall between the values of <i>min</i> and <i>max</i>.
+If v &lt; min, then min is returned.  If v &gt; max, then max is returned.  If max &lt;
+min then a constant value of (min+max)/2 will be returned.
+</td></tr>
+</tbody></table>
+</p><p>
+<br>
+<b>functions - fractals and noise</b>
+</p><p>
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+
+<tbody><tr><td width="40">&nbsp;</td><td>
+<b>mandel(x,y)</b></td><td align="left">
+<b>Mandelbrot Set, level set method (also mand)</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td>
+<b>manc(x,y)</b></td><td align="left">
+<b>Mandelbrot Set, CPM method</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td>
+<b>man3</b></td><td align="left">
+<b>Mandelbrot cubed</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td>
+<b>julia(x,y,p,q)</b></td><td align="left">
+<b>Julia Set, level set method</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td>
+<b>dragon(x,y,p,q)</b></td><td align="left">
+<b>Dragon Fractal</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td>
+<b>fbm(a,b,c,d,e,f)</b></td><td align="left">
+<b>Fractal Brownian Motion (broken)</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td>
+<b>noise(x,y)</b></td><td align="left">
+<b>2D Noise</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td>
+<b>turb(x,y)</b></td><td align="left">
+<b>2D Turbulence (fractal noise)</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td>
+<b>noise3d(x,y,z)</b></td><td align="left">
+<b>3D Noise</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td>
+<b>turb3d(x,y,z)</b></td><td align="left">
+<b>3D Turbuluence (fractal noise)</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td>
+<b>gnoise3d(x,y,z)</b></td><td align="left">
+<b>Alternate Noise Function</b>
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td>
+<b>gturb3d(x,y,z)</b></td><td align="left">
+<b>Alternate Turbulence Function</b>
+</td></tr>
+
+</tbody></table>
+<br>
+</p><p>
+
+<b>functions - misc</b>
+</p><p>
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+
+<tbody><tr><td width="40">&nbsp;</td><td>
+<b>cond(exp,a,b)</b></td><td align="left">
+<b>if exp is non zero, a, otherwise, b.</b>
+</td></tr>
+<tr><td width="40">&nbsp;</td><td>
+<b>angle(x,y)</b></td><td align="left">
+<b>angle from 0,0 to x,y</b>
+</td></tr>
+<tr><td width="40">&nbsp;</td><td>
+<b>dist(x,y)</b></td><td align="left">
+<b>distance to x,y</b>
+</td></tr>
+<tr><td width="40">&nbsp;</td><td>
+<b>fib(n)</b></td><td align="left">
+<b>Fibonacci Series</b>
+</td></tr>
+<tr><td width="40">&nbsp;</td><td>
+<b>prime(n)</b></td><td align="left">
+<b>Prime number function</b>
+</td></tr>
+</tbody></table>
+</p><p>
+
+</p><hr>
+<a name="menucommands">&nbsp;<br></a>
+<h1>4.0 Menu Commands</h1>
+<p>
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+
+<tbody><tr><td colspan="3"><b>File</b></td></tr>
+
+<tr><td width="40">&nbsp;</td><td colspan="2"><b>New</b></td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Creates a new patch document.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td colspan="2"><b>Open...</b></td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Opens an existing patch document.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td colspan="2"><b>Close</b></td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Closes the current window.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td colspan="2"><b>Save</b></td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Saves the current patch document to disc.  If you haven't named it yet, you'll be
+asked to assign a name.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td colspan="2"><b>Save As...</b></td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Saves the current patch document to disc under a new  name.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td colspan="2"><b>Exit</b></td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Exits the Syd application.<br>
+</td></tr>
+
+<tr><td colspan="3"><b>Edit</b></td></tr>
+
+<tr><td width="40">&nbsp;</td><td colspan="2"><b>Undo<br>Cut<br>Copy<br>Paste<br>Clear</b></td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Most editing operations are unimplemented, except for "Clear" which deletes the
+selected unit.
+</td></tr>
+
+<tbody><tr><td colspan="3"><b>Synth</b></td></tr>
+
+<tr><td width="40">&nbsp;</td><td colspan="2"><b>Synthesize</b></td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Starts synthesizing the current patch.
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td colspan="2"><b>Play</b></td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Starts playing back the current patch (only works after synthesis).
+</td></tr>
+
+<tr><td width="40">&nbsp;</td><td colspan="2"><b>Abort Synth</b></td></tr>
+<tr><td width="40">&nbsp;</td><td width="40">&nbsp;</td><td align="left">
+Stops synthesis or playback.
+</td></tr>
+
+
+</tbody></table>
+
+
+</p>
+<hr>
+
+<a name="versionhistory">&nbsp;<br></a>
+<h1>Version History</h1>
+<p>
+<pre>
+8-7-2006   JSyd version 1.0.1
+
+           Added support for stereo output.
+           Added stereo panning control to amplifier module.
+           Added trigger support to ADSR module.
+           Added expressions to ADSR module.
+           Fixed bugs in involving multiple open windows.
+
+6/1/2006 - 8/1/2006  JSyd (Java Syd) version 1.0, ported from the C version of Syd (1.0.6).
+</pre>
+
+<!-- end of document -->
+</p></td>
+<td width="10%">&nbsp;</td>
+</tr><tr></tr></tbody></table>
+
+
+</body></html>

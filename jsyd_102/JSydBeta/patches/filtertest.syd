@@ -1,0 +1,41 @@
+MODS 7
+MOD mOut1 out (709 178 773 242)
+IN mRscore5 -> sig
+OUTPUT 10.0 44100.0 2 0 0 filtertest.wav
+MOD mOsc2 osc (138 170 202 234)
+OSCI 1
+OSCF p5
+OSCA ftab(0,t/p3)*p4
+OSCP 0
+MOD mButter3 butter (336 184 400 248)
+IN mOsc2 -> sig
+IN mOsc4 -> ctl
+BUTTER 2
+BUTTERF p5*(2^ctl*4)
+BUTTERB 100
+MOD mOsc4 osc (212 96 276 160)
+OSCI 3
+OSCF 1/(p3*2)
+OSCA 1
+OSCP 0
+MOD mRscore5 rscore (524 175 588 239)
+IN mRscore7 -> i1
+RSCO 5
+RSCON 40
+RSCO1 1
+RSCO2 ?*(p3-1)
+RSCO3 0.1+?
+RSCO4 0.5 + ?*0.5
+RSCO5 55*2**(?*4.0)
+MOD mFtable6 ftable (53 247 117 311)
+FTAB 0 100
+FTABE sin(t*2*pi)
+MOD mRscore7 rscore (430 174 494 238)
+IN mButter3 -> i1
+RSCO 5
+RSCON 10
+RSCO1 1
+RSCO2 n*p3/10
+RSCO3 p3/10
+RSCO4 p4*(1-n/10)
+RSCO5 p5*2*(1-n/10)

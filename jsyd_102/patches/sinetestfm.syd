@@ -1,0 +1,15 @@
+MODS 3
+MOD mOut1 out (445 123 485 163)
+IN mOsc2 -> sig
+OUTPUT 20.0 22050.0 2 0 0 sinetestfm.wav
+MOD mOsc2 osc (282 122 322 162)
+IN mOsc3 -> fm
+OSCI 0
+OSCF 440+100*fm
+OSCA .1
+OSCP 0
+MOD mOsc3 osc (104 124 144 164)
+OSCI 0
+OSCF 1
+OSCA 1
+OSCP 0

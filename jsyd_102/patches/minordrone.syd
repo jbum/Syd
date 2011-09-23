@@ -1,0 +1,22 @@
+MODS 7
+MOD mOut1 out (438 146 502 210)
+IN mMix7 -> sig
+OUTPUT 8.0 22000.0 2 0 0 minordrone.wav
+MOD mExp2 exp (178 207 242 271)
+EXP turb(t+sin(t/8),sin(2*¹*(30+sin(t/16))*t))
+MOD mExp3 exp (114 138 178 202)
+EXP turb(t+sin(t/8),sin(2*¹*20*t))
+MOD mAmp4 amp (272 204 336 268)
+IN mExp2 -> sig
+AMPS 0.2
+AMPO 0
+MOD mExp5 exp (178 84 242 148)
+EXP turb(t+sin(t/8),sin(2*¹*(47.4074+sin(t/16))*t))
+MOD mAmp6 amp (270 90 334 154)
+IN mExp5 -> sig
+AMPS 0.4
+AMPO 0
+MOD mMix7 mix (351 142 415 206)
+IN mAmp6 -> sig
+IN mExp3 -> sig
+IN mAmp4 -> sig

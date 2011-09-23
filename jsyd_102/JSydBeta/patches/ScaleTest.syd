@@ -1,0 +1,33 @@
+MODS 5
+MOD mOut1 out (601 199 665 263)
+IN mRscore5 -> sig
+OUTPUT 2.0 22050.0 2 0 0 untitled.wav
+MOD mEnv2 env (199 120 263 184)
+ADSR2 0
+ADSRAT 0.1
+ADSRAL .6
+ADSRDT 0.1
+ADSRDL .5
+ADSRST .7
+ADSRSL .4
+ADSRRT 0.1
+ADSRD p3
+MOD mAmp3 amp (401 189 465 253)
+IN mEnv2 -> ctl
+IN mOsc4 -> sig
+AMPS ctl
+AMPO 0.0
+MOD mOsc4 osc (197 232 261 296)
+OSCI 0
+OSCF cpsmidi(p5)
+OSCA p4
+OSCP 0
+MOD mRscore5 rscore (502 185 566 249)
+IN mAmp3 -> i1
+RSCO 5
+RSCON 15
+RSCO1 1
+RSCO2 i*p3/m
+RSCO3 p3/m
+RSCO4 .25
+RSCO5 60+snote(major,i)

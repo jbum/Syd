@@ -1,0 +1,14 @@
+MODS 3
+MOD mOut1 out (600 200 664 264)
+IN mAmp3 -> sig
+OUTS 1 6.2 22050.0 2 untitled.wav
+MOD mOsc2 osc (209 178 273 242)
+OSCI 0
+OSCF 440
+OSCA 1
+OSCP 0
+MOD mAmp3 amp (379 185 443 249)
+IN mOsc2 -> sig
+AMPP sin(t)
+AMPS 1.0
+AMPO 0.0

@@ -1,0 +1,18 @@
+MODS 3
+MOD mOut1 out (600 200 664 264)
+IN mRscore3 -> sig
+OUTPUT 2.0 22050.0 2 0 0 untitled.wav
+MOD mOsc2 osc (209 178 273 242)
+OSCI 3
+OSCF p5
+OSCA p4
+OSCP 0
+MOD mRscore3 rscore (420 186 484 250)
+IN mOsc2 -> i1
+RSCO 5
+RSCON 24
+RSCO1 1
+RSCO2 i*p3/m
+RSCO3 p3/m
+RSCO4 .5
+RSCO5 fnote(major,i,60)

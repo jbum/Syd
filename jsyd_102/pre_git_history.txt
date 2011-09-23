@@ -1,0 +1,56 @@
+History - new comments at top
+
+JSyd
+4/1/11
+  Fixed error in Pluck when frequencies are < 0 or > 20000 (causing gaps in output)
+  (note to build, use 'ant dist')
+
+5/07/09
+  Added stereo + panning support to CSyd (it hadn't been added earlier).
+  Attempting to debug random noise glitches which show up in complex patches rendered on Mac.
+  Noise issues aren't happening on CSyd.
+    
+2/12/07 (forensic note)
+  Updates to SSModule, SydPanel, ModList, JSydApp
+  * Use Smaller Module Size
+  * Turn off Auto-connect as default.
+  (both for Dan Landes)
+  
+8/13/06 (forensic note)
+  Bug fixes (quite possibly related to stereo) in SSOutput, SSStorage, SSStoreMem, GraphCanvas
+  NOTE: Check if these changes are in CSyd...
+  
+8/11 (forensic)
+  Made some updates to CSyd modules: ssadsr.h, ssadsr.cpp, ssoutput.cpp, ssmodule.cpp, ssmain.cpp
+
+8/7/06 (last note from laptop - next couple are forensic)
+
+Added stereo support - amplifier module can do panning.
+
+8/2/06 (forensic)
+
+Made an update to CSyd module: sspluck.cpp
+
+7/31/06
+Most stuff (except Mandelbrot, GNoise) is working.
+Added support for expressions & triggers in ADSR.
+Added snote and fnote functions.
+Added visual feedback for playback.
+
+7/17/06
+Got dialog load/save working.  patch -> synthesis is working.
+
+7/12/06
+Patching interface (with zap linking feature) is basically working.
+Tested on linux.
+Beginning work on parameter editing / patch saving.
+
+6/14/06 Got basic expressions working (most functions unimplemented)
+60 second sine wave 5.04 5.10 5.0
+
+6/12/06 Got a minimal patch with no formulas to render.  60 second sine wave: 7.532 seconds
+(compared to 0.48 for CSyd)
+repeated runs:
+7.53 6.54 5.67 5.7
+eliminate calls to System.currentTimeMillis
+5.54 5.58 5.71

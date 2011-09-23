@@ -1,0 +1,44 @@
+MODS 8
+MOD mOut1 out (583 176 615 208)
+IN mDelay3 -> sig
+OUTPUT 60 44100 2 0 0 rileymid.wav
+MOD mAmp2 amp (419 174 451 206)
+IN mCscore4 -> sig
+AMPS .666
+AMPO 0.0
+MOD mDelay3 delay (494 174 526 206)
+IN mAmp2 -> sig
+DELF 1
+DELd 0.025
+DELa0 1.0
+DELa1 0.5
+MOD mCscore4 cscore (307 199 339 231)
+IN mPluck5 -> i4
+IN mPluck8 -> i1
+IN mPluck7 -> i2
+IN mPluck6 -> i3
+CSCO rileymid.sco 0 0
+MOD mPluck5 pluck (184 252 216 284)
+PLKI 0
+PLKF cpsmidi(p5)
+PLKD p3
+PLKA p4/256
+PLKd 5+p6*5
+MOD mPluck6 pluck (179 210 211 242)
+PLKI 0
+PLKF cpsmidi(p5)
+PLKD p3
+PLKA p4/255
+PLKd 5+p6*5
+MOD mPluck7 pluck (174 162 206 194)
+PLKI 0
+PLKF cpsmidi(p5)
+PLKD p3
+PLKA p4/255
+PLKd 5+p6*5
+MOD mPluck8 pluck (183 107 215 139)
+PLKI 0
+PLKF cpsmidi(p5)
+PLKD p3
+PLKA p4/255
+PLKd 5+p6*5

@@ -1,0 +1,20 @@
+MODS 4
+MOD mOut1 out (600 200 640 240)
+IN mAmp2 -> sig
+OUTS 1 4.0 22050.0 2 test.wav
+MOD mAmp2 amp (382 195 422 235)
+IN mOsc3 -> sig
+IN mOsc4 -> ctl
+AMPP ctl
+AMPS 1.0
+AMPO 0.0
+MOD mOsc3 osc (231 163 271 203)
+OSCI 0
+OSCF 440
+OSCA 1
+OSCP 0
+MOD mOsc4 osc (240 228 280 268)
+OSCI 0
+OSCF 1
+OSCA 1
+OSCP 0

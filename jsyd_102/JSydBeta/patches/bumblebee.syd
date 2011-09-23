@@ -1,0 +1,16 @@
+MODS 3
+MOD mOut1 out (432 174 496 238)
+IN mOsc2 -> sig
+OUTPUT 2.0 22000.0 2 0 0 bumblebee.wav
+MOD mOsc2 osc (229 175 293 239)
+IN mOsc3 -> fm
+OSCI 5
+OSCF 110*2**(fm*.05)
+OSCA 1
+OSCP 0
+OSCW (turb(t,g)-.25)*((-cos(t*2*pi)+1)/2)
+MOD mOsc3 osc (67 123 131 187)
+OSCI 0
+OSCF 8
+OSCA 1
+OSCP 0

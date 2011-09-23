@@ -1,0 +1,20 @@
+MODS 3
+MOD mOut1 out (449 133 481 165)
+IN mRscore2 -> sig
+OUTPUT 5 22000 0 0 0 Untitled.aif
+MOD mRscore2 rscore (355 129 387 161)
+IN mPluck3 -> i1
+RSCO 6
+RSCON 32
+RSCO1 1
+RSCO2 n*p3/60
+RSCO3 p3/60
+RSCO4 .5
+RSCO5 110*2**(5*n/60)
+RSCO6 60-n/60
+MOD mPluck3 pluck (227 133 259 165)
+PLKI 0
+PLKF p5
+PLKD p3
+PLKA p4
+PLKd 2

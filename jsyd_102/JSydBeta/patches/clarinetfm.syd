@@ -1,0 +1,33 @@
+MODS 8
+MOD mOut1 out (422 155 454 187)
+IN mOsc7 -> sig
+OUTPUT 1 22000 2 0 0 clarinetfm.wav
+MOD mEnv2 env (54 258 86 290)
+ADSR 0.1 1 0.3 0.5 0.5 0.5 0.1
+ADSRD 1.0
+MOD mEnv3 env (51 208 83 240)
+ADSR 0.1 1 0.2 0.7 0.6 0.6 0.2
+ADSRD 1
+MOD mFtable4 ftable (119 255 151 287)
+IN mEnv2 -> sig
+FTAB 1 512
+FTABE sig
+MOD mFtable5 ftable (117 204 149 236)
+IN mEnv3 -> sig
+FTAB 0 512
+FTABE sig
+MOD mOsc6 osc (229 82 261 114)
+IN mExp8 -> fm
+OSCI 0
+OSCF fm*2
+OSCA fm*3*ftab(0,t/p3)
+OSCP 0
+MOD mOsc7 osc (258 156 290 188)
+IN mOsc6 -> fmgain
+IN mExp8 -> fm
+OSCI 0
+OSCF fmgain+fm
+OSCA p4*ftab(1,t/p3)
+OSCP 0
+MOD mExp8 exp (73 97 105 129)
+EXP p5*2**((t/p3)*sin(g*12*pi)*.02)

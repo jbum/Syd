@@ -1,0 +1,53 @@
+MODS 13
+MOD mOut1 out (577 181 641 245)
+IN mDelay6 -> sig
+OUTPUT 12.0 22000.0 2 0 0 acceleration.wav
+MOD mShold2 shold (116 232 180 296)
+IN mOsc9 -> trig
+IN mNoise10 -> sig
+MOD mNoise3 noise (149 145 213 209)
+RND 1 0
+MOD mShold4 shold (252 188 316 252)
+IN mNoise3 -> sig
+IN mShold2 -> trig
+MOD mOsc5 osc (399 233 463 297)
+IN mShold4 -> fm
+IN mOsc7 -> am
+OSCI 0
+OSCF 220*2**(fm*2)
+OSCA am
+OSCP 0
+MOD mDelay6 delay (480 180 544 244)
+IN mAmp12 -> ctl
+IN mOsc5 -> sig
+DELF 1
+DELd ctl
+DELa0 0.2
+DELa1 0.9
+MOD mOsc7 osc (296 278 360 342)
+IN mThresh8 -> am
+OSCI 0
+OSCF 8
+OSCA am
+OSCP 0
+MOD mThresh8 thresh (210 274 274 338)
+IN mShold2 -> sig
+THR 0.5
+MOD mOsc9 osc (20 166 84 230)
+OSCI 2
+OSCF 16
+OSCA 1
+OSCP 0
+MOD mNoise10 noise (34 247 98 311)
+RND 1 0
+MOD mOsc11 osc (197 97 261 161)
+OSCI 1
+OSCF 0.25
+OSCA 1
+OSCP 0
+MOD mAmp12 amp (381 143 445 207)
+IN mInv13 -> sig
+AMPS 0.2
+AMPO 0.15
+MOD mInv13 inv (296 120 360 184)
+IN mOsc11 -> sig

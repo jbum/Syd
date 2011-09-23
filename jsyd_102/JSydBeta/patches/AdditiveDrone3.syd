@@ -1,0 +1,36 @@
+MODS 5
+MOD mOut1 out (681 185 745 249)
+IN mAmp4 -> sig
+OUTPUT 10.0 44100.0 2 0 0 additivedrone3.wav
+MOD mRscore2 rscore (333 234 397 298)
+IN mOsc3 -> i1
+RSCO 7
+RSCON 50
+RSCO1 1
+RSCO2 0
+RSCO3 p3
+RSCO4 1/(n+1)
+RSCO5 100+(80+20*?)*i
+RSCO6 2+?*4
+RSCO7 ?*8
+MOD mOsc3 osc (156 238 220 302)
+OSCI 5
+OSCF p5
+OSCA p4*noise(t*p6,p7)
+OSCP 0
+OSCW noise(t*8-4,p6)-.5
+MOD mAmp4 amp (499 184 563 248)
+IN mRscore2 -> sig
+IN mEnv5 -> ctl
+AMPS ctl
+AMPO 0.0
+MOD mEnv5 env (315 75 379 139)
+ADSR2 0
+ADSRAT .25
+ADSRAL 1.0
+ADSRDT 0
+ADSRDL 1
+ADSRST 0.5
+ADSRSL 1
+ADSRRT 0.25
+ADSRD p3

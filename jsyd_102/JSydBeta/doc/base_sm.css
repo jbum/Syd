@@ -1,0 +1,9 @@
+  body,div,p,blockquote,ol,ul,dl,li,dt,dd,td,th,h1,h2,h3,h4,b,i,br { font-family: verdana,arial,geneva,helvetica,sans-serif; 
+         color: black; }
+  /* body,p,div,td,br,tr { font-size: x-small; font-weight: normal } */
+  body { background-color:#FFFFFF; margin: 0px; font-size:12pt; font-family:Verdana, Arial, Helvetica;}
+  /* h1 {font-size: xx-large; font-family: Comic Sans MS,Parade,Palatino,Palatino-LinoType,Garamond,Times New Roman,Times,serif; color: #9E0B0E; } */
+  a:link { color: #000088 }       /* unvisited link */
+  a:visited { color: #880088 }   /* visited links */
+  a:active { color: #8800FF }    /* active links */
+  .scripttable, .scripttable td, .scripttable p { /* font-family: serif,Palatino,Palatino-LinoType,Garamond,New Courier,Courier,Times New Roman,Times; */ font-size:12pt; }

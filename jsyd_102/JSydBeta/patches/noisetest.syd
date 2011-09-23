@@ -1,0 +1,22 @@
+MODS 5
+MOD mOut1 out (600 199 664 263)
+IN mRscore3 -> sig
+OUTPUT 10.0 22050.0 2 0 0 noisetest.wav
+MOD mExp2 exp (257 208 321 272)
+EXP turb(t*p4,t*p5)*ftab(0,t/p3)*.5
+MOD mRscore3 rscore (427 192 491 256)
+IN mExp2 -> i1
+RSCO 5
+RSCON 20
+RSCO1 1
+RSCO2 ?*(p3-1)
+RSCO3 0.5+?*0.5
+RSCO4 300+?*200
+RSCO5 ?*100
+MOD mEnv4 env (40 165 104 229)
+ADSR 0.1 1.0 0.2 0.7 0.6 0.6 0.1
+ADSRD 1.0
+MOD mFtable5 ftable (139 156 203 220)
+IN mEnv4 -> sig
+FTAB 0 512
+FTABE sig

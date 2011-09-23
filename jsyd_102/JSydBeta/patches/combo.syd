@@ -1,0 +1,15 @@
+MODS 5
+MOD mOut1 out (432 174 496 238)
+IN mMix4 -> sig
+OUTPUT 15.0 5000.0 2 0 0 combo.wav
+MOD mFolder2 folder (99 197 163 261)
+CSCO windpluck.syd
+MOD mFolder3 folder (196 90 260 154)
+CSCO drones.syd
+MOD mMix4 mix (332 128 396 192)
+IN mFolder3 -> sig
+IN mAmp5 -> sig
+MOD mAmp5 amp (226 198 290 262)
+IN mFolder2 -> sig
+AMPS 2
+AMPO 0.0

@@ -1,0 +1,31 @@
+History (newer entries at top)
+
+5/07/09
+  Version 1.5.1
+  Added stereo + panning support to CSyd, to match JSyd 1.0.2 updates.
+
+8/11/06 (forensic)
+  Made some updates to CSyd modules: ssadsr.h, ssadsr.cpp, ssoutput.cpp, ssmodule.cpp, ssmain.cpp
+
+8/2/06 (forensic)
+
+Made an update to CSyd module: sspluck.cpp
+
+5/30/06
+Added -x option to allow .sco files to override duration.
+Added skiniscore module - preliminary support for skini format.
+
+5/29/06
+
+First CSyd - Ported from windows version of Syd.
+
+Most syd patches appear to be working.  Performance
+is significantly better than syd.  Pluck patches
+are SIGNIFICANTLY faster.
+
+  
+* Fixed ssoutput to force wave output if memory is in use,
+* Fixed ssoutput to override duration and samplerate if requested.
+* Added explicit WAV/AIFF override via -o
+
+* Tested Mersenne Twister random numbers - not faster than current implementation.

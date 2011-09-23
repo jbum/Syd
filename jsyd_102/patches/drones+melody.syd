@@ -1,0 +1,93 @@
+MODS 21
+MOD mOut1 out (804 212 868 276)
+IN mDelay11 -> sig
+OUTPUT 12.0 22000.0 2 0 0 drones_melody.wav
+MOD mShold2 shold (141 145 205 209)
+IN mOsc9 -> trig
+IN mNoise10 -> sig
+MOD mNoise3 noise (137 73 201 137)
+RND 1 0
+MOD mShold4 shold (219 89 283 153)
+IN mNoise3 -> sig
+IN mShold2 -> trig
+MOD mOsc5 osc (363 146 427 210)
+IN mShold4 -> fm
+IN mOsc7 -> am
+OSCI 0
+OSCF p5*2**(fm*2)
+OSCA am*p4*(1-t/p3)
+OSCP 0
+MOD mRscore6 rscore (611 207 675 271)
+IN mAmp19 -> i1
+RSCO 5
+RSCON 30
+RSCO1 1
+RSCO2 ?*p3
+RSCO3 2
+RSCO4 0.25
+RSCO5 440*2**(?*2)
+MOD mOsc7 osc (282 172 346 236)
+IN mThresh8 -> am
+OSCI 0
+OSCF 8
+OSCA 1
+OSCP 0
+MOD mThresh8 thresh (221 162 285 226)
+IN mShold2 -> sig
+THR 0.5
+MOD mOsc9 osc (46 88 110 152)
+OSCI 2
+OSCF 12
+OSCA 1
+OSCP 0
+MOD mNoise10 noise (41 157 105 221)
+RND 1 0
+MOD mDelay11 delay (708 209 772 273)
+IN mRscore6 -> sig
+DELF 1
+DELd 0.2
+DELa0 0.555556
+DELa1 0.444444
+MOD mOsc12 osc (56 233 120 297)
+OSCI 2
+OSCF 16
+OSCA 1
+OSCP 0
+MOD mNoise13 noise (46 307 110 371)
+RND 1 0
+MOD mShold14 shold (122 281 186 345)
+IN mOsc12 -> trig
+IN mNoise13 -> sig
+MOD mOsc15 osc (213 291 277 355)
+IN mShold14 -> fm
+OSCI 0
+OSCF (p5/2+30)*2**(fm*0.5)
+OSCA p4*(1-t/p3)
+OSCP 0
+MOD mOsc16 osc (226 234 290 298)
+IN mShold14 -> fm
+OSCI 0
+OSCF (p5/2)*2**(fm*0.5)
+OSCA p4*(1-t/p3)
+OSCP 0
+MOD mOsc17 osc (205 354 269 418)
+IN mShold14 -> fm
+OSCI 0
+OSCF (p5/2-10)*2**(fm*0.5)
+OSCA p4*(1-t/p3)
+OSCP 0
+MOD mAmp18 amp (382 252 446 316)
+IN mMix20 -> sig
+AMPS 0.5
+AMPO 0
+MOD mAmp19 amp (528 205 592 269)
+IN mMix21 -> sig
+AMPS 0.7
+AMPO 0
+MOD mMix20 mix (315 257 379 321)
+IN mOsc17 -> sig
+IN mOsc15 -> sig
+IN mOsc16 -> sig
+MOD mMix21 mix (441 204 505 268)
+IN mAmp18 -> sig
+IN mOsc5 -> sig

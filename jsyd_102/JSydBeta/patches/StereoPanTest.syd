@@ -1,0 +1,20 @@
+MODS 4
+MOD mOut1 out (600 200 664 264)
+IN mAmp3 -> sig
+OUTS 1 2.0 22050.0 2 pantest.wav
+MOD mOsc2 osc (230 201 294 265)
+OSCI 0
+OSCF 440
+OSCA 1
+OSCP 0
+MOD mAmp3 amp (416 174 480 238)
+IN mOsc2 -> sig
+IN mOsc4 -> ctl
+AMPP ctl
+AMPS 1.0
+AMPO 0.0
+MOD mOsc4 osc (250 129 314 193)
+OSCI 0
+OSCF 4
+OSCA 1
+OSCP 0

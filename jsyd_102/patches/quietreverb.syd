@@ -1,0 +1,15 @@
+MODS 4
+MOD mOut1 out (432 174 464 206)
+IN mAmp3 -> sig
+OUT 2 22000
+MOD mDelay2 delay (213 161 245 193)
+IN mFinput4 -> sig
+DEL 0.1 0.9 1
+MOD mAmp3 amp (331 163 363 195)
+IN mDelay2 -> sig
+AMPS .3
+AMPO 0.0
+MOD mFinput4 finput (96 152 128 184)
+FIDEF sin(t*440*2*¹+sin(t*8*pi)*50)
+FINN 0
+FIND signal

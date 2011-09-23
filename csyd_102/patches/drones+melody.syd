@@ -1,0 +1,93 @@
+MODS 21
+MOD mOut1 out (467 239 499 271)
+IN mDelay11 -> sig
+OUTPUT 12 22000 1 0 0 Untitled.aiff
+MOD mShold2 shold (94 108 126 140)
+IN mOsc9 -> trig
+IN mNoise10 -> sig
+MOD mNoise3 noise (106 70 138 102)
+RND 1 0
+MOD mShold4 shold (177 109 209 141)
+IN mNoise3 -> sig
+IN mShold2 -> trig
+MOD mOsc5 osc (283 128 315 160)
+IN mShold4 -> fm
+IN mOsc7 -> am
+OSCI 0
+OSCF p5*2**(fm*2)
+OSCA am*p4*(1-t/p3)
+OSCP 0
+MOD mRscore6 rscore (434 117 466 149)
+IN mAmp19 -> i1
+RSCO 5
+RSCON 30
+RSCO1 1
+RSCO2 ?*p3
+RSCO3 2
+RSCO4 0.25
+RSCO5 440*2**(?*2)
+MOD mOsc7 osc (233 171 265 203)
+IN mThresh8 -> am
+OSCI 0
+OSCF 8
+OSCA 1
+OSCP 0
+MOD mThresh8 thresh (171 167 203 199)
+IN mShold2 -> sig
+THR 0.5
+MOD mOsc9 osc (21 71 53 103)
+OSCI 2
+OSCF 12
+OSCA 1
+OSCP 0
+MOD mNoise10 noise (16 147 48 179)
+RND 1 0
+MOD mDelay11 delay (452 168 484 200)
+IN mRscore6 -> sig
+DELF 1
+DELd 0.2
+DELa0 0.555556
+DELa1 0.444444
+MOD mOsc12 osc (25 221 57 253)
+OSCI 2
+OSCF 16
+OSCA 1
+OSCP 0
+MOD mNoise13 noise (29 258 61 290)
+RND 1 0
+MOD mShold14 shold (71 234 103 266)
+IN mOsc12 -> trig
+IN mNoise13 -> sig
+MOD mOsc15 osc (193 235 225 267)
+IN mShold14 -> fm
+OSCI 0
+OSCF (p5/2+30)*2**(fm*0.5)
+OSCA p4*(1-t/p3)
+OSCP 0
+MOD mOsc16 osc (198 199 230 231)
+IN mShold14 -> fm
+OSCI 0
+OSCF (p5/2)*2**(fm*0.5)
+OSCA p4*(1-t/p3)
+OSCP 0
+MOD mOsc17 osc (191 270 223 302)
+IN mShold14 -> fm
+OSCI 0
+OSCF (p5/2-10)*2**(fm*0.5)
+OSCA p4*(1-t/p3)
+OSCP 0
+MOD mAmp18 amp (300 218 332 250)
+IN mMix20 -> sig
+AMPS 0.5
+AMPO 0
+MOD mAmp19 amp (385 115 417 147)
+IN mMix21 -> sig
+AMPS 0.7
+AMPO 0
+MOD mMix20 mix (246 234 278 266)
+IN mOsc17 -> sig
+IN mOsc15 -> sig
+IN mOsc16 -> sig
+MOD mMix21 mix (344 169 376 201)
+IN mAmp18 -> sig
+IN mOsc5 -> sig

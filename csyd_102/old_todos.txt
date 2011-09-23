@@ -1,0 +1,213 @@
+x Compile & Test on Linux based system. (works)
+
+Finish adding SKINI support (use test.skini)
+  Add support for other directives (ampmult, etc. see calico docs)
+  file:///C:/Program%20Files/calico/doc/html/stk_frameset.html)
+
+Add MIDI support
+
+Add support for some basic patch modifications
+  (pipe thru midi score, etc.)
+
+	Add support for supplying midi score name in patch on command line
+	(Hammertest)
+
+
+Add support for XML-based patch format.
+
+Add masked based function for generating scales or ragas using rotation and
+modulo arithmetic.
+
+Add multi-channel support with expression for determining pan.
+
+/***
+* Finish documenting new features in manual, add simple hammerbank patch.  Release.
+
+* Add drum option for pluck.
+
+* Bug: Still possibly a file problem -
+
+* Consider possible bugs with multiple open files.  May
+be crashing when 2 patch files are open.
+
+* Look at Yamaha CSound instrument to see how operator values
+are applied.  Find Yamaha book.
+
+* Hammer
+	* Currently using delay of v^t
+
+	* Generate damp flag when sustain goes below 50%, to force
+	dampening on next sample.
+
+	* Check tuning problems (possibly with use of sin() exp)
+
+* Make known bug list in manual.
+
+* Generate MIDI score module, first using CSoundToMIDI as a model, later
+  generate separate events for controllers - this should correct some
+  audible problems with sustain, when it is provided with note events.
+
+* Figure out math curve for "S" curve i'm seeing with keyboard
+  decay characteristics.
+		0=0.9,1,2,3=.7,4,5=.4,6,7=.05,8,9=0.004,10,11=0.0004
+
+* Fix Maraca to use non-sample-rate dependent decay, as we did for hammerbank.
+
+* Add support for Midi scores (icon has a keyboard), which can play
+hammer style instruments.
+
+* Bug: Folder instruments played by scores may not contain FTables.
+  (Table management can't deal with this situation yet - debugger
+   showed null table entry, possibly because one table cleared
+   after another table inited.).
+
+* think about interpolating flag for oscillators,
+
+* Use Envelope algorithm from Moore
+
+	given transion from (x1,y1) -> (x2,y2), 
+	and transition parameter A  (0 = linear, + = exp, - = inverse exp
+
+	pe2 = 1 - pow(e,a);
+	as x travels from x1 to x2,
+		ix = (x-x1)/(x2-x1);	(goes from 0 - 1)
+		f(x) = y1 + (y2-y1)*(1-pow(e,ix*a)/pe2;
+
+* Known problem: Gliches in audio playback when reading/writing to disk.
+
+* Consider adding offset to audio-in - check CSound Audio In for other ideas.		
+
+* Add keyboard selection rotation on main window (so we can delete inaccessible
+modules)
+
+* Add support for some of the CSound Gen routines in F statements in
+  a score.
+
+* Compare timing on shephard 4 instrument with CSound equivalent.
+
+* Continue working on optimizations, function tables (see below).
+	+ Try carrying constants forward...
+	+ Try optimizing bottlenecks (Profile)
+		Main bottleneck is overhead from
+			MixIn->Exp->GetOut->SolveExp->EvalF->MixIn
+				and
+			GetFolderSig
+	
+	See Timings.cp for docs
+						
+* Add (2), expression,delimiter parsing to simplify files (count nested ()).
+
+* Add desc to expression units which display.  If no label, display expression.
+
+* Double clicking on a folder a) assigns the module or b) opens the window
+
+* add [wt] and [ft] input to oscillators
+
+* Add midi amp converter ampmidi = (p4/128), ampdx7 converter(p4/100)
+
+* Work on other CSound scores - add more score parsing features.
+
+* Make Windows resizeable (module files should remember window size
+& position)
+
+* Use unknown symbols to create named inputs into expressions (instead of
+  sig1/sig2 etc.)
+
+* Use FInputs to 'self document' folder instruments.
+
+* Fix parser to use better template system.
+  %f
+  %l
+  %s (quoted string)
+
+* Comment/Text modules.
+
+* OMS
+
+Ideas
+=====
+EASY
+
+* Expressions
+	* Fix random number seeds to use module seed.
+
+* Debug Perlin Turbulence function FBN()
+
+MEDIUM
+
+* Consider making fixed Output + Headphone + Graph ports on the right side.
+
+* Go thru CSound Tutorial, and cmusic Unit list  for ideas.
+
+* Output mods should support floats or ints, arbitrary precision.  Support
+multiple file formats (SD2F, AIFF).
+
+* Make fun modules that display graphics or oscil.
+	* Graphics should be a separate window. When patch is patched into
+	graphics, the Graphics window accepts the signal and updates itself
+	accordingly.
+	* Make a module which outputs a movie with sound track.
+
+* 1/f noise module.  Accepts triggers to generate next output.
+Output is scaled 0-1.  Parameter is exponent for F.  Would
+typically be used for scaling melodies?  Check perlin Text.
+
+* Try listening to zooming turbulence (see Sting - very nice sound similar to pluck)
+
+* Voltage converter - log to linear, etc.
+
+* Discrete Delay Module
+
+* ADSR
+	* Set control points using formula in ECM
+	* Check book for reducing clicks on ADSR...
+
+* Think about phase vocoder.
+	
+* Add Loop control for playback 
+
+* Auto-repeat button for playback of realtime patches...
+
+* Module Ideas:
+	* Change envelope generator to use graphical interface.
+	* Add a mixer module that has sliders for each input.
+	x Add Sound Buffer Display Module, which contains x,y zoom gadgets and
+	  scroll gadget.
+	* Add OSC-like Module for input of user-drawn waveform (256 samples).
+	* OSC Cluster (specify N oscillators which are X distance apart),
+		during output, treat like regular oscillator, except sum the series.
+	* User-defined (group of module primitives, or other UD modules)
+		(drag rect around existing set, and use menu option to create)
+		 (figures out inputs and outputs...)
+
+* Make a truly bandlimited square wave - sums from sintable based
+on current frequency and 1/2 samplerate.
+
+
+
+  
+HARD
+====
+
+* Make Pure-Java implementation.
+	* Make templates for units as java subclasses.
+	
+* Manual / Online Help
+
+* Shareware Fee
+
+* Windows Version
+
+* Consider a similar graphical system for creating collections of
+notes, e.g. modules for retrograde etc. - does this make sense?
+
+* Markhov chains - can we extend to other notions besides successons
+of pitches?  Can we go from one chain to another in a musical way (
+perhaps by programming in transition points ?)
+
+* Consider a MIDI -> Marhov Chain -> MIDI converter
+
+* Import CSound Orc Files
+
+
+***/

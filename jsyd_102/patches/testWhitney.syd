@@ -1,0 +1,22 @@
+MODS 3
+MOD mOut1 out (676 116 708 148)
+IN mRscore3 -> sig
+OUTPUT 60 44100 2 0 0 Whitney.wav
+MOD mOsc2 osc (113 117 145 149)
+OSCI 0
+OSCF p5
+OSCA (1-(g*p9-int(g*p9)))^2*.05
+OSCP 0
+MOD mRscore3 rscore (283 115 315 147)
+IN mOsc2 -> i1
+RSCO 9
+RSCON 48
+RSCO1 1
+RSCO2 0
+RSCO3 p3
+RSCO4 i
+RSCO5 55*2^(i/12)
+RSCO6 (2*pi*48)/p3
+RSCO7 (i+1)/48
+RSCO8 55*(i+1)
+RSCO9 (i+1)/p3

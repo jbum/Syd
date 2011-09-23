@@ -1,0 +1,20 @@
+MODS 3
+MOD mOut1 out (449 133 513 197)
+IN mRscore2 -> sig
+OUTPUT 5.0 22000.0 2 0 0 plucktest.wav
+MOD mRscore2 rscore (355 129 419 193)
+IN mPluck3 -> i1
+RSCO 6
+RSCON 33
+RSCO1 1
+RSCO2 n*p3/33
+RSCO3 p3/33
+RSCO4 .5
+RSCO5 110*2**(5*n/60)
+RSCO6 1
+MOD mPluck3 pluck (227 133 291 197)
+PLKI 0
+PLKF p5
+PLKD p3
+PLKA p4
+PLKd 2

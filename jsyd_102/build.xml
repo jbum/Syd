@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="JSyd" default="compile" basedir=".">
+	<description>
+	Build file for the RenderMusic application.
+	</description>
+
+	<property name="source.dir" location="src" />
+	<property name="classes.dir" location="bin" />
+	<property name="dist.dir" location="JSydBeta" />
+	<property name="dist.jarfile" value="JSyd.jar" />
+
+	<target name="compile" description="Compile all sources.">
+		<mkdir dir="${classes.dir}" />
+		<copy todir="${classes.dir}/assets">
+    			<fileset dir="coreassets"/>
+  		</copy>
+		<javac srcdir="${source.dir}" destdir="${classes.dir}" 
+		       source="1.4"
+		       target="1.4"
+		       > 
+		  <compilerarg  value="-Xlint" />
+		</javac>
+	</target> 
+
+	<target name="clean" description="Clean up output directories.">
+		<delete dir="${classes.dir}" />
+	</target>
+ 
+	 <target name="rebuild" depends="clean,compile"
+                 description="Cleanly compiles all sources." />
+
+	<target name="dist" depends="rebuild"
+	 description="Creates the binary distribution.">
+
+	<mkdir dir="${dist.dir}" />
+		<jar basedir="${classes.dir}"
+		     destfile="${dist.dir}/${dist.jarfile}" 
+		     manifest="manifest.mft"
+		      />
+	</target>
+
+
+</project>

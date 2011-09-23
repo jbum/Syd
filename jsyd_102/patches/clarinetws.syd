@@ -1,0 +1,31 @@
+MODS 7
+MOD mOut1 out (432 174 496 238)
+IN mRscore4 -> sig
+OUTPUT 6.0 22050.0 2 0 0 clarinetws.wav
+MOD mFtable2 ftable (133 213 197 277)
+IN mEnv3 -> sig
+FTAB 0 512
+FTABE sig*2-1
+MOD mEnv3 env (42 208 106 272)
+ADSR 0.39 0.25 0.218 0.75 0.39 1.0 1.0
+ADSRD 1.0
+MOD mRscore4 rscore (362 145 426 209)
+IN mExp6 -> i1
+RSCO 5
+RSCON 6
+RSCO1 1
+RSCO2 i*p3/6
+RSCO3 p3/6
+RSCO4 0.1+i*.9/6
+RSCO5 220*2**(i/6)
+MOD mOsc5 osc (126 97 190 161)
+IN mExp7 -> am
+OSCI 0
+OSCF p5
+OSCA p4*am
+OSCP 0
+MOD mExp6 exp (213 97 277 161)
+IN mOsc5 -> sig
+EXP ftab(0,sig*.5+.5)
+MOD mExp7 exp (43 93 107 157)
+EXP linen(t,0.085,p3,cond(p3>0.75,0.64,p3-0.085))

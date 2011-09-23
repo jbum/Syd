@@ -1,0 +1,18 @@
+MODS 3
+MOD mOut1 out (601 200 665 264)
+IN mRscore2 -> sig
+OUTPUT 2.0 22050.0 2 0 0 additive_square.wav
+MOD mRscore2 rscore (457 199 521 263)
+IN mOsc3 -> i1
+RSCO 5
+RSCON 25
+RSCO1 1
+RSCO2 0
+RSCO3 d
+RSCO4 cond(i&1,0,0.5/(i+1))
+RSCO5 440*(i+1)
+MOD mOsc3 osc (327 192 391 256)
+OSCI 0
+OSCF p5
+OSCA p4
+OSCP 0

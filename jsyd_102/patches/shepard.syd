@@ -1,0 +1,53 @@
+MODS 14
+MOD mOut1 out (577 253 641 317)
+IN mMix14 -> sig
+OUTPUT 8.0 22200.0 2 0 0 shepard.wav
+MOD mOsc2 osc (291 369 355 433)
+IN mExp3 -> fm
+IN mExp4 -> am
+OSCI 0
+OSCF 60*2**(fm*2)
+OSCA am
+OSCP 0
+MOD mExp3 exp (59 326 123 390)
+EXP 1-(t-int(t/8)*8)/8
+MOD mExp4 exp (161 369 225 433)
+EXP sin(2*¹*t/16)**2
+MOD mOsc5 osc (293 287 357 351)
+IN mExp6 -> fm
+IN mExp7 -> am
+OSCI 0
+OSCF 60*2**(fm*2)
+OSCA am
+OSCP 0
+MOD mExp6 exp (66 248 130 312)
+EXP 1-((t+4)-int((t+4)/8)*8)/8
+MOD mExp7 exp (157 291 221 355)
+EXP sin(2*¹*(t+4)/16)**2
+MOD mExp8 exp (54 168 118 232)
+EXP 1-((t+2)-int((t+2)/8)*8)/8
+MOD mExp9 exp (159 210 223 274)
+EXP sin(2*¹*(t+2)/16)**2
+MOD mOsc10 osc (294 210 358 274)
+IN mExp9 -> am
+IN mExp8 -> fm
+OSCI 0
+OSCF 60*2**(fm*2)
+OSCA am
+OSCP 0
+MOD mOsc11 osc (294 130 358 194)
+IN mExp13 -> fm
+IN mExp12 -> am
+OSCI 0
+OSCF 60*2**(fm*2)
+OSCA am
+OSCP 0
+MOD mExp12 exp (186 137 250 201)
+EXP sin(2*¹*(t+6)/16)**2
+MOD mExp13 exp (56 89 120 153)
+EXP 1-((t+6)-int((t+6)/8)*8)/8
+MOD mMix14 mix (441 238 505 302)
+IN mOsc11 -> sig
+IN mOsc10 -> sig
+IN mOsc5 -> sig
+IN mOsc2 -> sig

@@ -1,0 +1,28 @@
+MODS 4
+MOD mOut1 out (432 174 464 206)
+IN mRscore4 -> sig
+OUT 4 22000
+MOD mRscore2 rscore (220 156 252 188)
+IN mOsc3 -> i1
+RSCO 5
+RSCON 13
+RSCO1 1
+RSCO2 ?*p3
+RSCO3 p3/10*?*2
+RSCO4 p4*0.25
+RSCO5 p5*2**?
+MOD mOsc3 osc (129 160 161 192)
+OSCI 5
+OSCF p5
+OSCA p4*(1-t/p3)
+OSCP 0
+WEXP turb(t/(n+.01),g*3)*sin(t*2*¹)
+MOD mRscore4 rscore (331 137 363 169)
+IN mRscore2 -> i1
+RSCO 5
+RSCON 10
+RSCO1 1
+RSCO2 ?*p3
+RSCO3 .5+?*1
+RSCO4 0.50
+RSCO5 110*2**(?*4)

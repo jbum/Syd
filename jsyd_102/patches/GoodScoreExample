@@ -1,0 +1,27 @@
+MODS 4
+MOD mOut1 out (600 200 640 240)
+IN mRscore3 -> sig
+OUTPUT 60.0 22050.0 2 0 0 untitled.wav
+MOD mOsc2 osc (211 172 251 212)
+OSCI 0
+OSCF p5
+OSCA p4*(1-t/p3)**2
+OSCP 0
+MOD mRscore3 rscore (519 193 559 233)
+IN mRscore4 -> i1
+RSCO 5
+RSCON 250
+RSCO1 1
+RSCO2 ?*p3
+RSCO3 ?
+RSCO4 0.05 + ?*0.05
+RSCO5 55+?*2000
+MOD mRscore4 rscore (404 195 444 235)
+IN mOsc2 -> i1
+RSCO 5
+RSCON 6
+RSCO1 1
+RSCO2 i*p3/6
+RSCO3 p3
+RSCO4 p4
+RSCO5 p5+55*i

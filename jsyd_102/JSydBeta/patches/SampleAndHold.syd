@@ -1,0 +1,36 @@
+MODS 7
+MOD mOut1 out (601 200 665 264)
+IN mAmp4 -> sig
+OUTPUT 10.0 22050.0 2 0 0 untitled.wav
+MOD mOsc2 osc (95 139 159 203)
+OSCI 0
+OSCF 5
+OSCA 1
+OSCP 0
+MOD mEnv3 env (331 142 395 206)
+IN mOsc2 -> trig
+ADSR2 1
+ADSRAT 0.1
+ADSRAL .6
+ADSRDT 0.1
+ADSRDL .5
+ADSRST .7
+ADSRSL .4
+ADSRRT 0.1
+ADSRD .1
+MOD mAmp4 amp (465 174 529 238)
+IN mEnv3 -> ctl
+IN mOsc7 -> sig
+AMPS ctl
+AMPO 0.0
+MOD mShold5 shold (199 229 263 293)
+IN mNoise6 -> sig
+IN mOsc2 -> trig
+MOD mNoise6 noise (61 232 125 296)
+RND 1 1
+MOD mOsc7 osc (319 246 383 310)
+IN mShold5 -> fm
+OSCI 0
+OSCF 110*(2^fm*4)
+OSCA 1
+OSCP 0

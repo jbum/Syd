@@ -1,0 +1,99 @@
+MODS 16
+MOD mOut1 out (432 174 464 206)
+IN mRscore15 -> sig
+OUTPUT 4 22050 1 0 0 Untitled.aiff
+MOD mAmp2 amp (387 84 419 116)
+IN mOsc3 -> sig
+IN mOsc6 -> sig
+IN mOsc8 -> sig
+IN mOsc10 -> sig
+IN mOsc13 -> sig
+IN mOsc7 -> sig
+IN mOsc12 -> sig
+IN mOsc11 -> sig
+IN mOsc9 -> sig
+IN mOsc14 -> sig
+IN mOsc5 -> sig
+AMPS p4/11
+AMPO 0.0
+MOD mOsc3 osc (53 77 85 109)
+OSCI 5
+OSCF p5*.56
+OSCA ftab(0,t/p3)
+OSCP 0
+WEXP ftabi(1,t)
+MOD mFtable4 ftable (44 176 76 208)
+FTAB 0 512
+FTABE (.99^(1/512))^(t*512)*(1-t)
+MOD mOsc5 osc (331 230 363 262)
+OSCI 5
+OSCF p5*4.07
+OSCA 1.33*ftab(0,t/(p3*.075))
+OSCP 0
+WEXP ftabi(1,t)
+MOD mOsc6 osc (90 102 122 134)
+OSCI 5
+OSCF (p5*.56)+1
+OSCA .67*ftab(0,t/(p3*.9))
+OSCP 0
+WEXP ftabi(1,t)
+MOD mOsc7 osc (304 198 336 230)
+OSCI 5
+OSCF p5*3.75
+OSCA 0.75*ftab(0,t/(p3*.1))
+OSCP 0
+WEXP ftabi(1,t)
+MOD mOsc8 osc (122 132 154 164)
+OSCI 5
+OSCF p5*.92
+OSCA 1.35*ftab(0,t/(p3*.65))
+OSCP 0
+WEXP ftabi(1,t)
+MOD mOsc9 osc (277 164 309 196)
+OSCI 5
+OSCF p5*3
+OSCA 1.33*ftab(0,t/(p3*.15))
+OSCP 0
+WEXP ftabi(1,t)
+MOD mOsc10 osc (154 163 186 195)
+OSCI 5
+OSCF (p5*.92)+1.7
+OSCA 1.80*ftab(0,t/(p3*.55))
+OSCP 0
+WEXP ftabi(1,t)
+MOD mOsc11 osc (246 142 278 174)
+OSCI 5
+OSCF p5*2.74
+OSCA 1.33*ftab(0,t/(p3*.2))
+OSCP 0
+WEXP ftabi(1,t)
+MOD mOsc12 osc (215 117 247 149)
+OSCI 5
+OSCF p5*2
+OSCA 1.46*ftab(0,t/(p3*.25))
+OSCP 0
+WEXP ftabi(1,t)
+MOD mOsc13 osc (187 194 219 226)
+OSCI 5
+OSCF p5*1.19
+OSCA 2.67*ftab(0,t/(p3*.325))
+OSCP 0
+WEXP ftabi(1,t)
+MOD mOsc14 osc (211 223 243 255)
+OSCI 5
+OSCF p5*1.7
+OSCA 1.67*ftab(0,t/(p3*0.35))
+OSCP 0
+WEXP ftabi(1,t)
+MOD mRscore15 rscore (425 118 457 150)
+IN mAmp2 -> i1
+RSCO 5
+RSCON 1
+RSCO1 1
+RSCO2 0
+RSCO3 p3
+RSCO4 .75
+RSCO5 633
+MOD mFtable16 ftable (39 215 71 247)
+FTAB 1 512
+FTABE sin(t*2*pi)

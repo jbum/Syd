@@ -1,0 +1,9 @@
+MODS 2
+MOD mOut1 out (988 116 1020 148)
+IN mOsc2 -> sig
+OUTPUT 60 22050 2 0 0 untitled.wav
+MOD mOsc2 osc (566 119 598 151)
+OSCI 0
+OSCF 880
+OSCA .5
+OSCP 0
