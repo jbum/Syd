@@ -206,6 +206,7 @@ let selection = new Set();       // selected modules
 let selLink = null;              // {mod, index}: a selected patch cord
 let zoom = 1.5;
 let showNames = true;
+let autoFit = true;              // keep fitting the patch to the desk until zoomed by hand
 try { showNames = localStorage.getItem("syd-names") !== "0"; } catch (_) {}
 let undoStack = [], redoStack = [];
 
@@ -758,12 +759,13 @@ $("applySource").onclick = () => {
 // ---- zoom ----------------------------------------------------------------------------
 
 function fit() {
+  autoFit = true;
   const b = bounds(), wrap = $("deskWrap");
   zoom = Math.max(0.5, Math.min(2.5, (wrap.clientWidth - 30) / (b.x1 - b.x0), (wrap.clientHeight - 30) / (b.y1 - b.y0)));
   draw();
 }
-$("zoomIn").onclick = () => { zoom = Math.min(4, zoom * 1.25); draw(); };
-$("zoomOut").onclick = () => { zoom = Math.max(0.3, zoom / 1.25); draw(); };
+$("zoomIn").onclick = () => { autoFit = false; zoom = Math.min(4, zoom * 1.25); draw(); };
+$("zoomOut").onclick = () => { autoFit = false; zoom = Math.max(0.3, zoom / 1.25); draw(); };
 $("zoomFit").onclick = fit;
 $("namesBtn").onclick = () => {
   showNames = !showNames;
@@ -771,7 +773,7 @@ $("namesBtn").onclick = () => {
   draw();
 };
 // the desk fills whatever room the inspector leaves it
-new ResizeObserver(() => patch && draw()).observe($("deskWrap"));
+new ResizeObserver(() => patch && (autoFit ? fit() : draw())).observe($("deskWrap"));
 
 // ---- files ---------------------------------------------------------------------------
 
