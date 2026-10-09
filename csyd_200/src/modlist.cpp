@@ -106,7 +106,7 @@ bool ModList::OpenSpec(SydFileSpec *fsSpec)
 	FILE	*readFile;
   extern SydFileSpec sydSpec;
 
-	if ((readFile = fopen(fsSpec->name,"rb")) == NULL)
+	if ((readFile = FOpenRead(fsSpec->name)) == NULL)
 	{
       char  oname[512], iname[512];
       char  *p;
@@ -119,7 +119,7 @@ bool ModList::OpenSpec(SydFileSpec *fsSpec)
       else
         oname[0] = 0;
       strcat(oname,iname);
-      if ((readFile = fopen(oname,"rb")) == NULL)
+      if ((readFile = FOpenRead(oname)) == NULL)
       {
   			ErrorMessage("Can't open file: %s", fsSpec->name);
   			return true;

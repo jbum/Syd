@@ -1,4 +1,7 @@
 #include "ss.h"
+#include <dirent.h>
+#include <strings.h>
+#include <string>
 
 /*
 void WriteFileLine(FILE* ar, char *str,...)
@@ -164,7 +167,7 @@ unsigned char*SuckFilefromSpec(SydFileSpec *fsSpec)
 	long			fileSize,bytesRead;
   extern SydFileSpec sydSpec;
 
-	if ((cFile = fopen(fsSpec->name,"rb")) == NULL)
+	if ((cFile = FOpenRead(fsSpec->name)) == NULL)
 	{
       char  oname[512], iname[512];
       char  *p;
@@ -177,7 +180,7 @@ unsigned char*SuckFilefromSpec(SydFileSpec *fsSpec)
       else
         oname[0] = 0;
       strcat(oname,iname);
-      if ((cFile = fopen(oname,"rb")) == NULL)
+      if ((cFile = FOpenRead(oname)) == NULL)
       {
     		ErrorMessage("SuckFile problem: %s", fsSpec->name);
     		return NULL;
@@ -316,4 +319,27 @@ int32 LongRandom(void)
 ssfloat DoubleRandom(void)
 {
 	return LongRandom() / (ssfloat) R_M;
+}
+
+// fopen(name, "rb"), or failing that a file whose name differs only in case: patches made on
+// the Mac, whose disks ignore case, name files as they please ("Prelude.sco" for
+// prelude.sco), and the browser's file system doesn't ignore case.
+FILE *FOpenRead(const char *name)
+{
+	FILE	*f = fopen(name, "rb");
+	if (f != NULL)
+		return f;
+	const char	*slash = strrchr(name, '/');
+	std::string	dir = slash? std::string(name, slash - name + 1) : std::string("./");
+	const char	*base = slash? slash + 1 : name;
+	DIR			*d = opendir(dir.c_str());
+	if (d == NULL)
+		return NULL;
+	for (struct dirent *e; (e = readdir(d)) != NULL; )
+		if (strcasecmp(e->d_name, base) == 0) {
+			f = fopen((dir + e->d_name).c_str(), "rb");
+			break;
+		}
+	closedir(d);
+	return f;
 }

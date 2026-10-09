@@ -145,7 +145,7 @@ OSErr SSStoreFile::OpenFile()	// open file for input
 {
 	// LogMessage("Opening File for Read...\n");
 
-  fRef = fopen(fsSpec.name,"rb");
+  fRef = FOpenRead(fsSpec.name);
   if (fRef == NULL) {
     ErrorMessage("Can't open file for input (%s)",fsSpec.name);
     return -1;
