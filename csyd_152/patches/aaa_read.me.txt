@@ -1,0 +1,93 @@
+// Patches Read.Me
+
+Acceleration.syn
+	This patch uses an oscillator to control the delay time on a delay unit,
+	creating an interesting phase effect.
+
+Bell.syn
+	A chime sound, created via additive synthesis.  Similar to the Risset bell.orc
+	included with CSound.
+
+Bumblebee.syn
+	A simple patch that uses FM on a turbulent waveform.
+	
+Choir.syn
+	A patch which simulates a 16 voice male choir singing "ah".
+	Illustrates use of the butterworth bandpass filters to create vowel formants,
+	as well as the use of a random score module to "multiplex" a note with random permutations.
+
+ClarinetFM.syn
+	A patch illustrating simple FM synthesis, used in this case
+	to create a clarinet-like sound.
+
+ClarinetWS.syn
+	A patch illustrating waveshaping synthesis, used in this case
+	to create a clarinet-like sound.  Simlar to the Risset clarinet
+	included with CSound.
+
+Combo.syn
+	A patch illustrating the use of multiple folders.
+	WindPluck and Drones are combined.
+
+Drones+Melody.syn
+	A patch which illustrates the use of a random score module.
+
+Drones.syn
+	A simple patch which combines three fm-controlled oscillators.
+	
+HammerTest.syn
+	A patch for demonstrating the HammerBank unit, for creating sustaining instruments.
+
+Melody+Reverb+Turb.syn
+	A random frequency melody oscillator is used to control a
+	turbulence function, and then highly reverberated.
+
+Melody+Reverb.syn
+	Your basic "forbidden planet" patch.
+
+MidiSting.syn
+	Plucked sound instrument intended to be controlled from a MIDI score.
+	
+MinorDrone.syn
+	Instrument that combines three signals to create a chord.
+	
+pluckpluck.syn
+	An example of a score playing a score.  The instrument is the KP Pluck module.
+
+plucktest.syn
+	A simple test patch for the KP Pluck module.  The random score is configured
+	to play an ascending chromatic scale.
+	
+prelude.sco
+	A sample CSound score which was converted from a MIDI file.
+	(Bach's Prelude #2 in C Minor from the Well Tempered Clavier Book 1)
+
+	Used to test the CScore unit and MIDI functions.
+
+prelude_pluck.syn
+	A sample patch which plays the "prelude" score using a "Pluck" instrument.
+	
+QuietReverb.syn
+	Example folder instrument - this one applies a quiet reverb to it's signal.
+
+ScoreScore.syn
+	Example of a random score playing another random score which in turn
+	is playing a simple oscillator instrument.
+
+	Considerable complexity results.
+
+Shepard.syn
+	Shepard/Risset Tones
+
+Sting.syn
+	Another kind of plucked sound instrument which is made by "zooming"
+	into a fractal turbulence function.  Slower to compute than the Karplus/Strong 
+	Pluck sound.
+
+TestPhase.syn
+	Phase shifting effect.
+	
+WindPluck.syn
+	A modification of the Wind patch which uses a pluck sound.
+
+

@@ -1,0 +1,10 @@
+MODS 2
+MOD mOut1 out (600 200 664 264)
+IN mPluck2 -> sig
+OUTPUT 2.0 22050.0 2 0 0 untitled.wav
+MOD mPluck2 pluck (151 181 215 245)
+PLKI 0
+PLKF cpsmidi(p5)
+PLKD p3
+PLKA p4
+PLKd 10

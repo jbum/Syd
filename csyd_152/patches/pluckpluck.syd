@@ -1,0 +1,30 @@
+MODS 4
+MOD mOut1 out (463 162 495 194)
+IN mRscore4 -> sig
+OUTPUT 60 22050 1 0 0 Untitled.aiff
+MOD mPluck2 pluck (154 149 186 181)
+PLKI 0
+PLKF p5
+PLKD p3
+PLKA p4
+PLKd 1+p6
+MOD mRscore3 rscore (239 141 271 173)
+IN mPluck2 -> i1
+RSCO 6
+RSCON 12
+RSCO1 1
+RSCO2 n*p3/12
+RSCO3 p3/12
+RSCO4 p4
+RSCO5 p5*2**(turb(n/6,p6))
+RSCO6 ?*20
+MOD mRscore4 rscore (333 139 365 171)
+IN mRscore3 -> i1
+RSCO 6
+RSCON d*3
+RSCO1 1
+RSCO2 ?*d
+RSCO3 1+?
+RSCO4 0.25
+RSCO5 55*2**(?*4.0)
+RSCO6 ?*32

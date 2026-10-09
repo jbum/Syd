@@ -1,0 +1,18 @@
+MODS 4
+MOD mOut1 out (600 200 640 240)
+IN mCscore2 -> sig
+OUTS 1 10.0 44100.0 2 untitled.wav
+MOD mCscore2 cscore (357 193 397 233)
+IN mAmp4 -> i1
+CSCO stars.sco
+MOD mPluck3 pluck (165 190 205 230)
+PLKI 0
+PLKF p5
+PLKD p3
+PLKA p4
+PLKd 50
+MOD mAmp4 amp (274 191 314 231)
+IN mPluck3 -> sig
+AMPP p6
+AMPS 1.0
+AMPO 0.0

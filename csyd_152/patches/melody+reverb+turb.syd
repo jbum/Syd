@@ -1,0 +1,26 @@
+MODS 7
+MOD mOut1 out (432 174 464 206)
+IN mDelay4 -> sig
+OUT 8 22000
+MOD mExp2 exp (287 147 319 179)
+IN mOsc3 -> sig
+EXP turb(t,sig)
+MOD mOsc3 osc (218 146 250 178)
+IN mShold6 -> fm
+OSCI 0
+OSCF 440*2**fm
+OSCA 1
+OSCP 0
+MOD mDelay4 delay (358 143 390 175)
+IN mExp2 -> sig
+DEL 0.25 16 1
+MOD mNoise5 noise (75 173 107 205)
+RND 1 0
+MOD mShold6 shold (151 142 183 174)
+IN mOsc7 -> trig
+IN mNoise5 -> sig
+MOD mOsc7 osc (72 100 104 132)
+OSCI 2
+OSCF 8
+OSCA 1
+OSCP 0

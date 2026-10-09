@@ -1,0 +1,42 @@
+MODS 10
+MOD mOut1 out (471 239 503 271)
+IN mDelay9 -> sig
+OUT 15 5000
+MOD mOsc2 osc (278 90 310 122)
+IN mShold7 -> fm
+OSCI 0
+OSCF 220*2**(fm*0.5)
+OSCA 1
+OSCP 0
+MOD mOsc3 osc (280 145 312 177)
+IN mShold7 -> fm
+OSCI 0
+OSCF 230*2**(fm*0.5)
+OSCA 1
+OSCP 0
+MOD mOsc4 osc (280 206 312 238)
+IN mShold7 -> fm
+OSCI 3
+OSCF 140*2**(fm*0.5)
+OSCA 1
+OSCP 0
+MOD mOsc5 osc (113 143 145 175)
+OSCI 2
+OSCF 8
+OSCA 1
+OSCP 0
+MOD mNoise6 noise (117 80 149 112)
+RND 1 0
+MOD mShold7 shold (170 109 202 141)
+IN mNoise6 -> sig
+IN mOsc5 -> trig
+MOD mDelay8 delay (403 151 435 183)
+IN mMix10 -> sig
+DEL 0.2 0.8 1
+MOD mDelay9 delay (460 156 492 188)
+IN mDelay8 -> sig
+DEL 0.2 0.8 1
+MOD mMix10 mix (343 148 375 180)
+IN mOsc2 -> sig
+IN mOsc3 -> sig
+IN mOsc4 -> sig

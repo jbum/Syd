@@ -1,0 +1,53 @@
+MODS 14
+MOD mOut1 out (432 174 464 206)
+IN mMix14 -> sig
+OUT 8 22200
+MOD mOsc2 osc (218 261 250 293)
+IN mExp3 -> fm
+IN mExp4 -> am
+OSCI 0
+OSCF 60*2**(fm*2)
+OSCA am
+OSCP 0
+MOD mExp3 exp (44 230 76 262)
+EXP 1-(t-int(t/8)*8)/8
+MOD mExp4 exp (120 262 152 294)
+EXP sin(2*¹*t/16)**2
+MOD mOsc5 osc (219 200 251 232)
+IN mExp6 -> fm
+IN mExp7 -> am
+OSCI 0
+OSCF 60*2**(fm*2)
+OSCA am
+OSCP 0
+MOD mExp6 exp (49 171 81 203)
+EXP 1-((t+4)-int((t+4)/8)*8)/8
+MOD mExp7 exp (117 203 149 235)
+EXP sin(2*¹*(t+4)/16)**2
+MOD mExp8 exp (40 111 72 143)
+EXP 1-((t+2)-int((t+2)/8)*8)/8
+MOD mExp9 exp (119 142 151 174)
+EXP sin(2*¹*(t+2)/16)**2
+MOD mOsc10 osc (220 142 252 174)
+IN mExp9 -> am
+IN mExp8 -> fm
+OSCI 0
+OSCF 60*2**(fm*2)
+OSCA am
+OSCP 0
+MOD mOsc11 osc (219 83 251 115)
+IN mExp13 -> fm
+IN mExp12 -> am
+OSCI 0
+OSCF 60*2**(fm*2)
+OSCA am
+OSCP 0
+MOD mExp12 exp (138 88 170 120)
+EXP sin(2*¹*(t+6)/16)**2
+MOD mExp13 exp (41 52 73 84)
+EXP 1-((t+6)-int((t+6)/8)*8)/8
+MOD mMix14 mix (330 163 362 195)
+IN mOsc11 -> sig
+IN mOsc10 -> sig
+IN mOsc5 -> sig
+IN mOsc2 -> sig

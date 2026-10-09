@@ -1,0 +1,13 @@
+MODS 3
+MOD mOut1 out (432 174 464 206)
+IN mCscore2 -> sig
+OUT 20 22000
+MOD mCscore2 cscore (299 175 331 207)
+IN mPluck3 -> i1
+CSCO Prelude.sco -3 39846
+MOD mPluck3 pluck (145 172 177 204)
+PLKI 0
+PLKF cpsmidi(p5)
+PLKD p3
+PLKA p4/100
+PLKd 4

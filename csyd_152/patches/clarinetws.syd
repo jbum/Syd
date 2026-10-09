@@ -1,0 +1,31 @@
+MODS 7
+MOD mOut1 out (432 174 464 206)
+IN mRscore4 -> sig
+OUTPUT 6 22050 0 0 0 Untitled.aiff
+MOD mFtable2 ftable (129 164 161 196)
+IN mEnv3 -> sig
+FTAB 0 512
+FTABE sig*2-1
+MOD mEnv3 env (39 163 71 195)
+ADSR 0.39 0.25 0.218 0.75 0.39 1 1
+ADSRD 1.0
+MOD mRscore4 rscore (362 145 394 177)
+IN mExp6 -> i1
+RSCO 5
+RSCON 6
+RSCO1 1
+RSCO2 i*p3/6
+RSCO3 p3/6
+RSCO4 0.1+i*.9/6
+RSCO5 220*2**(i/6)
+MOD mOsc5 osc (126 97 158 129)
+IN mExp7 -> am
+OSCI 0
+OSCF p5
+OSCA p4*am
+OSCP 0
+MOD mExp6 exp (213 97 245 129)
+IN mOsc5 -> sig
+EXP ftab(0,sig*.5+.5)
+MOD mExp7 exp (43 93 75 125)
+EXP linen(t,0.085,p3,cond(p3>0.75,0.64,p3-0.085))

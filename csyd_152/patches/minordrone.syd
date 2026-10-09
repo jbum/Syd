@@ -1,0 +1,22 @@
+MODS 7
+MOD mOut1 out (438 146 470 178)
+IN mMix7 -> sig
+OUT 8 22000
+MOD mExp2 exp (204 201 236 233)
+EXP turb(t+sin(t/8),sin(2*¹*(30+sin(t/16))*t))
+MOD mExp3 exp (202 143 234 175)
+EXP turb(t+sin(t/8),sin(2*¹*20*t))
+MOD mAmp4 amp (272 204 304 236)
+IN mExp2 -> sig
+AMPS 0.2
+AMPO 0
+MOD mExp5 exp (201 90 233 122)
+EXP turb(t+sin(t/8),sin(2*¹*(47.4074+sin(t/16))*t))
+MOD mAmp6 amp (270 90 302 122)
+IN mExp5 -> sig
+AMPS 0.4
+AMPO 0
+MOD mMix7 mix (351 142 383 174)
+IN mAmp6 -> sig
+IN mExp3 -> sig
+IN mAmp4 -> sig

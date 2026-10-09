@@ -1,0 +1,47 @@
+MODS 8
+MOD mOut1 out (432 174 464 206)
+IN mHammerbank2 -> sig
+IN mSkscore4 -> sig
+OUTPUT 10 22050 1 0 0 Untitled.aiff
+MOD mHammerbank2 hammerbank (205 119 237 151)
+IN mButter8 -> i1
+HAMB
+HAMBN 0
+HAMBF cpsmidi(k)
+HAMBA 1-(k/128)*1
+HAMBAt 0.05
+HAMBD 0.001
+HAMBS 1
+HAMBW 
+MOD mHammeract3 hammeract (106 166 138 198)
+HAMA
+HAMAN 0
+HAMAK p5
+HAMAT 1
+HAMAV p4/128
+HAMAU 1
+MOD mSkscore4 skiniscore (307 199 339 231)
+IN mAmp5 -> i1
+SKINISCO stars.skini
+MOD mAmp5 amp (199 197 231 229)
+IN mHammeract3 -> sig
+IN mHammeract6 -> sig
+AMPS 1.0
+AMPO 0.0
+MOD mHammeract6 hammeract (108 218 140 250)
+HAMA
+HAMAN 0
+HAMAK p5
+HAMAT cond(t<p3-.1,0,1)
+HAMAV p4/128
+HAMAU 0
+MOD mOsc7 osc (97 98 129 130)
+OSCI 1
+OSCF p5
+OSCA .5
+OSCP 0
+MOD mButter8 butter (161 105 193 137)
+IN mOsc7 -> sig
+BUTTER 2
+BUTTERF p5
+BUTTERB 1+5*p5*a
