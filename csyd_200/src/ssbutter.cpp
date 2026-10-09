@@ -69,7 +69,7 @@ ssfloat SSButter::GenerateOutput(SSModule *callingMod)
 		ssfloat	c,d;
 		switch (filterType) {
 		case BT_LoPass:
-			c = 1.0 / tan(pidsr * freq);
+			c = 1.0 / sm_tan(pidsr * freq);
 			a0 = 1.0 / (1.0 + ROOT2 * c + c * c);
 			a1 = a0 + a0; 
 			a2 = a0;
@@ -77,7 +77,7 @@ ssfloat SSButter::GenerateOutput(SSModule *callingMod)
 			b2 = (1.0 - ROOT2 * c + c * c) * a0;
 			break;
 		case BT_HiPass:
-			c = tan(pidsr * freq);
+			c = sm_tan(pidsr * freq);
 			a0 = 1.0 / (1.0 + ROOT2 * c + c * c);
 			a1 = -2.0 * a0; 
 			a2 = a0;
@@ -85,8 +85,8 @@ ssfloat SSButter::GenerateOutput(SSModule *callingMod)
 			b2 = (1.0 - ROOT2 * c + c * c) * a0;
 			break;
 		case BT_BandPass:
-			c = 1.0 / tan(pidsr * bw);
-			d = 2.0 * cos(2.0 * pidsr * freq);
+			c = 1.0 / sm_tan(pidsr * bw);
+			d = 2.0 * sm_cos(2.0 * pidsr * freq);
 			a0 = 1.0 / (1.0 + c);
 			a1 = 0.0;
 			a2 = -a0;
@@ -94,8 +94,8 @@ ssfloat SSButter::GenerateOutput(SSModule *callingMod)
 			b2 = (c - 1.0) * a0;
 			break;
 		case BT_BandReject:
-			c = tan(pidsr * bw);
-			d = 2.0 * cos(2.0 * pidsr * freq);
+			c = sm_tan(pidsr * bw);
+			d = 2.0 * sm_cos(2.0 * pidsr * freq);
 			a0 = 1.0 / (1.0 + c);
 			a1 = - d * a0;
 			a2 = a0;

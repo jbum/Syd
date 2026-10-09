@@ -116,10 +116,10 @@ ExpMgr::ExpMgr()
 	}
 
 	// 9/9/97 Pitch Init for C1, relative to A5
-	c1 = (55*pow(2,0.25))/64;
-	log2 = log(2.0);
+	c1 = (55*sm_pow(2,0.25))/64;
+	log2 = sm_log(2.0);
 	pi2 = pi*2;
-	exp1 = exp(1.0);
+	exp1 = sm_exp(1.0);
 }
 
 /* Return Non-Zero if False */
@@ -778,7 +778,7 @@ ssfloat ExpMgr::EvalExp(SSModule *callingModule, ExpRec *exp)
 		case XI_Pow:
 			v2 = PopF();
 			v1 = PopF();
-			PushF(pow(v1,v2));
+			PushF(sm_pow(v1,v2));
 			break;
 		default: {
 			unsigned char *ep = exp->cExp + ip->at;
@@ -901,11 +901,11 @@ void ExpMgr::Step(EvalState &st, SSModule *callingModule, unsigned char *&ep)
 			case OP_Power:
 				v2 = PopF();
 				v1 = PopF();
-				PushF(pow(v1,v2));
+				PushF(sm_pow(v1,v2));
 				break;
 			case OP_Power2:
 				v1 = PopF();
-				PushF(pow(2.0,v1));
+				PushF(sm_pow(2.0,v1));
 				break;
 			case OP_Integer:
 				lv1 = PopL();
@@ -1119,30 +1119,30 @@ void ExpMgr::Step(EvalState &st, SSModule *callingModule, unsigned char *&ep)
 				break;
 			case OP_Cos:
 				v1 = PopF();
-				PushF(cos(v1));
+				PushF(sm_cos(v1));
 				break;
 			case OP_Sin:
 				v1 = PopF();
-				PushF(sin(v1));
+				PushF(sm_sin(v1));
 				break;
 			case OP_Sin2:
 				v1 = PopF();
-				v1 = sin(v1);
+				v1 = sm_sin(v1);
 				PushF(v1*v1);
 				break;
 			case OP_Cos2:
 				v1 = PopF();
-				v1 = cos(v1);
+				v1 = sm_cos(v1);
 				PushF(v1*v1);
 				break;
 			case OP_Sin3:
 				v1 = PopF();
-				v1 = sin(v1);
+				v1 = sm_sin(v1);
 				PushF(v1*v1*v1);
 				break;
 			case OP_Cos3:
 				v1 = PopF();
-				v1 = cos(v1);
+				v1 = sm_cos(v1);
 				PushF(v1*v1*v1);
 				break;
 			case OP_FTab:
@@ -1203,11 +1203,11 @@ void ExpMgr::Step(EvalState &st, SSModule *callingModule, unsigned char *&ep)
 				break;
 			case OP_Log:
 				v1 = PopF();
-				PushF(log(v1));
+				PushF(sm_log(v1));
 				break;
 			case OP_Log10:
 				v1 = PopF();
-				PushF(log10(v1));
+				PushF(sm_log10(v1));
 				break;
 			case OP_Fabs:
 				v1 = PopF();
@@ -1219,35 +1219,35 @@ void ExpMgr::Step(EvalState &st, SSModule *callingModule, unsigned char *&ep)
 				break;
 			case OP_Exp:
 				v1 = PopF();
-				PushF(exp(v1));	// Mac version used expf??
+				PushF(sm_exp(v1));	// Mac version used expf??
 				break;
 			case OP_Tan:
 				v1 = PopF();
-				PushF(tan(v1));
+				PushF(sm_tan(v1));
 				break;
 			case OP_ACos:
 				v1 = PopF();
-				PushF(acos(v1));
+				PushF(sm_acos(v1));
 				break;
 			case OP_ASin:
 				v1 = PopF();
-				PushF(asin(v1));
+				PushF(sm_asin(v1));
 				break;
 			case OP_ATan:
 				v1 = PopF();
-				PushF(atan(v1));
+				PushF(sm_atan(v1));
 				break;
 			case OP_Cosh:
 				v1 = PopF();
-				PushF(cosh(v1));
+				PushF(sm_cosh(v1));
 				break;
 			case OP_Sinh:
 				v1 = PopF();
-				PushF(sinh(v1));
+				PushF(sm_sinh(v1));
 				break;
 			case OP_Tanh:
 				v1 = PopF();
-				PushF(tanh(v1));
+				PushF(sm_tanh(v1));
 				break;
 /* example input function
 			case OP_Red:

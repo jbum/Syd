@@ -67,7 +67,7 @@ ssfloat	ExpMgr::CalcMandelCPM(ssfloat p0, ssfloat q0)
 		if (kol > limit)
 			retVal = 0.0;
 		else
-			retVal = -log(log10(sumxy) / pow(2,kol));
+			retVal = -sm_log(sm_log10(sumxy) / sm_pow(2,kol));
 
 
 		lastMandelX = p0;
@@ -367,7 +367,7 @@ ssfloat ExpMgr::fBm(ssfloat x, ssfloat y, ssfloat z,
 		exponent_array=(ssfloat *) MyNewPtrClear((iOctaves+1)*sizeof(ssfloat));
 		frequency = 1.0;
 		for (i = 0; i <= iOctaves; i++) {
-			exponent_array[i] = pow( frequency, -H );
+			exponent_array[i] = sm_pow( frequency, -H );
 			frequency *= lacunarity;
 		}
 		first = false;
@@ -447,8 +447,8 @@ static void gradientTabInit(int seed)
         r = sqrt(1 - z*z);
         /* theta is angle in (x,y) */
         theta = 2 * pi * DoubleRandom();
-        *table++ = r * cos(theta);
-        *table++ = r * sin(theta);
+        *table++ = r * sm_cos(theta);
+        *table++ = r * sm_sin(theta);
         *table++ = z;
     }
 }
@@ -488,9 +488,9 @@ ssfloat ExpMgr::Angle(ssfloat xd, ssfloat yd)
 	ssfloat	r;
 	r = Distance(xd,yd);
 	if (yd > 0)
-		return (pi*2)-acos(xd/r);
+		return (pi*2)-sm_acos(xd/r);
 	else
-		return acos(xd/r);
+		return sm_acos(xd/r);
 }
 
 // Returns length of line which begins at origin and ends at xd,yd
@@ -535,12 +535,12 @@ ssfloat ExpMgr::cpspch(ssfloat pch)
 	ssfloat	i,f;
 	i = (int) pch;
 	f = (pch - i)*100/12.0;
-	return c1*pow(2,i+f);
+	return c1*sm_pow(2,i+f);
 }
 
 ssfloat ExpMgr::cpsoct(ssfloat oct)
 {
-	return c1*pow(2,oct);
+	return c1*sm_pow(2,oct);
 }
 
 ssfloat ExpMgr::pchoct(ssfloat oct)
@@ -563,7 +563,7 @@ ssfloat ExpMgr::octcps(ssfloat cps)
 {
 	ssfloat octpow;
 	octpow = cps/c1;
-	return log(octpow) / log2;	// compute base 2 logarithm of octpow (log(octpow) / log(2))
+	return sm_log(octpow) / log2;	// compute base 2 logarithm of octpow (log(octpow) / log(2))
 }
 
 ssfloat ExpMgr::octmidi(ssfloat mp)
@@ -603,7 +603,7 @@ ssfloat ExpMgr::linenr(ssfloat t, ssfloat atk, ssfloat dcy, ssfloat atdec)
 		return t/atk;
 	}
 	t -= atk;
-	return pow(atdec,t/dcy);
+	return sm_pow(atdec,t/dcy);
 }
 
 ssfloat ExpMgr::limit(ssfloat v, ssfloat low, ssfloat high)

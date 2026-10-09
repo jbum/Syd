@@ -56,15 +56,15 @@ void SSPluck::Reset(SSModule *callingMod)
 	R = parList->itsOwner->mainInst->sampleRate;
 	loop = R / f1;
 	p = (int) loop;
-	Gf = pow(10.0, -Q / (20.0 * f1 * dur));	// loop gain required at any req for a Q db loss over dur seconds
-	G = cos(pi * f1 / R);				// loop gain without adjustments to rho and S
+	Gf = sm_pow(10.0, -Q / (20.0 * f1 * dur));	// loop gain required at any req for a Q db loss over dur seconds
+	G = sm_cos(pi * f1 / R);				// loop gain without adjustments to rho and S
 
 	// If smaller gain needed, reduce with rho, otherwise, stretch with S
 	if (Gf <= G)
 		rho = Gf/G;
 	else {
 		double	cosf1,a,b,c,D,a2,S2;
-		cosf1 = cos(2*pi*f1/R);
+		cosf1 = sm_cos(2*pi*f1/R);
 		a = 2.0 - 2.0*cosf1;
 		b = 2.0*cosf1 - 2.0;
 		c = 1.0 - Gf*Gf;

@@ -36,7 +36,7 @@ ssfloat GetFTableEntry(SSModule *callingMod, int tNbr, ssfloat pTime, int flags)
 
 SSFTable::SSFTable(ModList * mList, short h, short v) : SSModule(MT_FTable, mList, h, v)
 {
-	InitExp(&tabExp, "sin(t*2*pi)");
+	InitExp(&tabExp, "sm_sin(t*2*pi)");
 	tabNbr = 0;
 	tabSize = 100;
 	table = NULL;

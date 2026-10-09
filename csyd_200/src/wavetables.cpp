@@ -43,7 +43,7 @@ void InitWaveTables()
 		double	n = 10;
 		piF = 2*pi/(double)WaveTableSize;
 		for (i = 0; i < WaveTableSize; ++i) {
-			gSquareTable[i] =pow(sssin(n*i*piF),2.0)/sssin(i*piF);
+			gSquareTable[i] =sm_pow(sssin(n*i*piF),2.0)/sssin(i*piF);
 		}
 	}
 */

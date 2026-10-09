@@ -95,8 +95,8 @@ void  DisposePtr(Ptr ptr);
 #define noErr				0
 
 // Math
-#define sssin	sin
-#define sspow	pow
+#define sssin	sm_sin
+#define sspow	sm_pow
 #define pi					3.1415926535897932
 
 

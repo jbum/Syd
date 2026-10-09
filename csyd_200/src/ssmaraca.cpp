@@ -33,13 +33,13 @@ void SSMaraca::Reset(SSModule *callingMod)
 	snddecay = ResetExp(&snddecayExp, callingMod);
 
 	numBeans = 64;
-	gain = log((double) numBeans) / log(4.0) * 40.0 / numBeans;
+	gain = sm_log((double) numBeans) / sm_log(4.0) * 40.0 / numBeans;
 	output[0] = output[1] = 0.0;
 	input = 0.0;
 	shakeEnergy = 0;
 	temp = 0.0;
 	sndLevel = 0;
-	coeffs[0] = -respole * 2.0 * cos(resfreq * 2.0 * pi * parList->itsOwner->timeInc);
+	coeffs[0] = -respole * 2.0 * sm_cos(resfreq * 2.0 * pi * parList->itsOwner->timeInc);
 	coeffs[1] = respole * respole;
 	i = 0;
 }
@@ -49,7 +49,7 @@ ssfloat	SSMaraca::GenerateOutput(SSModule *callingMod)
 	if (temp < 2*pi) {
 		// shake over 50 ms and add energy
 		temp += (2*pi*parList->itsOwner->timeInc) / 0.05;
-		shakeEnergy += (1.0 - cos(temp));
+		shakeEnergy += (1.0 - sm_cos(temp));
 	}
 
 	// Compute exponential system decay

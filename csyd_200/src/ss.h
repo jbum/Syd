@@ -6,6 +6,7 @@
 #define SYD_AUTHOR  "Jim Bumgardner (www.krazydad.com)"
 
 #include "../sydlocal.h"
+#include "smath/smath.h"
 
 #include <stdlib.h>
 #include <stdio.h>

@@ -752,7 +752,7 @@ void dtox80(ssfloat *s, SSExtended80 *ext)
 	ssfloat	v = *s, targetv, f;
 
 	// figure out nearest power of 2
-	p2 = int(log(pow(v,(1/log(2)))));
+	p2 = int(sm_log(sm_pow(v,(1/sm_log(2)))));
 	// compute e
 	e = 16383+p2;
 	
@@ -760,7 +760,7 @@ void dtox80(ssfloat *s, SSExtended80 *ext)
 	LocalToMSBShort((short *) &ext->e[0]);
 
 	f = 0;
-	targetv = pow(2,p2)*(1+f);
+	targetv = sm_pow(2,p2)*(1+f);
 
 	mask = 0x80;
 	offset = 0;
@@ -770,10 +770,10 @@ void dtox80(ssfloat *s, SSExtended80 *ext)
 
 	for (i = 1; i <= 63 && targetv < v; ++i)
 	{
-		if (pow(2,p2)*(1+f+pow(2,-i)) <= v)
+		if (sm_pow(2,p2)*(1+f+sm_pow(2,-i)) <= v)
 		{
-			f += pow(2,-i);
-			targetv = pow(2,p2)*(1+f);
+			f += sm_pow(2,-i);
+			targetv = sm_pow(2,p2)*(1+f);
 			ext->f[offset] |= mask;
 		}
 		mask >>= 1;
@@ -803,7 +803,7 @@ ssfloat x80tod(SSExtended80 *ext)
 
 	for (i = 1; i <= 63; ++i) {
 		if ((ext->f[offset] & mask) > 0)
-			f += pow(2,-i);
+			f += sm_pow(2,-i);
 
 		mask >>= 1;
 		if (mask == 0) {
@@ -812,7 +812,7 @@ ssfloat x80tod(SSExtended80 *ext)
 		}
 	}
 	
-	v = sign*pow(2,p2)*(1 + f);
+	v = sign*sm_pow(2,p2)*(1 + f);
 	return v;
 }
 

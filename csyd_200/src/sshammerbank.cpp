@@ -21,7 +21,7 @@ SSHammerBank::SSHammerBank(ModList * mList, short h, short v) : SSModule(MT_Hamm
 	InitExp(&kAttackExp,"0.05");
 	InitExp(&kDecayExp,"0.1");
 	InitExp(&sustainExp,"1.0");
-	InitExp(&waveformExp,"sin(t*2*pi)");
+	InitExp(&waveformExp,"sm_sin(t*2*pi)");
 	DescribeLink(0, "Instrument 1", "i1",0xFFFF,0x0000,0xFFFF);
 	DescribeLink(1, "Instrument 2", "i2",0xDDDD,0x0000,0xDDDD);
 	DescribeLink(2, "Instrument 3", "i3",0xBBBB,0x0000,0xBBBB);
@@ -128,7 +128,7 @@ void SSHammerBank::Reset(SSModule *callingMod)
 		ar->amp = SolveExp(&kAmpExp, callingMod);
 		ar->attack = SolveExp(&kAttackExp, callingMod);
 		// Decay per sample = attenpersec ^ (1 / SR)
-		ar->decay = pow(SolveExp(&kDecayExp, callingMod),parList->itsOwner->timeInc);
+		ar->decay = sm_pow(SolveExp(&kDecayExp, callingMod),parList->itsOwner->timeInc);
 		ar->waveInc = 0;
 		ar->attackCtr = 0;
 		ar->attackSamples = (long) (ar->attack * parList->itsOwner->mainInst->sampleRate);
