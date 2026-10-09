@@ -3,6 +3,8 @@
 #define _H_SSScore	1
 
 #include "ssmodule.h"
+#include <vector>
+#include <unordered_map>
 
 typedef struct ScoreSection {
 	int				nbrNotes,noteNbr,allocNotes;
@@ -16,6 +18,13 @@ typedef struct ActiveNote {
 	NoteEventPtr	noteInfo;
 	ModList			*instr;
 } ActiveNote, *ActiveNotePtr;
+
+// A note sounding during part of a block (see SSScore::RenderSegment): samples k0 to k1.
+struct ScoreVoice {
+	ModList			*instr;
+	NoteEventPtr	note;
+	int				k0, k1;
+};
 
 class SSScore : public SSModule {
 public:
@@ -33,6 +42,12 @@ public:
 	Boolean			scoreDone;
 	ssfloat			curTempo;
 
+	// Block rendering: notes rendered a block of samples at a time (see RenderBlock)
+	Boolean			blockMode;
+	std::vector<ssfloat>	blkTimes, blkL, blkR;	// the block being played out, at the top level
+	int				blkPos;
+	std::unordered_map<ModList *, double>	voiceCost;	// seconds each note took last block
+
 	// Overrides
 	SSScore(short modType, ModList * mList, short h, short v);
 	ssfloat	GenerateOutput(SSModule *callingMod);
@@ -41,6 +56,14 @@ public:
 	ssfloat GetInstParameter(int n);
 	ssfloat GetNoteTime();
 	Boolean	IsInScore();
+
+	// Block rendering
+	Boolean	BlockSafe();
+	ssfloat	BlockOutput(ssfloat pTime);
+	void	RenderBlock(const ssfloat *times, int n, ssfloat *outL, ssfloat *outR);
+	int		RenderSegment(const ssfloat *times, int n, ssfloat *outL, ssfloat *outR);
+	void	RenderVoice(ScoreVoice &sv, const ssfloat *times, ssfloat sectionStart,
+						ssfloat *outL, ssfloat *outR);
 
 	// Internal
 	void ActivateNextNote(ssfloat pTime);

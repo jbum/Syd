@@ -4,6 +4,8 @@
 
 #include "modlist.h"
 #include <new>
+#include <atomic>
+#include <vector>
 #include <stdlib.h>
 // #include "instrmnt.h"
 
@@ -27,7 +29,7 @@ typedef struct LinkDesc {
 // time, note parameters, arithmetic) as instructions of their own, and every other token as
 // XI_Token, run by ExpMgr::Step from its place in cExp.
 enum { XI_End = 0, XI_Const, XI_Time, XI_Param, XI_Add, XI_Sub, XI_Mul, XI_Div, XI_Neg, XI_Pow,
-	   XI_Token };
+	   XI_Square, XI_Token };
 #define MaxExpInstrs	64
 
 typedef struct ExpInstr {
@@ -65,6 +67,7 @@ public:
 	int				nbrSupportedLinks;
 	int				moduleType;
 	int				id;
+	std::vector<ExpRec *>	exps;	// this module's expressions (InitExp), for ExpUnsafe
 
   // used for stereo mode
   ssfloat   lastRightSample;
@@ -144,6 +147,7 @@ public:
   virtual bool  GetOverlay(char *overlay, int* x, int* y);
   virtual void  Save(FILE* ar);
 #endif
+	bool			ExpUnsafe();	// an expression of this one fails ExpMgr::BlockSafe
 	virtual ssfloat	GenerateOutput(SSModule *callingMod); // Uses global gTime;
   virtual ssfloat  GenerateOutputTime(SSModule *callingMod, ssfloat pTime);
   virtual ssfloat getRightSample();
@@ -163,6 +167,6 @@ public:
 	virtual void	Load(FILE* ar);
 };
 
-extern int gModAlloc;
+extern std::atomic<int> gModAlloc;
 
 #endif

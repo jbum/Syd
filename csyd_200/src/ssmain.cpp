@@ -2,6 +2,8 @@
 #include "patchowner.h"
 #include "modlist.h"
 #include <ctype.h>
+#include <thread>
+#include "sspool.h"
 
 void SyntaxExit()
 {
@@ -12,6 +14,8 @@ void SyntaxExit()
   printf("    -s samplerate  sampling rate\n");
   printf("    -v #           verbosity level\n");
   printf("    -q             quiet output (same as -v 0)\n");
+  printf("    -b samples     block size for scores (default 256; 0: sample by sample)\n");
+  printf("    -j threads     threads to render with (default: one per core)\n");
   printf("    -r seed        fixed seed for randomized noise (also SYD_SEED)\n");
   printf("    -x             allow score to override duration\n");
   printf("    -pN #          instrument parameter override (N may be 4-15)\n");
@@ -32,6 +36,9 @@ SydFileSpec sydSpec;
 
 int main(int argc, char **argv)
 {  
+  gThreads = std::thread::hardware_concurrency();
+  if (gThreads < 1)
+    gThreads = 1;
   if (getenv("SYD_SEED"))
     gFixedSeed = atoi(getenv("SYD_SEED"));
   LogMessage("%s version %s, by %s\n", SYD_TITLE, SYD_VERSION, SYD_AUTHOR);
@@ -58,6 +65,14 @@ int main(int argc, char **argv)
         break;
       case 'q':
         gVerbose = 0;
+        break;
+      case 'b':
+        ++i;
+        gBlockSize = atoi(argv[i]);
+        break;
+      case 'j':
+        ++i;
+        gThreads = atoi(argv[i]);
         break;
       case 'r':
         ++i;

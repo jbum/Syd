@@ -18,6 +18,7 @@
 #define EF_NoParams			2
 #define EF_NoTime			4
 #define EF_NeedsSolving		8
+#define EF_BlockUnsafe		16		// fails ExpMgr::BlockSafe
 
 // Noise Stuff
 
@@ -94,6 +95,7 @@ public:
 	ssfloat	EvalExp(SSModule *callingModule, ExpRec *exp);
 	void	Step(EvalState &st, SSModule *callingModule, unsigned char *&ep);
 	const ExpInstr *Decode(unsigned char *cExp);
+	static bool	BlockSafe(unsigned char *cExp);
 
 	// Expression Compiling
 	int		CompileExp(SSModule *callingModule, char *exp, unsigned char *cExp, int *compileFlags);

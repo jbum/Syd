@@ -117,7 +117,7 @@ void PatchOwner::PerformSynthesis()
 {
 	InitWaveTables();
 
-	LogMessage("Starting Synthesis... [%d]\n",gModAlloc);
+	LogMessage("Starting Synthesis... [%d]\n",gModAlloc.load());
 	if (showMemory)
 		LogMessage("%s\n",StatString());
 	InitGlobals();
@@ -263,7 +263,7 @@ void PatchOwner::CleanUpSynthesis()
 	windowState = WS_Idle;
 	mainInst->CleanUpInstruments();
 
-	LogMessage("...Ending Synthesis [%d]\n",gModAlloc);
+	LogMessage("...Ending Synthesis [%d]\n",gModAlloc.load());
 	if (showMemory)
 		LogMessage("%s\n",StatString());
 
@@ -287,7 +287,7 @@ char* PatchOwner::StatString()
 {
 	static char tempS[64];
 	gLastFreeMem = -1;
-	printf(tempS, "%ld (%ld) [%d/%d]",gLastFreeMem,gLastDelta,gAllocCtr,gModAlloc);
+	printf(tempS, "%ld (%ld) [%d/%d]",gLastFreeMem,gLastDelta,gAllocCtr.load(),gModAlloc.load());
 	return tempS;
 }
 

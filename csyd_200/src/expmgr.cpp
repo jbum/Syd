@@ -701,7 +701,16 @@ const ExpInstr *ExpMgr::Decode(unsigned char *cExp)
 			case OP_Multiply:	ip->op = XI_Mul;	break;
 			case OP_Divide:		ip->op = XI_Div;	break;
 			case OP_Negate:		ip->op = XI_Neg;	break;
-			case OP_Power:		ip->op = XI_Pow;	break;
+			case OP_Power:
+				// x^2 as x*x: the exactly rounded square, where pow may be a rounding step off
+				if (n >= 2 && prog[n - 2].op == XI_Const && prog[n - 2].k == 2.0) {
+					prog[n - 2] = *ip;
+					prog[n - 2].op = XI_Square;
+					--n;
+				}
+				else
+					ip->op = XI_Pow;
+				break;
 			default:			ip->op = XI_Token;	ip->at = start - cExp;	break;
 			}
 			++ep;
@@ -721,6 +730,45 @@ const ExpInstr *ExpMgr::Decode(unsigned char *cExp)
 	ExpInstr *copy = new ExpInstr[n];
 	memcpy(copy, prog, sizeof(ExpInstr) * n);
 	return copy;
+}
+
+// Whether a compiled expression touches only its own voice: no global variables, folder
+// signals, global time or global random numbers, and none of the functions that keep state in
+// the ExpMgr (fractals, noise) or read tables by number. A score renders its notes a block at a
+// time only when every expression in them passes (see SSScore::BlockSafe), since the notes'
+// samples are then computed in a different order.
+bool ExpMgr::BlockSafe(unsigned char *cExp)
+{
+	unsigned char	*ep = cExp;
+
+	while (*ep) {
+		switch (*(ep++)) {
+		case 'V':
+			if (*ep == '#') {
+				ep += 1 + sizeof(ssfloat);
+				continue;
+			}
+			if (*ep == 'g' || *ep == '?')
+				return false;
+			++ep;
+			break;
+		case 'P':
+		case 'L':
+			++ep;
+			break;
+		case 'O':
+			// noise and turbulence are pure (RandPoint); the fractals keep their last result,
+			// fBm and gnoise tables built on first use
+			if ((*ep >= OP_Mandel && *ep <= OP_Julia) || (*ep >= OP_Dragon && *ep <= OP_GNoise3D) ||
+				(*ep >= OP_FTab && *ep <= OP_FTabIP))
+				return false;
+			++ep;
+			break;
+		default:	// 'G' (globals), 'F' (folder signals) and anything unknown
+			return false;
+		}
+	}
+	return true;
 }
 
 // Evaluate exp, as EvalF(callingModule, exp->cExp) would, from its decoded instructions.
@@ -779,6 +827,10 @@ ssfloat ExpMgr::EvalExp(SSModule *callingModule, ExpRec *exp)
 			v2 = PopF();
 			v1 = PopF();
 			PushF(sm_pow(v1,v2));
+			break;
+		case XI_Square:
+			v1 = PopF();
+			PushF(v1*v1);
 			break;
 		default: {
 			unsigned char *ep = exp->cExp + ip->at;

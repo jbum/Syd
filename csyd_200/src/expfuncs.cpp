@@ -188,22 +188,19 @@ int	ExpMgr::CalcJulia(ssfloat x, ssfloat y, ssfloat p0, ssfloat q0)
 
 ssfloat ExpMgr::RandPoint(short x, short y)
 {
-	long	sr;
 	ssfloat	r;
 	if (x < 0)
 		x = -x;
 	if (y < 0)
 		y = -y;
-	sr = GetSRand();
-	MySRand(yA[y%256] ^ xA[x%256]);
-	r = DoubleRandom();
-	MySRand(sr);
+	// was: save the global seed, MySRand(hash), DoubleRandom(), restore the seed. The same
+	// number, without the global seed, so notes on several threads can use it.
+	r = DoubleRandomFrom((int32) (yA[y%256] ^ xA[x%256]));
 	return r;
 }
 
 ssfloat ExpMgr::RandPoint3D(short x, short y, short z)
 {
-	long	sr;
 	ssfloat	r;
 	if (x < 0)
 		x = -x;
@@ -211,10 +208,7 @@ ssfloat ExpMgr::RandPoint3D(short x, short y, short z)
 		y = -y;
 	if (z < 0)
 		z = -z;
-	sr = GetSRand();
-	MySRand(xA[x%256] ^ yA[y%256] ^ zA[z%256]);
-	r = DoubleRandom();
-	MySRand(sr);
+	r = DoubleRandomFrom((int32) (xA[x%256] ^ yA[y%256] ^ zA[z%256]));
 	return r;
 }
 

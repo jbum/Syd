@@ -6,6 +6,19 @@
 #include "patchowner.h"
 #include "ssoutput.h"
 #include <math.h>
+#include "sspool.h"
+#include <algorithm>
+#include <chrono>
+
+// The note a thread is rendering for a score (RenderVoice). Its modules ask the score for the
+// note's parameters and time, which sample by sample are in instParams and noteTime; rendering
+// in blocks, several threads render notes of one score at once, so each keeps its own.
+struct VoiceContext {
+	SSScore			*score;
+	NoteEventPtr	params;
+	ssfloat			noteTime;
+};
+static thread_local VoiceContext *tVoice;
 
 /* Todo:
 	Deal properly with sections with no notes
@@ -80,6 +93,8 @@ ssfloat	SSScore::GenerateOutput(SSModule *callingMod)
 	register ssfloat			pTime = parList->pTime;
 
 	this->callingMod = callingMod;
+	if (blockMode && parList == parList->itsOwner->mainInst)
+		return BlockOutput(pTime);
 	if (scoreDone)
 		return 0.0;
 	if (pTime >= curSection->sectionStart+curSection->sectionLength) {
@@ -134,6 +149,13 @@ ssfloat	SSScore::GenerateOutput(SSModule *callingMod)
 
 ssfloat SSScore::GetInstParameter(int n)
 {
+	NoteEventPtr	instParams = this->instParams;
+	ssfloat			noteTime = this->noteTime;
+
+	if (tVoice && tVoice->score == this) {
+		instParams = tVoice->params;
+		noteTime = tVoice->noteTime;
+	}
 	if (instParams == NULL)
 		return 0.0;
 
@@ -160,6 +182,8 @@ Boolean SSScore::IsInScore()
 //
 ssfloat SSScore::GetNoteTime()
 {
+	if (tVoice && tVoice->score == this)
+		return tVoice->noteTime;
 	return noteTime;
 }
 
@@ -384,6 +408,11 @@ void SSScore::InitScore(SSModule *callingMod)
 	else {
 		EndScore();
 	}
+	blockMode = gBlockSize > 0 && BlockSafe();
+	blkTimes.clear();
+	blkPos = 0;
+	if (gVerbose > 1)
+		LogMessage("Score %s: %s\n", label, blockMode? "block rendering" : "sample by sample");
 }
 
 int CompareScoreEvents(const void *e1, const void *e2);
@@ -420,4 +449,289 @@ void SSScore::GenerateScore(SSModule *callingMod)
 
 void SSScore::PostScoreProcessing()
 {
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+// Block rendering
+//
+// Sample by sample, a score renders every sounding note for one sample, then the next sample.
+// With thousands of notes sounding, each note's modules fall out of the cache between samples.
+// RenderBlock renders each note for a block of samples instead, then adds the notes together
+// sample by sample in the order GenerateOutput would have, so the result is the same to the
+// bit: each note computes the same samples in the same order as before (oscillator phase,
+// envelopes, filter and delay state all carry from one block to the next), and the sums add
+// the same numbers in the same order.
+//
+// The notes' samples are computed in a different order relative to each other, so this is only
+// done when nothing they compute is shared between them (BlockSafe): no global random numbers,
+// variables or time, and no modules that keep such state.
+
+int gBlockSize = 256;
+
+// Whether the modules feeding m only touch state of their own note. A score's own expressions
+// are solved when its score is generated, which for a score directly in our instruments is when
+// one of our notes starts (in time order, before a block renders), so those may use anything; a
+// score further down starts its notes while ours render, so its expressions must pass too.
+static bool SubtreeBlockSafe(SSModule *m, bool inNestedScore, int depth)
+{
+	if (m == NULL || depth > 64) {
+		if (gVerbose > 1)
+			LogMessage("  a missing input, or instruments nested too deep\n");
+		return false;
+	}
+	switch (m->moduleType) {
+	case MT_RandScore:
+	case MT_CScore:
+		if (inNestedScore && m->ExpUnsafe()) {
+			if (gVerbose > 1)
+				LogMessage("  %s: a nested score's expression shares state between notes\n", m->label);
+			return false;
+		}
+		for (int i = 0; i < m->nbrInputs; ++i)
+			if (!SubtreeBlockSafe(m->inputs[i].link, true, depth + 1))
+				return false;
+		return true;
+	case MT_Oscillator:
+	case MT_Envelope:
+	case MT_Mixer:
+	case MT_Filter:
+	case MT_Butter:
+	case MT_Smooth:
+	case MT_Noise:			// has its own random numbers
+	case MT_Delay:
+	case MT_Threshhold:
+	case MT_SampleAndHold:
+	case MT_Amplifier:
+	case MT_Inverter:
+	case MT_Expression:
+		break;
+	default:				// pluck and maraca use the global random numbers; the rest share
+		if (gVerbose > 1)	// files, globals or folder signals
+			LogMessage("  %s: a module that shares state between notes\n", m->label);
+		return false;
+	}
+	if (m->ExpUnsafe()) {
+		if (gVerbose > 1)
+			LogMessage("  %s: an expression that shares state between notes\n", m->label);
+		return false;
+	}
+	for (int i = 0; i < m->nbrInputs; ++i)
+		if (!SubtreeBlockSafe(m->inputs[i].link, inNestedScore, depth + 1))
+			return false;
+	return true;
+}
+
+Boolean SSScore::BlockSafe()
+{
+	for (int i = 0; i < nbrInputs; ++i)
+		if (!SubtreeBlockSafe(inputs[i].link, false, 0))
+			return false;
+	return true;
+}
+
+// GenerateOutput at the top level, where time is the sample number over the sample rate: play
+// out a block, rendering the next one when it runs out.
+ssfloat SSScore::BlockOutput(ssfloat pTime)
+{
+	if (blkPos < (int) blkTimes.size() && pTime == blkTimes[blkPos]) {
+		lastRightSample = blkR[blkPos];
+		return blkL[blkPos++];
+	}
+	if (blkPos > 0 && pTime == blkTimes[blkPos - 1]) {		// asked twice for one sample
+		lastRightSample = blkR[blkPos - 1];
+		return blkL[blkPos - 1];
+	}
+	PatchOwner	*po = parList->itsOwner;
+	long		s = po->sampleNbr;
+	if (pTime != (ssfloat) s / po->mainInst->sampleRate)
+		ErrorExit("Score %s: asked for time %g out of sequence while rendering in blocks "
+				  "(run with -b 0)", label, pTime);
+	long		n = po->nbrSamples - s;
+	if (n > gBlockSize)
+		n = gBlockSize;
+	if (n < 1)
+		n = 1;
+	blkTimes.resize(n);
+	blkL.resize(n);
+	blkR.resize(n);
+	for (long k = 0; k < n; ++k)
+		blkTimes[k] = (ssfloat) (s + k) / po->mainInst->sampleRate;
+	RenderBlock(blkTimes.data(), (int) n, blkL.data(), blkR.data());
+	blkPos = 1;
+	lastRightSample = blkR[0];
+	return blkL[0];
+}
+
+// What GenerateOutput would return (and leave in lastRightSample) at each of n times.
+void SSScore::RenderBlock(const ssfloat *times, int n, ssfloat *outL, ssfloat *outR)
+{
+	int		done = 0;
+	ssfloat	pTime = parList->pTime;		// the modules around us are still at this time
+
+	while (done < n)
+		done += RenderSegment(times + done, n - done, outL + done, outR + done);
+	parList->pTime = pTime;
+}
+
+// Render from times[0] up to the end of the block or of the score section, whichever is first
+// (a new section frees the notes of the last, which this block may still be rendering), and
+// return the number of samples rendered.
+int SSScore::RenderSegment(const ssfloat *times, int n, ssfloat *outL, ssfloat *outR)
+{
+	std::vector<ScoreVoice>	voices;
+	std::vector<int>		slotVoice;		// the voice of each active note, -1 if it doesn't sound
+	std::vector<int>		segStart, orderStart, order;	// summing order, from each change
+	std::vector<ModList *>	dead;			// notes ended in this block, freed after rendering
+	int						k;
+
+	parList->pTime = times[0];
+	if (!scoreDone && times[0] >= curSection->sectionStart + curSection->sectionLength)
+		NextSection(times[0]);
+	if (scoreDone) {				// GenerateOutput returns 0 and leaves lastRightSample as it is
+		for (k = 0; k < n; ++k) {
+			outL[k] = 0.0;
+			outR[k] = lastRightSample;
+		}
+		return n;
+	}
+
+	for (int i = 0; i < nbrActiveNotes; ++i) {
+		ActiveNotePtr ap = &activeNotes[i];
+		if (ap->instr != NULL && ap->instr->nbrModules >= 1) {
+			ScoreVoice sv = {ap->instr, ap->noteInfo, 0, -1};
+			voices.push_back(sv);
+			slotVoice.push_back((int) voices.size() - 1);
+		}
+		else
+			slotVoice.push_back(-1);
+	}
+
+	// Which notes sound at each sample, and in what order GenerateOutput would add them: start
+	// and end notes as it does, but leave the rendering for later.
+	for (k = 0; k < n; ++k) {
+		ssfloat	pTime = times[k];
+		bool	changed = (k == 0);
+
+		if (k > 0 && pTime >= curSection->sectionStart + curSection->sectionLength)
+			break;
+		while (curSection->noteNbr < curSection->nbrNotes &&
+			   curSection->notes[curSection->noteNbr]->p2 + curSection->sectionStart <= pTime &&
+			   parList->itsOwner->windowState == WS_Synthesize)
+		{
+			parList->pTime = pTime;			// as when GenerateOutput starts a note
+			ActivateNextNote(pTime);
+			ActiveNotePtr ap = &activeNotes[nbrActiveNotes - 1];
+			if (ap->instr != NULL && ap->instr->nbrModules >= 1) {
+				ScoreVoice sv = {ap->instr, ap->noteInfo, k, -1};
+				voices.push_back(sv);
+				slotVoice.push_back((int) voices.size() - 1);
+			}
+			else
+				slotVoice.push_back(-1);
+			changed = true;
+		}
+		int	i = 0;
+		while (i < nbrActiveNotes) {
+			ActiveNotePtr ap = &activeNotes[i];
+			if (curSection->sectionStart + ap->noteInfo->p2 + ap->noteInfo->p3 <= pTime) {
+				// KillNote, without freeing the instrument yet
+				if (slotVoice[i] >= 0)
+					voices[slotVoice[i]].k1 = k;
+				if (ap->instr)
+					dead.push_back(ap->instr);
+				activeNotes[i] = activeNotes[nbrActiveNotes - 1];
+				slotVoice[i] = slotVoice[nbrActiveNotes - 1];
+				slotVoice.pop_back();
+				--nbrActiveNotes;
+				changed = true;
+			}
+			else
+				++i;
+		}
+		if (changed) {
+			segStart.push_back(k);
+			orderStart.push_back((int) order.size());
+			for (int j = 0; j < nbrActiveNotes; ++j)
+				if (slotVoice[j] >= 0)
+					order.push_back(slotVoice[j]);
+		}
+	}
+	int		len = k;
+	ssfloat	sectionStart = curSection->sectionStart;
+
+	// Each note, for the samples it sounds
+	size_t	nv = voices.size();
+	std::vector<ssfloat>	vL(nv * len), vR(nv * len);
+	for (size_t v = 0; v < nv; ++v)
+		if (voices[v].k1 < 0)
+			voices[v].k1 = len;
+	// Hand the threads the slowest notes first (by what each took last block, new ones first),
+	// so none is left finishing a slow one alone at the end
+	std::vector<int>		byCost(nv);
+	std::vector<double>		cost(nv);
+	for (size_t v = 0; v < nv; ++v) {
+		auto it = voiceCost.find(voices[v].instr);
+		cost[v] = (it == voiceCost.end())? 1e9 : it->second;
+		byCost[v] = (int) v;
+	}
+	std::sort(byCost.begin(), byCost.end(), [&](int a, int b) { return cost[a] > cost[b]; });
+	ParallelFor((int) nv, [&](int i) {
+		int		v = byCost[i];
+		auto	t0 = std::chrono::steady_clock::now();
+		RenderVoice(voices[v], times, sectionStart, &vL[v * len], &vR[v * len]);
+		cost[v] = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
+	});
+	voiceCost.clear();
+	for (size_t v = 0; v < nv; ++v)
+		voiceCost[voices[v].instr] = cost[v];
+
+	// Their sum at each sample, in GenerateOutput's order
+	for (size_t g = 0; g < segStart.size(); ++g) {
+		int		kA = segStart[g], kB = (g + 1 < segStart.size())? segStart[g + 1] : len;
+		int		oA = orderStart[g], oB = (g + 1 < segStart.size())? orderStart[g + 1] : (int) order.size();
+		for (k = kA; k < kB; ++k) {
+			ssfloat	v = 0.0, r = 0.0;
+			for (int o = oA; o < oB; ++o) {
+				v += vL[order[o] * len + k];
+				r += vR[order[o] * len + k];
+			}
+			outL[k] = v;
+			outR[k] = r;
+		}
+	}
+	lastRightSample = outR[len - 1];
+
+	for (size_t d = 0; d < dead.size(); ++d)
+		delete dead[d];
+	return len;
+}
+
+// One note's samples k0 to k1, into outL and outR at the same indices.
+void SSScore::RenderVoice(ScoreVoice &sv, const ssfloat *times, ssfloat sectionStart,
+						  ssfloat *outL, ssfloat *outR)
+{
+	SSModule		*root = sv.instr->mods[0];
+	VoiceContext	ctx = {this, sv.note, 0.0}, *outer = tVoice;
+
+	tVoice = &ctx;
+	if ((root->moduleType == MT_RandScore || root->moduleType == MT_CScore) &&
+		((SSScore *) root)->blockMode)
+	{
+		// A score as the instrument: it renders the note's block itself
+		std::vector<ssfloat>	nt(sv.k1 - sv.k0);
+		for (int k = sv.k0; k < sv.k1; ++k)
+			nt[k - sv.k0] = times[k] - (sectionStart + sv.note->p2);
+		if (!nt.empty()) {
+			root->callingMod = this;
+			((SSScore *) root)->RenderBlock(nt.data(), (int) nt.size(), outL + sv.k0, outR + sv.k0);
+		}
+	}
+	else {
+		for (int k = sv.k0; k < sv.k1; ++k) {
+			ctx.noteTime = times[k] - (sectionStart + sv.note->p2);
+			outL[k] = root->GenerateOutputTime(this, ctx.noteTime);
+			outR[k] = root->getRightSample();
+		}
+	}
+	tVoice = outer;
 }

@@ -7,6 +7,7 @@
 
 #include "../sydlocal.h"
 #include "smath/smath.h"
+#include <atomic>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -20,8 +21,9 @@
 
 // extern bool	    gQuitFlag,gSuspended;
 extern ssfloat	*gSinTable,*gSquareTable;
-extern int		  gAllocCtr;
+extern std::atomic<int> gAllocCtr;
 extern int      gVerbose;
+extern int      gBlockSize;		// samples a score renders at a time; 0: sample by sample
 extern bool     gDurationOverride;
 
 // Utils
@@ -103,6 +105,7 @@ typedef struct NoteEvent {	// Parsed note event
 int32 GetSRand(void);
 void MySRand(int32 s);
 int32 LongRandom(void);
+ssfloat DoubleRandomFrom(int32 seed);
 ssfloat DoubleRandom(void);
 void Randomize(void);
 int32 RandomizeSeed(void);

@@ -124,7 +124,7 @@ BOOL LocalEqualPt(Point p1, Point p2)
 }
 */
 
-int gAllocCtr;
+std::atomic<int> gAllocCtr;
 
 void *MyNewPtrClear(size_t size)
 {
@@ -197,7 +197,7 @@ unsigned char*SuckFilefromSpec(SydFileSpec *fsSpec)
 	return p;
 }
 
-int	gLogIndent;
+thread_local int	gLogIndent;		// per thread: notes start and end on several
 
 void AddLogIndent(int i)
 {
@@ -267,6 +267,24 @@ void Randomize(void)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// What MySRand(seed) then DoubleRandom() return, without touching the global seed, so
+// threads can use it.
+ssfloat DoubleRandomFrom(int32 seed)
+{
+	int32	hi,lo,test;
+
+	if (seed == 0)
+		seed = 1;
+	hi   = seed / R_Q;
+	lo   = seed % R_Q;
+	test = R_A * lo - R_R * hi;
+	if (test > 0)
+		seed = test;
+	else
+		seed = test + R_M;
+	return seed / (ssfloat) R_M;
+}
 
 int32 LongRandom(void)
 {

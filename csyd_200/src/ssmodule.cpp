@@ -5,9 +5,12 @@
 #include "patchowner.h"
 #include "expmgr.h"
 #include "ssfolder.h"
+#include <mutex>
+#include <string>
+#include <unordered_map>
 
-long	gID;
-int		gModAlloc;
+std::atomic<long>	gID;		// atomic: notes start on several threads at once
+std::atomic<int>	gModAlloc;
 
 SSModule::SSModule(short itsType, ModList * mList, short h, short v)
 {
@@ -442,11 +445,48 @@ void	SSModule::CleanUp()
 
 // Convienience routines for built-in expressions
 //
+// Compiled expressions, by everything compiling depends on: the text, and the module's type and
+// link names (which name its inputs). Every module compiles default expressions when it's made,
+// including the copies made each time a note starts, so this saves compiling the same strings
+// over and over; and since notes start on several threads while a score renders in blocks, it
+// also keeps them from sharing the compiler at once.
+struct CompiledExp {
+	unsigned char	cExp[LenCompiledExp];
+	int				cFlags;
+	int				result;
+	const ExpInstr	*prog;
+};
+static std::mutex								gCompileLock;
+static std::unordered_map<std::string, CompiledExp>	gCompiled;
+
 int SSModule::CompileExp(ExpRecPtr exp)
 {
-	int	result;
-	result = parList->itsOwner->expMgr->CompileExp(this, exp->exp,exp->cExp,&exp->cFlags);
-	exp->prog = parList->itsOwner->expMgr->Decode(exp->cExp);
+	int			result;
+	std::string	key = std::to_string(moduleType) + "|";
+
+	for (int n = 0; n < nbrSupportedLinks; ++n) {
+		LinkDescPtr ld = GetLinkDesc(n);
+		key += ld->varName? ld->varName : "";
+		key += "|";
+	}
+	key += exp->exp;
+	{
+		std::lock_guard<std::mutex>	lock(gCompileLock);
+		auto	it = gCompiled.find(key);
+		if (it == gCompiled.end()) {
+			CompiledExp	&c = gCompiled[key];
+			memset(c.cExp, 0, sizeof(c.cExp));
+			c.result = parList->itsOwner->expMgr->CompileExp(this, exp->exp, c.cExp, &c.cFlags);
+			c.prog = parList->itsOwner->expMgr->Decode(c.cExp);
+			if (!ExpMgr::BlockSafe(c.cExp))
+				c.cFlags |= EF_BlockUnsafe;
+			it = gCompiled.find(key);
+		}
+		memcpy(exp->cExp, it->second.cExp, LenCompiledExp);
+		exp->cFlags = it->second.cFlags;
+		exp->prog = it->second.prog;
+		result = it->second.result;
+	}
 	if (result == 0 && exp->cFlags & EF_IsConstant)
 		exp->eConst = parList->itsOwner->expMgr->EvalExp(this, exp);
 	else
@@ -495,8 +535,22 @@ void SSModule::CopyExp(ExpRecPtr src, ExpRecPtr dst)
 	dst->eConst = src->eConst;
 }
 
+bool SSModule::ExpUnsafe()
+{
+	for (size_t i = 0; i < exps.size(); ++i)
+		if (exps[i]->cFlags & EF_BlockUnsafe)
+			return true;
+	return false;
+}
+
 int SSModule::InitExp(ExpRecPtr exp, char *str)
 {
+	bool	known = false;
+	for (size_t i = 0; i < exps.size(); ++i)
+		known |= (exps[i] == exp);
+	if (!known)
+		exps.push_back(exp);
+
 	char	*sp,*dp;
 
 	// Modified to correct for ending CRs
