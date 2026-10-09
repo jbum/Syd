@@ -1,6 +1,6 @@
 // CSyd render worker: renders a patch with csyd.wasm and posts back the WAV.
 //
-// in:  {patch: {name, text}, files: [{name, data: ArrayBuffer}], seconds, maxSeconds, seed}
+// in:  {patch: {name, text or data (Uint8Array, for Latin-1 bytes)}, files: [{name, data: ArrayBuffer}], seconds, maxSeconds, seed}
 // out: {type: "progress", value: 0..1}
 //      {type: "done", wav: ArrayBuffer, log: string}
 //      {type: "error", message: string, log: string}
@@ -28,7 +28,7 @@ onmessage = async (e) => {
     csyd.FS.mkdir("/work");
     csyd.FS.chdir("/work");
     for (const f of files) csyd.FS.writeFile(f.name, new Uint8Array(f.data));
-    csyd.FS.writeFile(patch.name, patch.text);
+    csyd.FS.writeFile(patch.name, patch.data || patch.text);
 
     const args = ["-q", "-P", "-M", String(maxSeconds), "-o", "/work/csyd-out.wav"];
     if (seconds) args.push("-d", String(seconds));

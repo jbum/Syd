@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Assemble the browser version in build/web: the page, the worker, csyd.js and csyd.wasm
+"""Assemble the browser version in build/web: the renderer and patch editor pages, the worker, csyd.js and csyd.wasm
 (build/build_wasm.sh web), and example patches with the score files they read.
 Serve build/web with any static file server; everything renders in the visitor's browser."""
 import json, os, re, shutil, subprocess
@@ -16,8 +16,9 @@ DATA = ["csyd_102/patches/prelude.sco", "csyd_102/patches/stars.skini", "csyd_10
 subprocess.run([os.path.join(HERE, "build_wasm.sh"), "web"], check=True)
 shutil.rmtree(OUT, ignore_errors=True)
 os.makedirs(os.path.join(OUT, "examples"))
-for f in ("index.html", "worker.js"):
+for f in ("index.html", "editor.html", "syd.js", "worker.js"):
     shutil.copy(os.path.join(SRC, "web", f), OUT)
+shutil.copytree(os.path.join(SRC, "web", "assets"), os.path.join(OUT, "assets"))
 for f in ("csyd.js", "csyd.wasm"):
     shutil.copy(os.path.join(HERE, "wasm-web", f), OUT)
 

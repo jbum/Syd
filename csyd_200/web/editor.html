@@ -1,0 +1,1048 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Syd Patch Editor</title>
+<style>
+  :root {
+    --bg: #faf8f4; --panel: #ffffff; --ink: #1f1d1a; --muted: #6b665e; --line: #e2ddd3;
+    --accent: #2f6f5e; --accent-ink: #ffffff; --bar: #e9e4da; --error: #a33a2a;
+    --desk: #eeeeee; --desk-dot: #dddddd; --wave: #1f1d1a; --wave-mid: #c800c8; --sel: #2f5fd0;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #171614; --panel: #201f1c; --ink: #ece8e1; --muted: #a29c91; --line: #353330;
+      --accent: #5fb39a; --accent-ink: #10201b; --bar: #2c2a27; --error: #e07a68;
+      --desk: #2a2927; --desk-dot: #34332f; --wave: #ece8e1; --wave-mid: #e070e0; --sel: #7aa2ff;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #171614; --panel: #201f1c; --ink: #ece8e1; --muted: #a29c91; --line: #353330;
+    --accent: #5fb39a; --accent-ink: #10201b; --bar: #2c2a27; --error: #e07a68;
+    --desk: #2a2927; --desk-dot: #34332f; --wave: #ece8e1; --wave-mid: #e070e0; --sel: #7aa2ff;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 14px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    display: flex; flex-direction: column;
+  }
+  header {
+    display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+    padding: 8px 16px; border-bottom: 1px solid var(--line); background: var(--panel);
+  }
+  header h1 { font-size: 17px; margin: 0 12px 0 0; letter-spacing: -0.01em; }
+  header .grow { flex: 1; }
+  header a { color: var(--accent); text-decoration: none; font-weight: 600; }
+  button, .btn {
+    font: inherit; font-weight: 600; border: 1px solid var(--line); border-radius: 6px; padding: 5px 11px;
+    background: transparent; color: var(--ink); cursor: pointer; white-space: nowrap;
+  }
+  button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  button:disabled { opacity: 0.45; cursor: default; }
+  select, input[type=text], input[type=number], textarea {
+    font: inherit; color: var(--ink); background: var(--bg);
+    border: 1px solid var(--line); border-radius: 5px; padding: 4px 7px;
+  }
+  header select { max-width: 220px; }
+  .tabs { display: flex; gap: 2px; margin-left: 8px; }
+  .tabs button { border-radius: 6px 6px 0 0; border-bottom: 0; font-weight: 500; }
+  .tabs button.on { background: var(--bg); font-weight: 700; }
+
+  #palette {
+    display: flex; flex-wrap: wrap; gap: 2px; padding: 6px 12px;
+    border-bottom: 1px solid var(--line); background: var(--panel);
+  }
+  .tool { width: 40px; height: 40px; cursor: grab; border-radius: 6px; touch-action: none; }
+  .tool:hover { background: var(--bar); }
+  .tool svg { pointer-events: none; }
+  .tool.sep { width: 10px; cursor: default; }
+  .tool.sep:hover { background: none; }
+
+  #main { flex: 1; display: flex; min-height: 0; }
+  #deskWrap { flex: 1; overflow: auto; background: var(--desk); position: relative; min-width: 0; }
+  #desk { display: block; touch-action: none; user-select: none; -webkit-user-select: none; }
+  #source { flex: 1; display: none; padding: 12px; min-width: 0; }
+  #source textarea { width: 100%; height: calc(100% - 40px); font: 13px/1.45 var(--mono); white-space: pre; resize: none; }
+  #source .bar2 { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+  #zoom { position: sticky; float: right; height: 0; top: 8px; right: 8px; margin: 8px; display: flex; gap: 4px; z-index: 2; }
+  #zoom button { background: var(--panel); padding: 2px 9px; }
+
+  aside {
+    width: 320px; flex: none; border-left: 1px solid var(--line); background: var(--panel);
+    overflow-y: auto; padding: 14px 16px;
+  }
+  aside h2 { font-size: 15px; margin: 0 0 2px; }
+  aside .kind { color: var(--muted); font-size: 13px; margin-bottom: 12px; }
+  aside label { display: block; font-size: 12px; color: var(--muted); margin: 10px 0 3px; }
+  aside input[type=text], aside input[type=number], aside select, aside textarea { width: 100%; }
+  aside textarea { font: 13px/1.4 var(--mono); resize: vertical; min-height: 34px; }
+  aside .exp { font-family: var(--mono); font-size: 13px; }
+  aside .check { display: flex; gap: 6px; align-items: center; margin-top: 10px; color: var(--ink); font-size: 14px; }
+  aside .radios { display: flex; flex-wrap: wrap; gap: 4px 12px; }
+  aside .radios label { display: flex; gap: 4px; align-items: center; margin: 0; color: var(--ink); font-size: 13px; }
+  aside .inrow { display: flex; gap: 6px; align-items: center; margin: 4px 0; }
+  aside .inrow span { flex: 1; font-family: var(--mono); font-size: 13px; overflow: hidden; text-overflow: ellipsis; }
+  aside .inrow select { width: auto; flex: none; }
+  aside .inrow button { padding: 1px 7px; }
+  aside .actions { margin-top: 18px; display: flex; gap: 8px; flex-wrap: wrap; }
+  aside .hint { color: var(--muted); font-size: 13px; }
+  aside .hint p { margin: 6px 0; }
+  aside .err { color: var(--error); font-size: 12px; min-height: 1em; }
+  kbd { font: 12px var(--mono); border: 1px solid var(--line); border-radius: 3px; padding: 0 4px; }
+
+  #preview { border-top: 1px solid var(--line); background: var(--panel); padding: 8px 16px 10px; }
+  #preview .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  #preview input[type=number] { width: 84px; }
+  #preview .lbl { color: var(--muted); font-size: 13px; }
+  .bar { flex: 1 1 120px; height: 6px; background: var(--bar); border-radius: 3px; overflow: hidden; min-width: 80px; }
+  .bar > div { height: 100%; width: 0; background: var(--accent); transition: width 0.15s; }
+  #status { font-size: 13px; color: var(--muted); margin-top: 6px; min-height: 1.4em; }
+  #status.error { color: var(--error); }
+  #waveWrap { position: relative; height: 90px; margin-top: 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); cursor: pointer; }
+  #wave { width: 100%; height: 100%; display: block; }
+  #playhead { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--accent); left: 0; display: none; }
+  #waveEmpty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 13px; }
+  #player { height: 32px; }
+  details { font-size: 12px; color: var(--muted); }
+  details pre { font: 12px/1.4 var(--mono); white-space: pre-wrap; max-height: 140px; overflow: auto; margin: 4px 0 0; }
+  .hidden { display: none !important; }
+
+  /* the patch */
+  .cord { stroke-width: 3; fill: none; stroke-linecap: round; }
+  .cord-shadow { stroke: #000; stroke-width: 3; opacity: 0.55; fill: none; }
+  .cord-hit { stroke: transparent; stroke-width: 12; fill: none; cursor: pointer; }
+  .cord.sel { stroke-width: 5; }
+  .node-label { font: 10px -apple-system, system-ui, sans-serif; fill: var(--muted); text-anchor: middle; pointer-events: none;
+    paint-order: stroke; stroke: var(--desk); stroke-width: 3px; stroke-linejoin: round; }
+  .node-label.sel { fill: var(--ink); font-weight: 600; }
+  .node .dock { fill: transparent; cursor: crosshair; }
+  .node .dock:hover { fill: rgba(255, 210, 0, 0.35); }
+  .node .body { cursor: move; }
+  .rubber { fill: rgba(47, 95, 208, 0.08); stroke: var(--sel); stroke-width: 1; }
+
+  @media (max-width: 760px) {
+    #main { flex-direction: column; }
+    aside { width: auto; border-left: 0; border-top: 1px solid var(--line); max-height: 40vh; }
+    #deskWrap { min-height: 50vh; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Syd</h1>
+  <button id="newBtn" title="Start a new patch">New</button>
+  <select id="example" title="Open an example patch"><option value="">Examples…</option></select>
+  <label class="btn" title="Open a .syd patch, with any score, sample or folder files it reads">Open…
+    <input type="file" id="files" multiple class="hidden"></label>
+  <button id="saveBtn" title="Save the patch as a .syd file">Save .syd</button>
+  <button id="undoBtn" title="Undo (⌘Z)">Undo</button>
+  <button id="redoBtn" title="Redo (⇧⌘Z)">Redo</button>
+  <div class="tabs">
+    <button id="tabPatch" class="on">Patch</button>
+    <button id="tabSource">Source</button>
+  </div>
+  <span class="grow"></span>
+  <span id="patchName" class="lbl"></span>
+  <a href="index.html" title="The plain renderer">Renderer</a>
+</header>
+
+<div id="palette"></div>
+
+<div id="main">
+  <div id="deskWrap">
+    <div id="zoom">
+      <button id="zoomOut" title="Zoom out">−</button>
+      <button id="zoomFit" title="Fit the patch">Fit</button>
+      <button id="zoomIn" title="Zoom in">+</button>
+      <button id="namesBtn" title="Show or hide the units' names">Names</button>
+    </div>
+    <svg id="desk" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+  <div id="source">
+    <textarea id="sourceText" spellcheck="false"></textarea>
+    <div class="bar2">
+      <button id="applySource" class="primary">Apply</button>
+      <span id="sourceErr" class="lbl"></span>
+    </div>
+  </div>
+  <aside id="inspector"></aside>
+</div>
+
+<section id="preview">
+  <div class="row">
+    <button id="previewBtn" class="primary" title="Render the first few seconds (⌘↵)">Preview</button>
+    <span class="lbl">first</span><input type="number" id="previewSecs" min="0.5" step="0.5" value="5"><span class="lbl">s</span>
+    <button id="renderBtn" title="Render the whole patch">Render all</button>
+    <button id="cancelBtn" disabled>Cancel</button>
+    <span class="lbl">seed</span><input type="number" id="seed" min="1" step="1" placeholder="random">
+    <div class="bar"><div id="progress"></div></div>
+    <audio id="player" controls class="hidden"></audio>
+    <a id="download" class="btn hidden">Download WAV</a>
+  </div>
+  <div id="waveWrap"><canvas id="wave"></canvas><div id="playhead"></div>
+    <div id="waveEmpty">Preview renders the patch with CSyd, here in your browser.</div></div>
+  <div id="status">Ready.</div>
+  <details id="logBox" class="hidden"><summary>CSyd's output</summary><pre id="log"></pre></details>
+</section>
+
+<script src="syd.js"></script>
+<script>
+"use strict";
+const { TYPES, PALETTE } = Syd;
+const $ = (id) => document.getElementById(id);
+const SVGNS = "http://www.w3.org/2000/svg";
+const NODE = 40;                 // JSyd draws every unit 40 px square
+const DOCK = 15;                 // the strip at a unit's right edge that starts a patch cord
+const MAX_SECONDS = 600;
+
+let patch = null, patchName = "untitled.syd";
+let files = new Map();           // data files the patch can read: name -> ArrayBuffer
+let exampleFiles = [];           // the examples' shared data files (fetched on demand)
+let selection = new Set();       // selected modules
+let selLink = null;              // {mod, index}: a selected patch cord
+let zoom = 1.5;
+let showNames = true;
+try { showNames = localStorage.getItem("syd-names") !== "0"; } catch (_) {}
+let undoStack = [], redoStack = [];
+
+// ---- state, undo, autosave ----------------------------------------------------------
+
+const snapshot = () => JSON.stringify({ patch, name: patchName });
+function restore(s) {
+  const o = JSON.parse(s);
+  patch = o.patch;
+  patchName = o.name;
+  selection.clear();
+  selLink = null;
+}
+// Call before every change
+function remember() {
+  undoStack.push(snapshot());
+  if (undoStack.length > 200) undoStack.shift();
+  redoStack = [];
+}
+function changed() {
+  draw();
+  inspect();
+  try { localStorage.setItem("syd-editor", snapshot()); } catch (_) {}
+  $("undoBtn").disabled = !undoStack.length;
+  $("redoBtn").disabled = !redoStack.length;
+  $("patchName").textContent = patchName;
+}
+function undo() {
+  if (!undoStack.length) return;
+  redoStack.push(snapshot());
+  restore(undoStack.pop());
+  changed();
+}
+function redo() {
+  if (!redoStack.length) return;
+  undoStack.push(snapshot());
+  restore(redoStack.pop());
+  changed();
+}
+function load(p, name, keepFiles) {
+  patch = p;
+  patchName = name;
+  if (!keepFiles) files = new Map();
+  undoStack = [];
+  redoStack = [];
+  selection.clear();
+  selLink = null;
+  clearPreview();
+  changed();
+  fit();
+}
+
+const byLabel = (label) => patch.modules.find((m) => m.label === label);
+
+// ---- drawing --------------------------------------------------------------------------
+
+function el(name, attrs, parent) {
+  const e = document.createElementNS(SVGNS, name);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+
+// A unit's icon: JSyd's background shape with its label stamp
+function icon(parent, type, selected, x, y, size) {
+  const t = TYPES[type];
+  const g = el("g", {}, parent);
+  const back = el("svg", { x, y, width: size, height: size, viewBox: `${t.icon * 64} ${selected ? 64 : 0} 64 64` }, g);
+  el("image", { href: "assets/iconbacks.png", width: 256, height: 128 }, back);
+  const stamp = el("svg", { x, y, width: size, height: size, viewBox: `${t.stamp * 64} 0 64 64` }, g);
+  el("image", { href: "assets/unitlabels.png", width: 1664, height: 64 }, stamp);
+  return g;
+}
+
+// Where a cord leaves its source and meets its destination (JSyd's GetOutputDock and
+// GetInputDock): out the right side and in the left when the destination is to the
+// right, otherwise out the bottom and in the top.
+function cordEnds(src, dst) {
+  const across = !(dst.x < src.x + NODE);
+  return across
+    ? [src.x + NODE - 8, src.y + NODE / 2, dst.x + 8, dst.y + NODE / 2]
+    : [src.x + NODE / 2, src.y + NODE - 8, dst.x + NODE / 2, dst.y + 8];
+}
+
+function bounds() {
+  let x0 = 0, y0 = 0, x1 = 400, y1 = 260;
+  for (const m of patch.modules) {
+    x0 = Math.min(x0, m.x - 20); y0 = Math.min(y0, m.y - 20);
+    x1 = Math.max(x1, m.x + NODE + 60); y1 = Math.max(y1, m.y + NODE + 60);
+  }
+  return { x0, y0, x1, y1 };
+}
+
+let dragCord = null;             // a cord being drawn: {src, x, y}
+let rubber = null;               // a selection rectangle: {x0, y0, x1, y1}
+
+function draw() {
+  const svg = $("desk");
+  svg.textContent = "";
+  const b = bounds();
+  const wrap = $("deskWrap");
+  const w = Math.max(b.x1 - b.x0, (wrap.clientWidth - 1) / zoom), h = Math.max(b.y1 - b.y0, (wrap.clientHeight - 5) / zoom);
+  svg.setAttribute("viewBox", `${b.x0} ${b.y0} ${w} ${h}`);
+  svg.setAttribute("width", w * zoom);
+  svg.setAttribute("height", h * zoom);
+
+  const defs = el("defs", {}, svg);
+  const pat = el("pattern", { id: "dots", width: 20, height: 20, patternUnits: "userSpaceOnUse" }, defs);
+  el("circle", { cx: 1, cy: 1, r: 1, fill: "var(--desk-dot)" }, pat);
+  el("rect", { x: b.x0, y: b.y0, width: w, height: h, fill: "url(#dots)", class: "backdrop" }, svg);
+
+  // cords under the units
+  const cords = el("g", {}, svg);
+  for (const dst of patch.modules) {
+    dst.inputs.forEach((inp, index) => {
+      const src = byLabel(inp.from);
+      if (!src) return;
+      const [x1, y1, x2, y2] = cordEnds(src, dst);
+      const d = `M${x1},${y1}L${x2},${y2}`;
+      const sel = selLink && selLink.mod === dst.label && selLink.index === index;
+      el("path", { d, class: "cord-shadow", transform: "translate(1,1)" }, cords);
+      el("path", { d, class: "cord" + (sel ? " sel" : ""), stroke: Syd.linkColor(inp.link) }, cords);
+      const hit = el("path", { d, class: "cord-hit" }, cords);
+      el("title", {}, hit).textContent = `${inp.from} → ${dst.label} (${inp.link})`;
+      hit.addEventListener("pointerdown", (e) => {
+        e.stopPropagation();
+        selection.clear();
+        selLink = { mod: dst.label, index };
+        draw();
+        inspect();
+      });
+    });
+  }
+
+  for (const m of patch.modules) {
+    const g = el("g", { class: "node" }, svg);
+    icon(g, m.type, selection.has(m), m.x, m.y, NODE);
+    if (showNames || selection.has(m))
+      el("text", { x: m.x + NODE / 2, y: m.y + NODE + 10, class: "node-label" + (selection.has(m) ? " sel" : "") }, g).textContent = m.label;
+    const body = el("rect", { x: m.x, y: m.y, width: NODE - DOCK, height: NODE, class: "body", fill: "transparent" }, g);
+    el("title", {}, body).textContent = `${m.label}: ${TYPES[m.type].desc}`;
+    body.addEventListener("pointerdown", (e) => startMove(e, m));
+    body.addEventListener("dblclick", () => focusFirstField());
+    const dock = el("rect", { x: m.x + NODE - DOCK, y: m.y, width: DOCK, height: NODE, rx: 4, class: "dock" }, g);
+    el("title", {}, dock).textContent = "Drag to patch " + m.label + " into another unit";
+    dock.addEventListener("pointerdown", (e) => startCord(e, m));
+  }
+
+  if (dragCord) {
+    const g = el("g", {}, svg);
+    const pts = lightning(dragCord.ax, dragCord.ay, dragCord.x, dragCord.y);
+    el("polyline", { points: pts, fill: "none", stroke: "#777", "stroke-width": 3, transform: "translate(1,1)" }, g);
+    el("polyline", { points: pts, fill: "none", stroke: `rgb(255,255,${(Math.random() * 256) | 0})`, "stroke-width": 2 + (Math.random() * 2 | 0) }, g);
+  }
+  if (rubber) {
+    el("rect", { x: Math.min(rubber.x0, rubber.x1), y: Math.min(rubber.y0, rubber.y1),
+      width: Math.abs(rubber.x1 - rubber.x0), height: Math.abs(rubber.y1 - rubber.y0), class: "rubber" }, svg);
+  }
+}
+
+// JSyd's patch cord, drawn as lightning while you drag it
+function lightning(x1, y1, x2, y2) {
+  const pts = [[x1, y1]];
+  (function bolt(ax, ay, bx, by, disp) {
+    if (disp < 2) { pts.push([bx, by]); return; }
+    const mx = (ax + bx) / 2 + (Math.random() - 0.5) * disp, my = (ay + by) / 2 + (Math.random() - 0.5) * disp;
+    bolt(ax, ay, mx, my, disp / 2);
+    bolt(mx, my, bx, by, disp / 2);
+  })(x1, y1, x2, y2, 10 + Math.random() ** 2 * 32);
+  return pts.map((p) => p.join(",")).join(" ");
+}
+
+// ---- pointer interaction -------------------------------------------------------------
+
+function toPatch(e) {
+  const pt = $("desk").createSVGPoint();
+  pt.x = e.clientX;
+  pt.y = e.clientY;
+  return pt.matrixTransform($("desk").getScreenCTM().inverse());
+}
+const unitAt = (p) => patch.modules.slice().reverse()
+  .find((m) => p.x >= m.x && p.x < m.x + NODE && p.y >= m.y && p.y < m.y + NODE);
+
+function track(e, move, up) {
+  const target = e.currentTarget;
+  target.setPointerCapture && target.setPointerCapture(e.pointerId);
+  const onMove = (ev) => move(ev);
+  const onUp = (ev) => {
+    window.removeEventListener("pointermove", onMove);
+    window.removeEventListener("pointerup", onUp);
+    up(ev);
+  };
+  window.addEventListener("pointermove", onMove);
+  window.addEventListener("pointerup", onUp);
+}
+
+function startMove(e, m) {
+  e.stopPropagation();
+  e.preventDefault();
+  selLink = null;
+  if (e.shiftKey || e.metaKey || e.ctrlKey) {
+    selection.has(m) ? selection.delete(m) : selection.add(m);
+    draw();
+    inspect();
+    return;
+  }
+  if (!selection.has(m)) { selection.clear(); selection.add(m); }
+  const start = toPatch(e), moving = [...selection], orig = moving.map((u) => [u.x, u.y]);
+  let moved = false;
+  inspect();
+  draw();
+  track(e, (ev) => {
+    const p = toPatch(ev), dx = Math.round(p.x - start.x), dy = Math.round(p.y - start.y);
+    if (!moved && Math.abs(dx) + Math.abs(dy) < 3) return;
+    if (!moved) { remember(); moved = true; }
+    moving.forEach((u, i) => { u.x = orig[i][0] + dx; u.y = orig[i][1] + dy; });
+    draw();
+  }, () => { if (moved) changed(); });
+}
+
+function startCord(e, m) {
+  e.stopPropagation();
+  e.preventDefault();
+  const p = toPatch(e);
+  dragCord = { src: m, ax: m.x + NODE - 8, ay: m.y + NODE / 2, x: p.x, y: p.y };
+  let timer = setInterval(draw, 60);      // the lightning flickers
+  track(e, (ev) => {
+    const q = toPatch(ev);
+    dragCord.x = q.x;
+    dragCord.y = q.y;
+    draw();
+  }, (ev) => {
+    clearInterval(timer);
+    const dst = unitAt(toPatch(ev));
+    dragCord = null;
+    if (dst && dst !== m) connect(m, dst);
+    else draw();
+  });
+}
+
+function connect(src, dst) {
+  const names = Syd.inputNames(dst.type);
+  if (!names.length) {
+    status(`A ${TYPES[dst.type].desc} takes no inputs.`, true);
+    draw();
+    return;
+  }
+  // like JSyd, the new cord gets the input type last chosen on this unit
+  const link = dst.lastLink && names.includes(dst.lastLink) ? dst.lastLink : names[0];
+  remember();
+  dst.inputs.push({ from: src.label, link });
+  selection.clear();
+  selLink = { mod: dst.label, index: dst.inputs.length - 1 };
+  status(`Patched ${src.label} into ${dst.label} as ${link}.` + (names.length > 1 ? " Pick another input type on the right." : ""));
+  changed();
+}
+
+$("desk").addEventListener("pointerdown", (e) => {
+  // empty desk: rubber-band selection
+  if (e.button !== 0) return;
+  const p = toPatch(e);
+  const additive = e.shiftKey || e.metaKey;
+  const before = additive ? new Set(selection) : new Set();
+  rubber = { x0: p.x, y0: p.y, x1: p.x, y1: p.y };
+  selLink = null;
+  selection = new Set(before);
+  track(e, (ev) => {
+    const q = toPatch(ev);
+    rubber.x1 = q.x;
+    rubber.y1 = q.y;
+    const [lx, hx] = [Math.min(rubber.x0, q.x), Math.max(rubber.x0, q.x)];
+    const [ly, hy] = [Math.min(rubber.y0, q.y), Math.max(rubber.y0, q.y)];
+    selection = new Set(before);
+    for (const m of patch.modules)
+      if (m.x + NODE > lx && m.x < hx && m.y + NODE > ly && m.y < hy) selection.add(m);
+    draw();
+  }, () => {
+    rubber = null;
+    draw();
+    inspect();
+  });
+});
+
+function deleteSelection() {
+  if (selLink) {
+    remember();
+    byLabel(selLink.mod).inputs.splice(selLink.index, 1);
+    selLink = null;
+    changed();
+    return;
+  }
+  const gone = [...selection].filter((m) => m.type !== "out");
+  if (!gone.length) {
+    if (selection.size) status("The output unit stays: every patch needs one.", true);
+    return;
+  }
+  remember();
+  const labels = new Set(gone.map((m) => m.label));
+  patch.modules = patch.modules.filter((m) => !labels.has(m.label));
+  for (const m of patch.modules) m.inputs = m.inputs.filter((i) => !labels.has(i.from));
+  selection.clear();
+  changed();
+}
+
+// ---- the palette ---------------------------------------------------------------------
+
+function buildPalette() {
+  const pal = $("palette");
+  for (const type of PALETTE) {
+    const d = document.createElement("div");
+    d.className = "tool";
+    d.title = TYPES[type].desc + " (" + type + ")";
+    const s = el("svg", { width: 40, height: 40, viewBox: "0 0 40 40" });
+    icon(s, type, false, 2, 2, 36);
+    d.appendChild(s);
+    d.addEventListener("pointerdown", (e) => startPaletteDrag(e, type));
+    pal.appendChild(d);
+  }
+}
+
+// Drag a unit off the palette onto the desk, or click to drop one in view
+function startPaletteDrag(e, type) {
+  e.preventDefault();
+  if (type === "out" && patch.modules.some((m) => m.type === "out")) {
+    status("This patch has its output unit already.", true);
+    return;
+  }
+  const ghost = document.createElement("div");
+  ghost.style.cssText = "position:fixed;pointer-events:none;z-index:10;opacity:.85;width:" + NODE * zoom + "px;height:" + NODE * zoom + "px";
+  const s = el("svg", { width: "100%", height: "100%", viewBox: "0 0 40 40" });
+  icon(s, type, true, 0, 0, 40);
+  ghost.appendChild(s);
+  const place = (ev) => { ghost.style.left = ev.clientX - NODE * zoom / 2 + "px"; ghost.style.top = ev.clientY - NODE * zoom / 2 + "px"; };
+  place(e);
+  document.body.appendChild(ghost);
+  const sx = e.clientX, sy = e.clientY;
+  track(e, place, (ev) => {
+    ghost.remove();
+    const r = $("deskWrap").getBoundingClientRect();
+    let p;
+    if (Math.abs(ev.clientX - sx) + Math.abs(ev.clientY - sy) < 4) {
+      // a click: the first free spot in view
+      const c = toPatch({ clientX: r.left + 40, clientY: r.top + 40 });
+      p = { x: c.x, y: c.y };
+      while (patch.modules.some((m) => Math.abs(m.x - p.x) < NODE + 8 && Math.abs(m.y - p.y) < NODE + 8)) {
+        p.x += NODE + 16;
+        if (p.x > c.x + r.width / zoom - 100) { p.x = c.x; p.y += NODE + 24; }
+      }
+    } else if (ev.clientX >= r.left && ev.clientX <= r.right && ev.clientY >= r.top && ev.clientY <= r.bottom) {
+      const q = toPatch(ev);
+      p = { x: q.x - NODE / 2, y: q.y - NODE / 2 };
+    } else return;
+    remember();
+    const m = Syd.newModule(patch, type, Math.round(p.x), Math.round(p.y));
+    patch.modules.push(m);
+    selection = new Set([m]);
+    selLink = null;
+    changed();
+  });
+}
+
+// ---- the inspector -------------------------------------------------------------------
+
+function h(tag, props, ...kids) {
+  const e = document.createElement(tag);
+  for (const k in props || {}) {
+    if (k.startsWith("on")) e.addEventListener(k.slice(2), props[k]);
+    else if (k === "text") e.textContent = props[k];
+    else if (k in e && k !== "list") e[k] = props[k];
+    else e.setAttribute(k, props[k]);
+  }
+  for (const k of kids) if (k != null) e.appendChild(typeof k === "string" ? document.createTextNode(k) : k);
+  return e;
+}
+
+// Edit one param; module.dirty makes it write its lines afresh
+function setParam(m, key, value) {
+  if (m.params[key] === value) return;
+  remember();
+  m.params[key] = value;
+  m.dirty = true;
+  // the cord menus and output length depend on these; the rest only needs the save
+  try { localStorage.setItem("syd-editor", snapshot()); } catch (_) {}
+  $("undoBtn").disabled = false;
+}
+
+function fieldEditor(m, f) {
+  const p = m.params;
+  const id = "f-" + f.key;
+  if (f.kind === "check")
+    return h("label", { className: "check" },
+      h("input", { type: "checkbox", checked: !!+p[f.key], onchange: (e) => setParam(m, f.key, e.target.checked ? 1 : 0) }), f.label);
+  const wrap = h("div", {}, h("label", { htmlFor: id, text: f.label }));
+  if (f.kind === "choice") {
+    const r = h("div", { className: "radios" });
+    f.options.forEach((o, i) => r.appendChild(h("label", {},
+      h("input", { type: "radio", name: id, checked: +p[f.key] === i,
+        onchange: () => { setParam(m, f.key, i); inspect(); } }), o)));
+    wrap.appendChild(r);
+  } else if (f.kind === "exp") {
+    const long = String(p[f.key]).length > 34;
+    const t = h(long ? "textarea" : "input", { id, className: "exp", value: p[f.key], spellcheck: false });
+    if (!long) t.type = "text";
+    t.rows = 2;
+    t.addEventListener("change", () => setParam(m, f.key, t.value.replace(/[\r\n]+/g, " ")));
+    wrap.appendChild(t);
+  } else if (f.kind === "file") {
+    const t = h("input", { id, type: "text", value: p[f.key], spellcheck: false });
+    t.setAttribute("list", "fileList");
+    t.addEventListener("change", () => setParam(m, f.key, t.value.trim().split(/\s+/)[0] || f.def));
+    wrap.appendChild(t);
+    const have = files.has(p[f.key]) || exampleFiles.includes(p[f.key]);
+    if (!have) wrap.appendChild(h("div", { className: "err", text: "Not opened yet: add it with Open…" }));
+  } else {
+    const num = f.kind === "int" || f.kind === "num";
+    const t = h("input", { id, type: num ? "number" : "text", value: p[f.key], step: f.kind === "int" ? 1 : "any" });
+    t.addEventListener("change", () => {
+      let v = t.value.trim();
+      if (num) v = f.kind === "int" ? (parseInt(v, 10) || 0) : (parseFloat(v) || 0);
+      else v = v.split(/\s+/)[0] || f.def;
+      setParam(m, f.key, v);
+    });
+    wrap.appendChild(t);
+  }
+  return wrap;
+}
+
+function inspect() {
+  const box = $("inspector");
+  box.textContent = "";
+  // the file list for file fields
+  const dl = h("datalist", { id: "fileList" });
+  for (const n of new Set([...files.keys(), ...exampleFiles])) dl.appendChild(h("option", { value: n }));
+  box.appendChild(dl);
+
+  if (selLink) {
+    const dst = byLabel(selLink.mod), inp = dst && dst.inputs[selLink.index];
+    if (!inp) { selLink = null; return inspect(); }
+    box.append(h("h2", { text: "Patch cord" }),
+      h("div", { className: "kind", text: `${inp.from} → ${dst.label}` }),
+      h("label", { text: "Arrives as" }));
+    const s = h("select", { onchange: (e) => {
+      remember();
+      inp.link = e.target.value;
+      dst.lastLink = inp.link;
+      changed();
+    } });
+    for (const [name, desc] of TYPES[dst.type].inputs) s.appendChild(h("option", { value: name, text: `${desc} [${name}]`, selected: name === inp.link }));
+    if (!Syd.inputNames(dst.type).includes(inp.link)) s.appendChild(h("option", { value: inp.link, text: inp.link + " (unknown)", selected: true }));
+    box.append(s, h("div", { className: "actions" }, h("button", { text: "Delete cord", onclick: deleteSelection })));
+    box.append(h("div", { className: "hint" }, h("p", { text: "In expressions, the unit reads this input by its name (sig, ctl, fm…). Several cords with the same name are summed." })));
+    return;
+  }
+
+  if (selection.size === 1) {
+    const m = [...selection][0], t = TYPES[m.type];
+    const name = h("input", { type: "text", value: m.label, spellcheck: false });
+    const err = h("div", { className: "err" });
+    name.addEventListener("change", () => {
+      const v = name.value.trim();
+      if (!/^\S{1,31}$/.test(v)) { err.textContent = "One word, at most 31 characters."; return; }
+      if (v !== m.label && byLabel(v)) { err.textContent = "Another unit has that name."; return; }
+      remember();
+      for (const u of patch.modules) for (const i of u.inputs) if (i.from === m.label) i.from = v;
+      if (selLink && selLink.mod === m.label) selLink.mod = v;
+      m.label = v;
+      changed();
+    });
+    box.append(h("h2", { text: t.desc }), h("div", { className: "kind", text: m.type }), h("label", { text: "Name" }), name, err);
+    for (const f of t.fields) {
+      if (f.hidden || (f.when && !f.when(m.params))) continue;
+      box.appendChild(fieldEditor(m, f));
+    }
+    if (m.type === "out") box.appendChild(h("div", { className: "hint" }, h("p", { text: "Preview renders the first few seconds; Render all renders the whole duration (up to 10 minutes)." })));
+    if (m.inputs.length) {
+      box.appendChild(h("label", { text: "Inputs" }));
+      m.inputs.forEach((inp, index) => {
+        const s = h("select", { onchange: (e) => { remember(); inp.link = e.target.value; m.lastLink = inp.link; changed(); } });
+        for (const [n] of t.inputs) s.appendChild(h("option", { value: n, text: n, selected: n === inp.link }));
+        box.appendChild(h("div", { className: "inrow" },
+          h("span", { text: inp.from, title: "Select this cord", style: "cursor:pointer", onclick: () => { selection.clear(); selLink = { mod: m.label, index }; changed(); } }),
+          s,
+          h("button", { text: "×", title: "Unpatch", onclick: () => { remember(); m.inputs.splice(index, 1); changed(); } })));
+      });
+    }
+    if (m.type !== "out") box.appendChild(h("div", { className: "actions" }, h("button", { text: "Delete unit", onclick: deleteSelection })));
+    return;
+  }
+
+  if (selection.size > 1) {
+    box.append(h("h2", { text: selection.size + " units" }),
+      h("div", { className: "actions" }, h("button", { text: "Delete units", onclick: deleteSelection })));
+    return;
+  }
+
+  const out = patch.modules.find((m) => m.type === "out");
+  box.append(h("h2", { text: patchName }),
+    h("div", { className: "kind", text: `${patch.modules.length} units` }));
+  if (out) for (const f of TYPES.out.fields) if (!f.hidden) box.appendChild(fieldEditor(out, f));
+  const want = Syd.dataFiles(patch);
+  if (want.length) {
+    box.appendChild(h("label", { text: "Files this patch reads" }));
+    for (const n of want) {
+      const have = files.has(n) || exampleFiles.includes(n);
+      box.appendChild(h("div", { className: "inrow" }, h("span", { text: n }),
+        h("span", { text: have ? "ready" : "missing: Open… it", style: "flex:none;font-family:inherit;color:" + (have ? "var(--muted)" : "var(--error)") })));
+    }
+  }
+  box.appendChild(h("div", { className: "hint" },
+    h("p", { text: "Drag a unit from the palette onto the desk. Drag from a unit's right edge to patch it into another. Click a unit or cord to edit it; drag on the desk to select several." }),
+    h("p", {}, h("kbd", { text: "Delete" }), " removes the selection, ", h("kbd", { text: "⌘Z" }), " undoes, ", h("kbd", { text: "⌘↵" }), " previews.")));
+}
+
+function focusFirstField() {
+  const f = $("inspector").querySelector("textarea, input[type=text]:not([value^=m])") || $("inspector").querySelector("input");
+  f && f.focus();
+}
+
+// ---- source view ---------------------------------------------------------------------
+
+let tab = "patch";
+function showTab(which) {
+  tab = which;
+  $("tabPatch").classList.toggle("on", which === "patch");
+  $("tabSource").classList.toggle("on", which === "source");
+  $("deskWrap").style.display = which === "patch" ? "" : "none";
+  $("source").style.display = which === "source" ? "block" : "none";
+  if (which === "source") {
+    $("sourceText").value = Syd.serialize(patch);
+    $("sourceErr").textContent = "";
+  } else draw();
+}
+$("tabPatch").onclick = () => showTab("patch");
+$("tabSource").onclick = () => showTab("source");
+$("applySource").onclick = () => {
+  try {
+    const p = Syd.parse($("sourceText").value);
+    if (!p.modules.some((m) => m.type === "out")) throw new Error("The patch needs an output unit (type out).");
+    remember();
+    patch = p;
+    selection.clear();
+    selLink = null;
+    changed();
+    $("sourceErr").textContent = "Applied.";
+  } catch (err) {
+    $("sourceErr").textContent = err.message;
+  }
+};
+
+// ---- zoom ----------------------------------------------------------------------------
+
+function fit() {
+  const b = bounds(), wrap = $("deskWrap");
+  zoom = Math.max(0.5, Math.min(2.5, (wrap.clientWidth - 30) / (b.x1 - b.x0), (wrap.clientHeight - 30) / (b.y1 - b.y0)));
+  draw();
+}
+$("zoomIn").onclick = () => { zoom = Math.min(4, zoom * 1.25); draw(); };
+$("zoomOut").onclick = () => { zoom = Math.max(0.3, zoom / 1.25); draw(); };
+$("zoomFit").onclick = fit;
+$("namesBtn").onclick = () => {
+  showNames = !showNames;
+  try { localStorage.setItem("syd-names", showNames ? "1" : "0"); } catch (_) {}
+  draw();
+};
+// the desk fills whatever room the inspector leaves it
+new ResizeObserver(() => patch && draw()).observe($("deskWrap"));
+
+// ---- files ---------------------------------------------------------------------------
+
+function status(text, isError) {
+  $("status").textContent = text;
+  $("status").classList.toggle("error", !!isError);
+}
+
+async function openExample(i) {
+  const ex = examples[i];
+  const bytes = new Uint8Array(await (await fetch("examples/" + ex.file)).arrayBuffer());
+  try {
+    load(Syd.parse(Syd.bytesToText(bytes)), ex.file);
+    status(ex.description || "Opened " + ex.file + ".");
+  } catch (err) {
+    status(ex.file + ": " + err.message, true);
+  }
+}
+
+let examples = [];
+async function init() {
+  buildPalette();
+  let restored = false;
+  try {
+    const s = localStorage.getItem("syd-editor");
+    if (s) { restore(s); restored = true; }
+  } catch (_) {}
+  if (!restored) { patch = Syd.newPatch(); }
+  changed();
+  fit();
+  try {
+    const manifest = await (await fetch("examples/examples.json")).json();
+    examples = manifest.patches;
+    exampleFiles = manifest.files;
+    examples.forEach((ex, i) => $("example").appendChild(h("option", { value: i, text: ex.name })));
+    inspect();
+  } catch (_) {}
+}
+
+$("example").onchange = () => {
+  const i = $("example").value;
+  $("example").value = "";
+  if (i !== "") openExample(+i);
+};
+
+$("files").onchange = async () => {
+  const chosen = [...$("files").files];
+  $("files").value = "";
+  const syd = chosen.filter((f) => /\.syd$/i.test(f.name));
+  // every file goes in the render's folder: a .syd may be a folder unit's patch
+  const read = await Promise.all(chosen.map(async (f) => [f.name, await f.arrayBuffer()]));
+  if (syd.length === 1 || (syd.length > 1 && !patch)) {
+    const main = syd[0];
+    try {
+      const p = Syd.parse(Syd.bytesToText(new Uint8Array(read.find(([n]) => n === main.name)[1])));
+      const keep = new Map(read.filter(([n]) => n !== main.name));
+      load(p, main.name);
+      files = keep;
+      inspect();
+      status("Opened " + main.name + (keep.size ? ` with ${keep.size} more file${keep.size > 1 ? "s" : ""}.` : "."));
+    } catch (err) {
+      status(main.name + ": " + err.message, true);
+    }
+  } else {
+    // data files only (or several patches): add them to this patch's folder
+    for (const [n, d] of read) files.set(n, d);
+    inspect();
+    status(`Added ${read.length} file${read.length > 1 ? "s" : ""} for this patch to read.`);
+  }
+};
+
+$("newBtn").onclick = () => {
+  remember();
+  const u = undoStack.slice();
+  load(Syd.newPatch(), "untitled.syd");
+  undoStack = u;
+  changed();
+};
+
+$("saveBtn").onclick = () => {
+  const blob = new Blob([Syd.textToBytes(Syd.serialize(patch))], { type: "application/octet-stream" });
+  const a = h("a", { href: URL.createObjectURL(blob), download: patchName });
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+};
+$("undoBtn").onclick = undo;
+$("redoBtn").onclick = redo;
+
+document.addEventListener("keydown", (e) => {
+  const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName);
+  const mod = e.metaKey || e.ctrlKey;
+  if (mod && e.key === "Enter") { e.preventDefault(); document.activeElement.blur(); startRender(true); return; }
+  if (typing) return;
+  if (mod && e.key.toLowerCase() === "z") { e.preventDefault(); e.shiftKey ? redo() : undo(); }
+  else if (mod && e.key.toLowerCase() === "y") { e.preventDefault(); redo(); }
+  else if (mod && e.key.toLowerCase() === "a" && tab === "patch") { e.preventDefault(); selection = new Set(patch.modules); selLink = null; draw(); inspect(); }
+  else if (e.key === "Delete" || e.key === "Backspace") { e.preventDefault(); deleteSelection(); }
+  else if (e.key === "Escape") { selection.clear(); selLink = null; draw(); inspect(); }
+});
+
+// ---- rendering: the hook to the WebAssembly renderer ---------------------------------
+//
+// render(patchText, {name, seconds, seed, files, onProgress}) renders a patch with
+// csyd.wasm in a worker and resolves to {wav: ArrayBuffer, log}; cancel() stops it.
+
+let worker = null, rejectRender = null;
+function render(text, opts) {
+  cancel();
+  return new Promise((resolve, reject) => {
+    rejectRender = reject;
+    worker = new Worker("worker.js");
+    worker.onmessage = (e) => {
+      const m = e.data;
+      if (m.type === "progress") { opts.onProgress && opts.onProgress(m.value); return; }
+      finishWorker();
+      if (m.type === "error") reject(Object.assign(new Error(m.message), { log: m.log }));
+      else resolve({ wav: m.wav, log: m.log });
+    };
+    worker.onerror = (e) => { finishWorker(); reject(new Error("The renderer failed: " + e.message)); };
+    worker.postMessage({
+      patch: { name: opts.name, data: Syd.textToBytes(text) },
+      files: opts.files, seconds: opts.seconds, maxSeconds: MAX_SECONDS, seed: opts.seed || 0,
+    });
+  });
+}
+function finishWorker() {
+  worker && worker.terminate();
+  worker = null;
+  rejectRender = null;
+}
+function cancel() {
+  if (!worker) return;
+  const r = rejectRender;
+  finishWorker();
+  r && r(Object.assign(new Error("Cancelled."), { cancelled: true }));
+}
+
+let wavURL = null, wavInfo = null;
+async function startRender(preview) {
+  const full = Syd.duration(patch);
+  if (!(full > 0)) { status("Give the output unit a duration.", true); return; }
+  const seconds = Math.min(preview ? Math.max(0.1, parseFloat($("previewSecs").value) || 5) : full, full, MAX_SECONDS);
+  // the patch's data files: the ones opened with it, else the examples'
+  const need = Syd.dataFiles(patch);
+  const list = [];
+  for (const [name, data] of files) list.push({ name, data: data.slice(0) });
+  for (const n of need) if (!files.has(n) && exampleFiles.includes(n))
+    list.push({ name: n, data: await (await fetch("examples/" + n)).arrayBuffer() });
+  const missing = need.filter((n) => !list.some((f) => f.name === n));
+  if (missing.length) { status("Open the file" + (missing.length > 1 ? "s" : "") + " this patch reads: " + missing.join(", "), true); return; }
+
+  $("previewBtn").disabled = $("renderBtn").disabled = true;
+  $("cancelBtn").disabled = false;
+  $("progress").style.width = "0";
+  const started = performance.now();
+  status(`Rendering ${preview && seconds < full ? "the first " + seconds + " s" : seconds + " s"}…`);
+  try {
+    const r = await render(Syd.serialize(patch), {
+      name: patchName, seconds, seed: parseInt($("seed").value, 10) || 0, files: list,
+      onProgress: (v) => {
+        $("progress").style.width = (v * 100).toFixed(1) + "%";
+        const el = (performance.now() - started) / 1000, left = v > 0.02 ? el / v - el : NaN;
+        status("Rendering… " + Math.round(v * 100) + "%" + (isFinite(left) ? ", about " + Math.ceil(left) + " s left" : ""));
+      },
+    });
+    const took = (performance.now() - started) / 1000;
+    showLog(r.log);
+    showWav(r.wav, seconds);
+    $("progress").style.width = "100%";
+    status(`Rendered ${seconds} s in ${took.toFixed(1)} s (${(seconds / took).toFixed(1)}× real time).`);
+    $("player").play().catch(() => {});
+  } catch (err) {
+    showLog(err.log);
+    $("progress").style.width = "0";
+    status(err.message + (err.log ? " See CSyd's output below." : ""), !err.cancelled);
+  } finally {
+    $("previewBtn").disabled = $("renderBtn").disabled = false;
+    $("cancelBtn").disabled = true;
+  }
+}
+$("previewBtn").onclick = () => startRender(true);
+$("renderBtn").onclick = () => startRender(false);
+$("cancelBtn").onclick = cancel;
+
+function showLog(log) {
+  $("log").textContent = log || "";
+  $("logBox").classList.toggle("hidden", !log);
+}
+
+function clearPreview() {
+  if (wavURL) URL.revokeObjectURL(wavURL);
+  wavURL = null;
+  wavInfo = null;
+  $("player").classList.add("hidden");
+  $("download").classList.add("hidden");
+  $("waveEmpty").classList.remove("hidden");
+  $("playhead").style.display = "none";
+  const c = $("wave");
+  c.getContext("2d").clearRect(0, 0, c.width, c.height);
+}
+
+// The WAV CSyd writes: 16-bit PCM, mono or stereo
+function readWav(buf) {
+  const v = new DataView(buf);
+  let pos = 12, ch = 1, data = null;
+  while (pos + 8 <= v.byteLength) {
+    const id = String.fromCharCode(v.getUint8(pos), v.getUint8(pos + 1), v.getUint8(pos + 2), v.getUint8(pos + 3));
+    const size = v.getUint32(pos + 4, true);
+    if (id === "fmt ") ch = v.getUint16(pos + 10, true);
+    if (id === "data") { data = new Int16Array(buf, pos + 8, Math.min(size, v.byteLength - pos - 8) >> 1); break; }
+    pos += 8 + size + (size & 1);
+  }
+  return { ch, data: data || new Int16Array(0) };
+}
+
+function showWav(wav, seconds) {
+  clearPreview();
+  wavInfo = readWav(wav);
+  wavInfo.seconds = seconds;
+  wavURL = URL.createObjectURL(new Blob([wav], { type: "audio/wav" }));
+  $("player").src = wavURL;
+  $("player").classList.remove("hidden");
+  $("download").href = wavURL;
+  $("download").download = patchName.replace(/\.syd$/i, "") + ".wav";
+  $("download").classList.remove("hidden");
+  $("waveEmpty").classList.add("hidden");
+  drawWave();
+}
+
+// JSyd's waveform panel: the peaks, per pixel column
+function drawWave() {
+  const c = $("wave");
+  const dpr = window.devicePixelRatio || 1;
+  c.width = c.clientWidth * dpr;
+  c.height = c.clientHeight * dpr;
+  const g = c.getContext("2d");
+  g.clearRect(0, 0, c.width, c.height);
+  if (!wavInfo) return;
+  const { ch, data } = wavInfo, frames = data.length / ch | 0, W = c.width, H = c.height, mid = H / 2;
+  const css = getComputedStyle(document.documentElement);
+  g.fillStyle = css.getPropertyValue("--wave").trim();
+  for (let x = 0; x < W; ++x) {
+    const a = Math.floor(x * frames / W) * ch, b = Math.max(a + ch, Math.floor((x + 1) * frames / W) * ch);
+    let lo = 0, hi = 0;
+    for (let i = a; i < b && i < data.length; ++i) { const s = data[i]; if (s < lo) lo = s; if (s > hi) hi = s; }
+    const y1 = mid - hi / 32768 * mid, y2 = mid - lo / 32768 * mid;
+    g.fillRect(x, y1, 1, Math.max(1, y2 - y1));
+  }
+  g.fillStyle = css.getPropertyValue("--wave-mid").trim();
+  g.fillRect(0, Math.floor(mid), W, Math.max(1, dpr | 0));
+}
+window.addEventListener("resize", drawWave);
+
+$("waveWrap").addEventListener("pointerdown", (e) => {
+  if (!wavInfo) return;
+  const r = $("waveWrap").getBoundingClientRect();
+  $("player").currentTime = (e.clientX - r.left) / r.width * $("player").duration;
+  $("player").play().catch(() => {});
+});
+(function tick() {
+  const p = $("player");
+  if (wavInfo && p.duration) {
+    $("playhead").style.display = "block";
+    $("playhead").style.left = (p.currentTime / p.duration * 100) + "%";
+  }
+  requestAnimationFrame(tick);
+})();
+
+init();
+</script>
+</body>
+</html>

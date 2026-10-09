@@ -187,7 +187,12 @@ void SSOscillator::Load(FILE* ar)
 	LoadExp(ar,"OSCA",&aExp);
 	LoadExp(ar,"OSCP",&pExp);
 	if (waveType == WT_Expression) {
-		LoadExp(ar,"WEXP", &wExp);
+		// JSyd wrote this line as OSCW
+		char *w = parList->GetNextInputLine(ar,"WEXP",tbuf);
+		if (!w)
+			w = parList->GetNextInputLine(ar,"OSCW",tbuf);
+		if (w)
+			InitExp(&wExp, w+5);
 	}
 #elif Style == 2
 	if (p[3] == 'I') {
