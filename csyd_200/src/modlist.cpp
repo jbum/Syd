@@ -43,6 +43,8 @@ struct ModuleDesc mDesc[MT_NbrModules] = {
 ModList::ModList(PatchOwner* itsOwner)	// replaces LoadInstrument
 {
 	nbrModules = 0;
+	noteSeed = gFixedSeed? gFixedSeed : 1;	// -r changes notes' random numbers too
+	ownRandom = false;
 	this->itsOwner = itsOwner;
 	sampleDuration = 2.0;
 	sampleRate = 22050;
@@ -51,6 +53,8 @@ ModList::ModList(PatchOwner* itsOwner)	// replaces LoadInstrument
 ModList::ModList(PatchOwner* itsOwner, SydFileSpec *fsSpec)	// replaces LoadInstrument
 {
 	nbrModules = 0;
+	noteSeed = gFixedSeed? gFixedSeed : 1;	// -r changes notes' random numbers too
+	ownRandom = false;
 	this->itsOwner = itsOwner;
 	sampleDuration = 2.0;
 	sampleRate = 22050;

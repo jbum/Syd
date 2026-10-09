@@ -55,10 +55,10 @@ ssfloat	SSMaraca::GenerateOutput(SSModule *callingMod)
 	// Compute exponential system decay
 	shakeEnergy *= sysdecay;
 	
-	if (DoubleRandom() < prob)
+	if (Random() < prob)
 		sndLevel += gain*shakeEnergy;
 
-	input = sndLevel * (DoubleRandom()*2 - 1);
+	input = sndLevel * (Random()*2 - 1);
 	sndLevel *= snddecay;
 
 	// do gourd resonance filter calc

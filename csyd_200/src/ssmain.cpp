@@ -16,7 +16,8 @@ void SyntaxExit()
   printf("    -q             quiet output (same as -v 0)\n");
   printf("    -b samples     block size for scores (default 256; 0: sample by sample)\n");
   printf("    -j threads     threads to render with (default: one per core)\n");
-  printf("    -r seed        fixed seed for randomized noise (also SYD_SEED)\n");
+  printf("    -r seed        seed for randomized noise and for notes' own random numbers\n");
+  printf("                   (also SYD_SEED)\n");
   printf("    -x             allow score to override duration\n");
   printf("    -pN #          instrument parameter override (N may be 4-15)\n");
   exit(1);

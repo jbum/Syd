@@ -268,6 +268,17 @@ void Randomize(void)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// A seed for the random number generator (1 to R_M-1) mixed from two numbers, for streams
+// that must be the same however many threads render: see SSModule::Random.
+int32 HashSeed(int32 a, int32 b)
+{
+	uint32 h = (uint32) a * 0x9E3779B1u ^ (uint32) b;
+	h ^= h >> 16;	h *= 0x85EBCA6Bu;
+	h ^= h >> 13;	h *= 0xC2B2AE35u;
+	h ^= h >> 16;
+	return (int32) (h % (uint32) (R_M - 1)) + 1;
+}
+
 // What MySRand(seed) then DoubleRandom() return, without touching the global seed, so
 // threads can use it.
 ssfloat DoubleRandomFrom(int32 seed)

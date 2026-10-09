@@ -106,6 +106,7 @@ int32 GetSRand(void);
 void MySRand(int32 s);
 int32 LongRandom(void);
 ssfloat DoubleRandomFrom(int32 seed);
+int32 HashSeed(int32 a, int32 b);
 ssfloat DoubleRandom(void);
 void Randomize(void);
 int32 RandomizeSeed(void);

@@ -535,6 +535,23 @@ void SSModule::CopyExp(ExpRecPtr src, ExpRecPtr dst)
 	dst->eConst = src->eConst;
 }
 
+// A random number for this module. Modules of notes rendered in blocks (SSScore::RenderBlock)
+// have a stream of their own, seeded from the note's place in its score and the module's id,
+// so a note's random numbers are the same however many notes render at once and in whatever
+// order. Everything else draws the global random numbers, in the order 1.5.1 did: the patch's
+// own modules, scores generating their notes, and notes rendered sample by sample.
+ssfloat SSModule::Random()
+{
+	if (parList == NULL || !parList->ownRandom)
+		return DoubleRandom();
+	if (rngSeed == 0)
+		rngSeed = HashSeed(parList->noteSeed, id);
+	int32	hi = rngSeed / 127773L, lo = rngSeed % 127773L;
+	int32	test = 16807L * lo - 2836L * hi;		// as LongRandom
+	rngSeed = (test > 0)? test : test + 2147483647L;
+	return rngSeed / (ssfloat) 2147483647L;
+}
+
 bool SSModule::ExpUnsafe()
 {
 	for (size_t i = 0; i < exps.size(); ++i)

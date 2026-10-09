@@ -148,6 +148,8 @@ public:
   virtual void  Save(FILE* ar);
 #endif
 	bool			ExpUnsafe();	// an expression of this one fails ExpMgr::BlockSafe
+	ssfloat			Random();		// 0 <= r < 1; see ssmodule.cpp
+	int32			rngSeed;		// this module's own random numbers, once it has used any
 	virtual ssfloat	GenerateOutput(SSModule *callingMod); // Uses global gTime;
   virtual ssfloat  GenerateOutputTime(SSModule *callingMod, ssfloat pTime);
   virtual ssfloat getRightSample();

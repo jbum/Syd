@@ -43,6 +43,9 @@ public:
 	SSModule	*mods[MaxModules];
 	PatchOwner	*itsOwner;
 	ssfloat		pTime;
+	int32		noteSeed;	// seeds the random numbers of a note's modules (SSModule::Random)
+	Boolean		ownRandom;	// a note of a score rendering in blocks: its modules' random
+							// numbers are their own
 
 //	ModList(MainWindow *itsOwner);	// replaces LoadInstrument
 //	ModList(MainWindow *itsOwner, FSSpec *spec);		// Create from Spec

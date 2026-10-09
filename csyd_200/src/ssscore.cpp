@@ -244,6 +244,9 @@ void SSScore::InitializeActiveNote(int i, NoteEventPtr	np)
 			if (ap->instr != NULL) {
 				noteTime = 0;
 				this->instParams = ap->noteInfo;
+				ap->instr->noteSeed = HashSeed(parList->noteSeed,
+											   (sectionIndex << 20) + curSection->noteNbr);
+				ap->instr->ownRandom = blockMode || parList->ownRandom;
 				ap->instr->ResetInstruments(this);
 			}
 			else {
@@ -463,8 +466,8 @@ void SSScore::PostScoreProcessing()
 // the same numbers in the same order.
 //
 // The notes' samples are computed in a different order relative to each other, so this is only
-// done when nothing they compute is shared between them (BlockSafe): no global random numbers,
-// variables or time, and no modules that keep such state.
+// done when nothing they compute is shared between them (BlockSafe): no global variables or
+// time, and no modules that share state (a note's random numbers are its own).
 
 int gBlockSize = 256;
 
@@ -472,6 +475,7 @@ int gBlockSize = 256;
 // are solved when its score is generated, which for a score directly in our instruments is when
 // one of our notes starts (in time order, before a block renders), so those may use anything; a
 // score further down starts its notes while ours render, so its expressions must pass too.
+// (Random numbers pass: a note's modules have their own, SSModule::Random.)
 static bool SubtreeBlockSafe(SSModule *m, bool inNestedScore, int depth)
 {
 	if (m == NULL || depth > 64) {
@@ -504,9 +508,11 @@ static bool SubtreeBlockSafe(SSModule *m, bool inNestedScore, int depth)
 	case MT_Amplifier:
 	case MT_Inverter:
 	case MT_Expression:
+	case MT_Pluck:			// random numbers of their own (SSModule::Random)
+	case MT_Maraca:
 		break;
-	default:				// pluck and maraca use the global random numbers; the rest share
-		if (gVerbose > 1)	// files, globals or folder signals
+	default:				// hammers share strings, the rest files, globals or folder signals
+		if (gVerbose > 1)
 			LogMessage("  %s: a module that shares state between notes\n", m->label);
 		return false;
 	}

@@ -733,7 +733,7 @@ const ExpInstr *ExpMgr::Decode(unsigned char *cExp)
 }
 
 // Whether a compiled expression touches only its own voice: no global variables, folder
-// signals, global time or global random numbers, and none of the functions that keep state in
+// signals or global time, and none of the functions that keep state in
 // the ExpMgr (fractals, noise) or read tables by number. A score renders its notes a block at a
 // time only when every expression in them passes (see SSScore::BlockSafe), since the notes'
 // samples are then computed in a different order.
@@ -748,7 +748,7 @@ bool ExpMgr::BlockSafe(unsigned char *cExp)
 				ep += 1 + sizeof(ssfloat);
 				continue;
 			}
-			if (*ep == 'g' || *ep == '?')
+			if (*ep == 'g')		// '?' is the module's own (SSModule::Random)
 				return false;
 			++ep;
 			break;
@@ -1376,7 +1376,7 @@ void ExpMgr::Step(EvalState &st, SSModule *callingModule, unsigned char *&ep)
 			case '?':
 				// 9/15 Better random number
 				// 1/24/93 Even Better
-				PushF(DoubleRandom());
+				PushF(callingModule? callingModule->Random() : DoubleRandom());
 				break;
 			case PICHAR:
 				// 10/26/92 Added PI support

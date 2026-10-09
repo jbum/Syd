@@ -100,16 +100,16 @@ void SSPluck::Reset(SSModule *callingMod)
 		// Initialize delay line
 		if (variant == 0 || variant == 1 || variant == 2) {
 			for (i = 0; i < p; ++i)
-				d[i] = 2.0*DoubleRandom() - 1.0;
+				d[i] = 2.0*Random() - 1.0;
 		} else if (variant == 3) {
 			int	var = 1+(variant-1)/2;
 			for (i = 0; i < p; ++i)
-				d[i] = 2.0*parList->itsOwner->expMgr->Noise((var*i)/(ssfloat)p,DoubleRandom()*256) - 1.0;
+				d[i] = 2.0*parList->itsOwner->expMgr->Noise((var*i)/(ssfloat)p,Random()*256) - 1.0;
 		}
 		else {
 			int	var = 1+(variant-2)/2;
 			for (i = 0; i < p; ++i)
-				d[i] = 2.0*parList->itsOwner->expMgr->Turbulence((var*i)/(ssfloat)p,DoubleRandom()*256) - 1.0;
+				d[i] = 2.0*parList->itsOwner->expMgr->Turbulence((var*i)/(ssfloat)p,Random()*256) - 1.0;
 		}
 		// Compute average
 		m = 0.0;
@@ -161,7 +161,7 @@ ssfloat	SSPluck::GenerateOutput(SSModule *callingMod)
   }
 
 	x = *sp;
-	if (variant == 2 || (variant == 1 && DoubleRandom() < 0.5))
+	if (variant == 2 || (variant == 1 && Random() < 0.5))
 		y = rho * (S1 * x - S * x1);		// filter1
 	else
 		y = rho * (S1 * x + S * x1);		// filter1
