@@ -51,6 +51,11 @@ thread_local bool tInParallel;
 
 void ParallelFor(int n, const std::function<void(int)> &fn)
 {
+#ifdef SYD_NO_THREADS
+	for (int i = 0; i < n; ++i)
+		fn(i);
+	return;
+#endif
 	if (gThreads <= 1 || n <= 1 || tInParallel) {
 		for (int i = 0; i < n; ++i)
 			fn(i);

@@ -151,6 +151,8 @@ void PatchOwner::PerformSynthesis()
   nbrSamples = (long) (mainInst->sampleRate * mainInst->sampleDuration);
 	mainInst->ResetInstruments(outMod);
   nbrSamples = (long) (mainInst->sampleRate * mainInst->sampleDuration);
+  if (gMaxDuration > 0 && nbrSamples > (long) (mainInst->sampleRate * gMaxDuration))
+    nbrSamples = (long) (mainInst->sampleRate * gMaxDuration);	// the first gMaxDuration seconds
 
   // Moved this here, so that score generation has a chance to reset score
   if (storageMod->StartStorage(nbrSamples,mainInst->sampleRate,listenFlag,((SSOutput *) outMod)->isStereo != 0? 2 : 1) != noErr)
@@ -205,6 +207,7 @@ void PatchOwner::SetOutputType(int fileType, int isStereo, SydFileSpec *fsSpec)
 void PatchOwner::SynthIdle()
 {
 	long	t = TickCount();
+	long	startNbr = sampleNbr;	// returns at each -P progress step
 
 #ifdef UI_FEATURES
 	SpinCursor();
@@ -220,7 +223,8 @@ void PatchOwner::SynthIdle()
 
     while (windowState == WS_Synthesize && sampleNbr < nbrSamples &&
         ( (sampleNbr & 0x0FF) > 0 ||
-           TickCount() - t < (TICKS_PER_SEC*5) )
+           TickCount() - t < (TICKS_PER_SEC*5) ) &&
+        (gProgressStep == 0 || sampleNbr == startNbr || sampleNbr % gProgressStep != 0)
         ) {
       gTime = (ssfloat) sampleNbr / mainInst->sampleRate;
       vL = ((SSOutput *) outMod)->GenerateOutputTime(NULL,gTime);	// will output from 0 - 1
@@ -233,7 +237,8 @@ void PatchOwner::SynthIdle()
   	ssfloat	v;
     while (windowState == WS_Synthesize && sampleNbr < nbrSamples &&
         ( (sampleNbr & 0x0FF) > 0 ||
-           TickCount() - t < (TICKS_PER_SEC*5) )
+           TickCount() - t < (TICKS_PER_SEC*5) ) &&
+        (gProgressStep == 0 || sampleNbr == startNbr || sampleNbr % gProgressStep != 0)
         ) {
       gTime = (ssfloat) sampleNbr / mainInst->sampleRate;
       v = ((SSOutput *) outMod)->GenerateOutputTime(NULL,gTime);	// will output from 0 - 1

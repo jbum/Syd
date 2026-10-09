@@ -16,6 +16,8 @@ void SyntaxExit()
   printf("    -q             quiet output (same as -v 0)\n");
   printf("    -b samples     block size for scores (default 256; 0: sample by sample)\n");
   printf("    -j threads     threads to render with (default: one per core)\n");
+  printf("    -M seconds     render at most this long\n");
+  printf("    -P             report progress on stderr (\"progress 0.42\")\n");
   printf("    -r seed        seed for randomized noise and for notes' own random numbers\n");
   printf("                   (also SYD_SEED)\n");
   printf("    -x             allow score to override duration\n");
@@ -29,6 +31,8 @@ ssfloat gDuration = 0;
 int     gSampleRate = 0;
 int     gVerbose = 1;
 bool    gDurationOverride = false;
+ssfloat gMaxDuration = 0;
+long    gProgressStep = 0;
 ssfloat gInstrumentParam[16] = {0,0,0,0,1.0,440.0,0,
                                 0,0,0,0,0,0,0};
 
@@ -37,7 +41,11 @@ SydFileSpec sydSpec;
 
 int main(int argc, char **argv)
 {  
+#ifdef SYD_NO_THREADS
+  gThreads = 1;
+#else
   gThreads = std::thread::hardware_concurrency();
+#endif
   if (gThreads < 1)
     gThreads = 1;
   if (getenv("SYD_SEED"))
@@ -70,6 +78,13 @@ int main(int argc, char **argv)
       case 'b':
         ++i;
         gBlockSize = atoi(argv[i]);
+        break;
+      case 'M':
+        ++i;
+        gMaxDuration = atof(argv[i]);
+        break;
+      case 'P':
+        gProgressStep = 1;    // set from the length once it's known
         break;
       case 'j':
         ++i;
@@ -119,6 +134,11 @@ int main(int argc, char **argv)
   // Synthesize it
   LogMessage("Beginning Synthesis\n");
   itsPatch->PerformSynthesis();
+  if (gProgressStep) {
+    gProgressStep = itsPatch->nbrSamples / 100;
+    if (gProgressStep < 1)
+      gProgressStep = 1;
+  }
   // !!! DO THE FOLLOWING IN A THREAD - find a way to interrupt via key here...
   while (itsPatch->sampleNbr < itsPatch->nbrSamples)
   {
@@ -126,7 +146,15 @@ int main(int argc, char **argv)
       if (itsPatch->sampleNbr)
         LogMessage("%.2f%%\n", itsPatch->sampleNbr*100.0/itsPatch->nbrSamples);
     }
+    if (gProgressStep) {
+      fprintf(stderr, "progress %.4f\n", (double) itsPatch->sampleNbr / itsPatch->nbrSamples);
+      fflush(stderr);
+    }
     itsPatch->SynthIdle();
+  }
+  if (gProgressStep) {
+    fprintf(stderr, "progress 1\n");
+    fflush(stderr);
   }
   if (gVerbose)
     putc('\n', stdout);  

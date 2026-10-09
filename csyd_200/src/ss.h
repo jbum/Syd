@@ -24,6 +24,8 @@ extern ssfloat	*gSinTable,*gSquareTable;
 extern std::atomic<int> gAllocCtr;
 extern int      gVerbose;
 extern int      gBlockSize;		// samples a score renders at a time; 0: sample by sample
+extern ssfloat  gMaxDuration;	// -M: render at most this many seconds (0: no limit)
+extern long     gProgressStep;	// -P: samples between progress reports (0: none)
 extern bool     gDurationOverride;
 
 // Utils

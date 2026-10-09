@@ -442,7 +442,11 @@ void SSScore::SortScore()
 
 	for (i =0,sp=sections ; i < nbrSections; ++i,++sp) 
 	{
-		qsort(sp->notes, sp->nbrNotes, sizeof(NoteEventPtr *), CompareScoreEvents);
+		// Stable: notes starting together keep the order they were made in. qsort leaves their
+		// order to the C library, which differs between platforms, and with it the order notes
+		// are added in and the random numbers each gets (SSModule::Random).
+		std::stable_sort(sp->notes, sp->notes + sp->nbrNotes,
+						 [](NoteEventPtr a, NoteEventPtr b) { return a->p2 < b->p2; });
 	}
 }
 
