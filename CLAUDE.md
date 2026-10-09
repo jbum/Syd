@@ -96,13 +96,14 @@ What changed vs 1.5.2 (commits f22f079..e91dc61):
   certbot.timer renews.
 
 ### Social card
-- Tags (og:* + twitter summary_large_image) in both pages; image `assets/card.png?v=2`
+- Tags (og:* + twitter summary_large_image) in both pages; image `assets/card.png?v=3`
   (bump `v` when the card changes so caches refetch).
-- `build/card/make_card.py` (needs `./csyd`, built `build/web`, numpy, Pillow, Chrome) renders the
-  Shepard patch natively for a neon spectrogram + scope trace, loads the live editor in an
-  iframe, and `build/card/shoot.js` captures it via the DevTools protocol (Chrome's
-  `--screenshot` never fires: the editor never idles). Style follows a Gemini mock-up, but every
-  picture is real — don't add things Syd lacks (its knob modules/glowing cables).
+- `build/card/make_card.py [--variant light|dark]` (needs built `build/web`, Pillow, Chrome) loads
+  the live editor in an iframe with its chrome hidden, so the card is a plain screenshot of the
+  Shepard patch, the title "Syd – experimental software synth" and the address; `build/card/shoot.js`
+  captures it via the DevTools protocol (Chrome's `--screenshot` never fires: the editor never
+  idles). jbum chose the dark variant (2026-10-09) over an earlier neon/Gemini-style card: keep
+  it plain, no taglines or glow.
 
 ## Not done yet / ideas
 - Folder units: editing the sub-patch a folder loads (only its filename is editable now).
