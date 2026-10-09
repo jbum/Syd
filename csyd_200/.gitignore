@@ -1,0 +1,8 @@
+csyd
+obj/
+tests/bin/
+tests/out/
+tests/ref/
+tests/listen/
+build/wasm-*/
+build/web/

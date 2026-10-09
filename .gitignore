@@ -1,0 +1,12 @@
+*/.mcp
+csyd_102/STK/*
+csyd_102/*.aiff
+csyd_102/*.wav
+*.LOG
+csyd_102/src/unused/*
+jsyd_102/wheelmusic/*
+jsyd_102/website/*
+jsyd_102/test patches/*
+jsyd_102/jimpatches/*
+jsyd_102/drawer/*
+
