@@ -390,17 +390,24 @@ function toPatch(e) {
 const unitAt = (p) => patch.modules.slice().reverse()
   .find((m) => p.x >= m.x && p.x < m.x + NODE && p.y >= m.y && p.y < m.y + NODE);
 
+// Follow a drag to its end.  The pointer is captured by an element that outlives the
+// drag: draw() rebuilds the desk's contents, and a touch (iPad) whose element is gone
+// stops delivering moves, so a drag on the desk is held by the desk itself.
 function track(e, move, up) {
-  const target = e.currentTarget;
-  target.setPointerCapture && target.setPointerCapture(e.pointerId);
-  const onMove = (ev) => move(ev);
+  const holder = (e.currentTarget.closest && e.currentTarget.closest("#desk")) || e.currentTarget;
+  try { holder.setPointerCapture(e.pointerId); } catch (_) {}
+  const id = e.pointerId;
+  const onMove = (ev) => { if (ev.pointerId === id) move(ev); };
   const onUp = (ev) => {
+    if (ev.pointerId !== id) return;
     window.removeEventListener("pointermove", onMove);
     window.removeEventListener("pointerup", onUp);
+    window.removeEventListener("pointercancel", onUp);
     up(ev);
   };
   window.addEventListener("pointermove", onMove);
   window.addEventListener("pointerup", onUp);
+  window.addEventListener("pointercancel", onUp);
 }
 
 function startMove(e, m) {
