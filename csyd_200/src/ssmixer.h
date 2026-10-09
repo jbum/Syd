@@ -10,6 +10,9 @@ public:
 	SSMixer(ModList * mList, short h, short v);
 	ssfloat	GenerateOutput(SSModule *callingMod);
 	ssfloat MixInputsAtten(int type, SSModule *callingMod);
+	bool	CanRenderBlock()	{ return InputsRenderBlock(-1); }
+	void	RenderBlock(SSModule *callingMod, const ssfloat *times, int n, ssfloat *out,
+						ssfloat *outR);
 };
 
 #endif

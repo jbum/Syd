@@ -1,6 +1,7 @@
 // SSAmplifier.cp
 
 #include "ss.h"
+#include "expmgr.h"
 #include "ssamplifier.h"
 #include "patchowner.h"
 
@@ -95,6 +96,40 @@ ssfloat SSAmplifier::GenerateOutput(SSModule *callingMod)
   }
   lastRightSample = vR;
 	return vL;
+}
+
+bool SSAmplifier::CanRenderBlock()
+{
+	return ExpMgr::Vectorizable(&scaleExp) && ExpMgr::Vectorizable(&offsetExp) &&
+		   ExpMgr::Vectorizable(&panExp) && InputsRenderBlock(SIG_Sig);
+}
+
+// GenerateOutput at n times (n <= 256; see SSModule::RenderBlock)
+void SSAmplifier::RenderBlock(SSModule *callingMod, const ssfloat *times, int n, ssfloat *out,
+							  ssfloat *outR)
+{
+	ssfloat	scale[256], offset[256], pan[256], mix[256], mixR[256];
+	int		count;
+
+	SolveExpVector(&scaleExp, callingMod, times, n, scale);
+	SolveExpVector(&offsetExp, callingMod, times, n, offset);
+	SolveExpVector(&panExp, callingMod, times, n, pan);
+	MixInputsBlock(SIG_Sig, times, n, mix, mixR, &count);
+	for (int i = 0; i < n; ++i) {
+		ssfloat	vL = mix[i]*scale[i] + offset[i];
+		ssfloat	vR = mixR[i]*scale[i] + offset[i];
+		ssfloat	p = pan[i];
+		if (p < -1) p = -1;
+		else if (p > 1) p = 1;
+		if (p < 0.0)
+			vR *= p+1;
+		else if (p > 0.0)
+			vL *= 1-p;
+		out[i] = vL;
+		outR[i] = vR;
+	}
+	lastRightInput = mixR[n - 1];
+	lastRightSample = outR[n - 1];
 }
 
 

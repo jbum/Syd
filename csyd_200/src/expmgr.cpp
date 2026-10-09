@@ -771,6 +771,110 @@ bool ExpMgr::BlockSafe(unsigned char *cExp)
 	return true;
 }
 
+// Whether EvalVector can evaluate exp: decoded, and only constants, time, note parameters,
+// arithmetic and functions of their arguments alone (sin, limit, cond...). Not inputs, globals,
+// random numbers, the note's own values (n, i, k, a), table lookups or fractals.
+bool ExpMgr::Vectorizable(const ExpRec *exp)
+{
+	if (exp->prog == NULL)
+		return false;
+	for (const ExpInstr *ip = exp->prog; ip->op != XI_End; ++ip) {
+		if (ip->op != XI_Token)
+			continue;
+		const unsigned char	*tok = exp->cExp + ip->at;
+		if (tok[0] == 'O') {
+			int	op = tok[1];
+			if ((op >= OP_Mandel && op <= OP_Julia) || (op >= OP_Dragon && op <= OP_GNoise3D) ||
+				(op >= OP_FTab && op <= OP_FTabIP))
+				return false;
+		}
+		else if (tok[0] == 'V') {
+			if (!(tok[1] == 'd' || tok[1] == 'r' || tok[1] == 'e' || tok[1] == PICHAR ||
+				  tok[1] == PICHAR+1))
+				return false;
+		}
+		else
+			return false;
+	}
+	return true;
+}
+
+// Evaluate exp at n times, as EvalExp would at each with the module's time (t) and its note's
+// time (p0) both times[k]: so for a module directly under a score, the note's own time. The
+// same operations in the same order for each sample, a block at a time, so each instruction's
+// cost is paid once per block instead of once per sample.
+void ExpMgr::EvalVector(SSModule *callingModule, ExpRec *exp, const ssfloat *times, int n,
+						ssfloat *out)
+{
+	enum { Chunk = 256, Depth = 32 };
+	static thread_local ssfloat	stack[Depth][Chunk];
+
+	for (int k0 = 0; k0 < n; k0 += Chunk) {
+		int		m = (n - k0 < Chunk)? n - k0 : Chunk;
+		int		sp = 0;
+		const ssfloat	*t = times + k0;
+
+		for (const ExpInstr *ip = exp->prog; ip->op != XI_End; ++ip) {
+			ssfloat	*a = stack[sp - 2 >= 0? sp - 2 : 0], *b = stack[sp - 1 >= 0? sp - 1 : 0];
+			switch (ip->op) {
+			case XI_Const: {
+				ssfloat *d = stack[sp++], k = ip->k;
+				for (int i = 0; i < m; ++i) d[i] = k;
+				break;
+			}
+			case XI_Time: {
+				ssfloat *d = stack[sp++];
+				for (int i = 0; i < m; ++i) d[i] = t[i];
+				break;
+			}
+			case XI_Param: {
+				ssfloat *d = stack[sp++];
+				if (ip->at == 0)
+					for (int i = 0; i < m; ++i) d[i] = t[i];
+				else {
+					ssfloat p = (callingModule && callingModule->callingMod)?
+								callingModule->callingMod->GetInstParameter(ip->at) : 0.0;
+					for (int i = 0; i < m; ++i) d[i] = p;
+				}
+				break;
+			}
+			// a is the earlier operand (v1), b the later (v2), as EvalExp pops them
+			case XI_Add:	for (int i = 0; i < m; ++i) a[i] = b[i] + a[i];		--sp;	break;
+			case XI_Sub:	for (int i = 0; i < m; ++i) a[i] = a[i] - b[i];		--sp;	break;
+			case XI_Mul:	for (int i = 0; i < m; ++i) a[i] = b[i] * a[i];		--sp;	break;
+			case XI_Div:
+				for (int i = 0; i < m; ++i) a[i] = (b[i] == 0.0)? HUGE_VAL : (a[i] / b[i]);
+				--sp;
+				break;
+			case XI_Pow:	for (int i = 0; i < m; ++i) a[i] = sm_pow(a[i], b[i]);	--sp;	break;
+			case XI_Neg:	for (int i = 0; i < m; ++i) b[i] = -b[i];				break;
+			case XI_Square:	for (int i = 0; i < m; ++i) b[i] = b[i] * b[i];			break;
+			default: {
+				// A function: Step runs it, for each sample, on that sample's stack
+				EvalState	st;
+				int			after = sp;
+				for (int i = 0; i < m; ++i) {
+					unsigned char	*ep = exp->cExp + ip->at;
+					st.stackCtr = sp;
+					st.lFlags = st.fFlags = 0L;
+					st.pTime = t[i];
+					for (int j = 0; j < sp; ++j)
+						st.stackF[j] = stack[j][i];
+					Step(st, callingModule, ep);
+					after = st.stackCtr;
+					for (int j = 0; j < after; ++j)
+						stack[j][i] = st.stackF[j];
+				}
+				sp = after;
+				break;
+			}
+			}
+		}
+		for (int i = 0; i < m; ++i)
+			out[k0 + i] = (sp > 0)? stack[sp - 1][i] : 0.0;
+	}
+}
+
 // Evaluate exp, as EvalF(callingModule, exp->cExp) would, from its decoded instructions.
 ssfloat ExpMgr::EvalExp(SSModule *callingModule, ExpRec *exp)
 {

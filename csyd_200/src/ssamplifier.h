@@ -13,6 +13,9 @@ public:
 	// Overrides
 	SSAmplifier(ModList * mList, short h, short v);
 	ssfloat	GenerateOutput(SSModule *callingMod);
+	bool	CanRenderBlock();
+	void	RenderBlock(SSModule *callingMod, const ssfloat *times, int n, ssfloat *out,
+						ssfloat *outR);
 	void	Reset(SSModule *callingMod);
 	int		ProcessDoubleClick();
 	void	Copy(SSModule *ss);

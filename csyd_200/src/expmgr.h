@@ -96,6 +96,9 @@ public:
 	void	Step(EvalState &st, SSModule *callingModule, unsigned char *&ep);
 	const ExpInstr *Decode(unsigned char *cExp);
 	static bool	BlockSafe(unsigned char *cExp);
+	static bool	Vectorizable(const ExpRec *exp);
+	void	EvalVector(SSModule *callingModule, ExpRec *exp, const ssfloat *times, int n,
+					   ssfloat *out);
 
 	// Expression Compiling
 	int		CompileExp(SSModule *callingModule, char *exp, unsigned char *cExp, int *compileFlags);

@@ -517,6 +517,76 @@ ssfloat SSModule::SolveExp(ExpRecPtr exp, SSModule *callingMod)
 	return exp->eConst;
 }
 
+// SolveExp at n times (see ExpMgr::EvalVector), for a module rendering a block itself.
+void SSModule::SolveExpVector(ExpRecPtr exp, SSModule *callingMod, const ssfloat *times, int n,
+							  ssfloat *out)
+{
+	this->callingMod = callingMod;
+	if ((exp->cFlags & EF_NeedsSolving) && (exp->cFlags & (EF_IsConstant | EF_NoTime))) {
+		parList->itsOwner->expMgr->EvalVector(this, exp, times, 1, &exp->eConst);
+		exp->cFlags &= ~EF_NeedsSolving;
+	}
+	if (exp->cFlags & EF_NeedsSolving) {
+		parList->itsOwner->expMgr->EvalVector(this, exp, times, n, out);
+		exp->eConst = out[n - 1];
+	}
+	else
+		for (int i = 0; i < n; ++i)
+			out[i] = exp->eConst;
+}
+
+// Whether every input (of a type, or all for -1) can render blocks and feeds only this
+// module: a module feeding two would be asked for each sample twice, which sample by sample
+// returns what it computed the first time, and rendering its block twice would not.
+bool SSModule::InputsRenderBlock(int type)
+{
+	static thread_local int	depth;		// a loop of modules feeding each other
+	if (depth > 32)
+		return false;
+	bool	ok = true;
+	++depth;
+	for (int i = 0; i < nbrInputs && ok; ++i) {
+		if (type != -1 && inputs[i].inputType != type) {
+			ok = false;
+			break;
+		}
+		SSModule	*in = inputs[i].link;
+		int			users = 0;
+		if (in == NULL || !in->CanRenderBlock()) {
+			ok = false;
+			break;
+		}
+		for (int m = 0; m < parList->nbrModules; ++m)
+			for (int j = 0; j < parList->mods[m]->nbrInputs; ++j)
+				users += (parList->mods[m]->inputs[j].link == in);
+		ok = (users == 1);
+	}
+	--depth;
+	return ok;
+}
+
+// MixInputs over a block: the sum, at each time, of the inputs (of a type, or all), added in
+// the same order, and of their right channels; count is set to the number of inputs.
+void SSModule::MixInputsBlock(int type, const ssfloat *times, int n, ssfloat *out,
+							  ssfloat *outR, int *count)
+{
+	ssfloat	in[256], inR[256];
+
+	for (int i = 0; i < n; ++i)
+		out[i] = outR[i] = 0.0;
+	*count = 0;
+	for (int j = 0; j < nbrInputs; ++j) {
+		if (type != -1 && inputs[j].inputType != type)
+			continue;
+		inputs[j].link->RenderBlock(this, times, n, in, inR);
+		for (int i = 0; i < n; ++i) {
+			out[i] += in[i];
+			outR[i] += inR[i];
+		}
+		++*count;
+	}
+}
+
 void SSModule::ClearExp(ExpRecPtr exp)
 {
 	exp->exp[0] = 0;

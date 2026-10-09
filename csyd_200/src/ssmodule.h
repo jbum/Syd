@@ -148,6 +148,18 @@ public:
   virtual void  Save(FILE* ar);
 #endif
 	bool			ExpUnsafe();	// an expression of this one fails ExpMgr::BlockSafe
+	void			SolveExpVector(ExpRecPtr exp, SSModule *callingMod, const ssfloat *times,
+								   int n, ssfloat *out);
+
+	// Rendering a block of a note's samples at once, a module and what feeds it (see
+	// SSScore::RenderVoice): RenderBlock returns what GenerateOutput and getRightSample would
+	// at each of n times, each the time of the module's list. Only modules that say they can.
+	virtual bool	CanRenderBlock()	{ return false; }
+	virtual void	RenderBlock(SSModule *callingMod, const ssfloat *times, int n, ssfloat *out,
+								ssfloat *outR)	{}
+	bool			InputsRenderBlock(int type);
+	void			MixInputsBlock(int type, const ssfloat *times, int n, ssfloat *out,
+								   ssfloat *outR, int *count);
 	ssfloat			Random();		// 0 <= r < 1; see ssmodule.cpp
 	int32			rngSeed;		// this module's own random numbers, once it has used any
 	virtual ssfloat	GenerateOutput(SSModule *callingMod); // Uses global gTime;

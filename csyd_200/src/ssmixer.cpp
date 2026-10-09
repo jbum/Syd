@@ -59,3 +59,31 @@ ssfloat SSMixer::MixInputsAtten(int type, SSModule *callingMod)
 	}
 }
 
+
+// GenerateOutput at n times (n <= 256; see SSModule::RenderBlock), mixing as MixInputsAtten
+void SSMixer::RenderBlock(SSModule *callingMod, const ssfloat *times, int n, ssfloat *out,
+						  ssfloat *outR)
+{
+	this->callingMod = callingMod;
+	if (nbrInputs == 0) {
+		for (int i = 0; i < n; ++i) {
+			out[i] = 0.0;
+			outR[i] = lastRightInput;
+		}
+		lastRightSample = lastRightInput;
+		return;
+	}
+	if (nbrInputs == 1)
+		inputs[0].link->RenderBlock(this, times, n, out, outR);	// passed through, not added to 0
+	else {
+		int	count;
+		MixInputsBlock(-1, times, n, out, outR, &count);
+		if (count > 1)
+			for (int i = 0; i < n; ++i) {
+				out[i] /= count;
+				outR[i] /= count;
+			}
+	}
+	lastRightInput = outR[n - 1];
+	lastRightSample = outR[n - 1];
+}

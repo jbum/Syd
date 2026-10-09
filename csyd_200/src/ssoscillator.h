@@ -24,6 +24,9 @@ public:
 
 	void	Initialize(short itsType, short h, short v);
 	ssfloat	GenerateOutput(SSModule *callingMod); // Uses global gTime;
+	bool	CanRenderBlock();
+	void	RenderBlock(SSModule *callingMod, const ssfloat *times, int n, ssfloat *out,
+						ssfloat *outR);	// n <= 256
 	int		ProcessDoubleClick();
 	void	Reset(SSModule *callingMod);
 	void	Copy(SSModule *ss);

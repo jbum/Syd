@@ -5,6 +5,7 @@
 #include "ssoscillator.h"
 // #include "MainWin.h"
 #include "patchowner.h"
+#include "expmgr.h"
 
 #include <math.h>
 
@@ -81,6 +82,55 @@ ssfloat	SSOscillator::GenerateOutput(SSModule *callingMod)
 	lastOutput = v;
   lastRightSample = v;
 	return v;
+}
+
+// Whether RenderBlock can stand in for GenerateOutput: no inputs, a built-in waveform, and
+// frequency and amplitude that ExpMgr::EvalVector can evaluate.
+bool SSOscillator::CanRenderBlock()
+{
+	return nbrInputs == 0 && waveType != WT_Expression &&
+		   ExpMgr::Vectorizable(&fExp) && ExpMgr::Vectorizable(&aExp);
+}
+
+// GenerateOutput at n times (see SSModule::RenderBlock). The frequency and amplitude are
+// evaluated a block at a time; the phase still steps sample by sample.
+void SSOscillator::RenderBlock(SSModule *callingMod, const ssfloat *times, int n, ssfloat *out,
+							   ssfloat *outR)
+{
+	ssfloat		bf[256], amp[256];
+	ssfloat		timeInc = parList->itsOwner->timeInc;
+
+	for (int k0 = 0; k0 < n; k0 += 256) {
+		int		m = (n - k0 < 256)? n - k0 : 256;
+		SolveExpVector(&fExp, callingMod, times + k0, m, bf);
+		SolveExpVector(&aExp, callingMod, times + k0, m, amp);
+		for (int i = 0; i < m; ++i) {
+			ssfloat	v = 0.0;
+			if (times[k0 + i] == lastTime) {		// as GenerateOutput, asked twice for a time
+				out[k0 + i] = lastOutput;
+				outR[k0 + i] = lastRightSample;
+				continue;
+			}
+			lastTime = times[k0 + i];
+			waveInc += (bf[i] == HUGE_VAL? 0 : timeInc * bf[i]);
+			if (waveInc < 0)
+				waveInc -= floor(waveInc);
+			waveInc -= (int) waveInc;
+			switch (waveType) {
+			case WT_Sine:		v = gSinTable[(int)(waveInc*WaveTableSize)];				break;
+			case WT_Sawtooth:	v = (waveInc*2)-1;											break;
+			case WT_Square:		v = waveInc < .5 ? 1.0 : -1.0;								break;
+			case WT_Triangle:	v = waveInc < .5 ? waveInc*4-1 : (4-4*waveInc)-1;			break;
+			case WT_BLSquare:	v = gSquareTable[(int)(waveInc*WaveTableSize)];			break;
+			}
+			v *= amp[i];
+			lastOutput = v;
+			lastRightSample = v;
+			out[k0 + i] = v;
+			outR[k0 + i] = v;
+		}
+	}
+	parList->InitTime(times[n - 1]);
 }
 
 void SSOscillator::Reset(SSModule *callingMod)

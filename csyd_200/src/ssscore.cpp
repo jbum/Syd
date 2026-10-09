@@ -7,6 +7,7 @@
 #include "ssoutput.h"
 #include <math.h>
 #include "sspool.h"
+#include "ssoscillator.h"
 #include <algorithm>
 #include <chrono>
 
@@ -731,6 +732,19 @@ void SSScore::RenderVoice(ScoreVoice &sv, const ssfloat *times, ssfloat sectionS
 			root->callingMod = this;
 			((SSScore *) root)->RenderBlock(nt.data(), (int) nt.size(), outL + sv.k0, outR + sv.k0);
 		}
+	}
+	else if (root->CanRenderBlock()) {
+		// The instrument renders the note's block itself, 256 samples at a time
+		int		n = sv.k1 - sv.k0;
+		ssfloat	nt[256];
+		for (int k0 = 0; k0 < n; k0 += 256) {
+			int	m = (n - k0 < 256)? n - k0 : 256;
+			for (int i = 0; i < m; ++i)
+				nt[i] = times[sv.k0 + k0 + i] - (sectionStart + sv.note->p2);
+			ctx.noteTime = nt[m - 1];
+			root->RenderBlock(this, nt, m, outL + sv.k0 + k0, outR + sv.k0 + k0);
+		}
+		root->parList->InitTime(ctx.noteTime);
 	}
 	else {
 		for (int k = sv.k0; k < sv.k1; ++k) {
