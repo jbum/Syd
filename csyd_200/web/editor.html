@@ -63,12 +63,14 @@
   .tool.sep:hover { background: none; }
 
   #main { flex: 1; display: flex; min-height: 0; }
-  #deskWrap { flex: 1; overflow: auto; background: var(--desk); position: relative; min-width: 0; }
+  #deskWrap { flex: 1; overflow: hidden; background: var(--desk); position: relative; min-width: 0; touch-action: none; }
+  #deskWrap.grab, #deskWrap.grab * { cursor: grab !important; }
+  #deskWrap.grabbing, #deskWrap.grabbing * { cursor: grabbing !important; }
   #desk { display: block; touch-action: none; user-select: none; -webkit-user-select: none; }
   #source { flex: 1; display: none; padding: 12px; min-width: 0; }
   #source textarea { width: 100%; height: calc(100% - 40px); font: 13px/1.45 var(--mono); white-space: pre; resize: none; }
   #source .bar2 { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
-  #zoom { position: sticky; float: right; height: 0; top: 8px; right: 8px; margin: 8px; display: flex; gap: 4px; z-index: 2; }
+  #zoom { position: absolute; top: 8px; right: 8px; display: flex; gap: 4px; z-index: 2; }
   #zoom button { background: var(--panel); padding: 2px 9px; }
 
   aside {
@@ -207,6 +209,7 @@ let selLink = null;              // {mod, index}: a selected patch cord
 let zoom = 1.5;
 let showNames = true;
 let autoFit = true;              // keep fitting the patch to the desk until zoomed by hand
+let view = { x: 0, y: 0 };       // the patch point at the desk's top left; zoom is px per unit
 try { showNames = localStorage.getItem("syd-names") !== "0"; } catch (_) {}
 let undoStack = [], redoStack = [];
 
@@ -291,11 +294,13 @@ function cordEnds(src, dst) {
     : [src.x + NODE / 2, src.y + NODE - 8, dst.x + NODE / 2, dst.y + 8];
 }
 
+// The patch's extent, for fitting it to the desk
 function bounds() {
-  let x0 = 0, y0 = 0, x1 = 400, y1 = 260;
+  if (!patch.modules.length) return { x0: 0, y0: 0, x1: 400, y1: 260 };
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
   for (const m of patch.modules) {
     x0 = Math.min(x0, m.x - 20); y0 = Math.min(y0, m.y - 20);
-    x1 = Math.max(x1, m.x + NODE + 60); y1 = Math.max(y1, m.y + NODE + 60);
+    x1 = Math.max(x1, m.x + NODE + 20); y1 = Math.max(y1, m.y + NODE + 26);
   }
   return { x0, y0, x1, y1 };
 }
@@ -306,17 +311,17 @@ let rubber = null;               // a selection rectangle: {x0, y0, x1, y1}
 function draw() {
   const svg = $("desk");
   svg.textContent = "";
-  const b = bounds();
+  // the desk is endless: the svg fills the view and the viewBox moves over the patch
   const wrap = $("deskWrap");
-  const w = Math.max(b.x1 - b.x0, (wrap.clientWidth - 1) / zoom), h = Math.max(b.y1 - b.y0, (wrap.clientHeight - 5) / zoom);
-  svg.setAttribute("viewBox", `${b.x0} ${b.y0} ${w} ${h}`);
-  svg.setAttribute("width", w * zoom);
-  svg.setAttribute("height", h * zoom);
+  const W = Math.max(1, wrap.clientWidth), H = Math.max(1, wrap.clientHeight), w = W / zoom, h = H / zoom;
+  svg.setAttribute("viewBox", `${view.x} ${view.y} ${w} ${h}`);
+  svg.setAttribute("width", W);
+  svg.setAttribute("height", H);
 
   const defs = el("defs", {}, svg);
   const pat = el("pattern", { id: "dots", width: 20, height: 20, patternUnits: "userSpaceOnUse" }, defs);
   el("circle", { cx: 1, cy: 1, r: 1, fill: "var(--desk-dot)" }, pat);
-  el("rect", { x: b.x0, y: b.y0, width: w, height: h, fill: "url(#dots)", class: "backdrop" }, svg);
+  el("rect", { x: view.x, y: view.y, width: w, height: h, fill: "url(#dots)", class: "backdrop" }, svg);
 
   // cords under the units
   const cords = el("g", {}, svg);
@@ -381,33 +386,40 @@ function lightning(x1, y1, x2, y2) {
 
 // ---- pointer interaction -------------------------------------------------------------
 
+// Screen to patch coordinates, from the view itself rather than the drawn svg, which
+// may be a frame behind while panning and zooming
 function toPatch(e) {
-  const pt = $("desk").createSVGPoint();
-  pt.x = e.clientX;
-  pt.y = e.clientY;
-  return pt.matrixTransform($("desk").getScreenCTM().inverse());
+  const r = $("desk").getBoundingClientRect();
+  return { x: view.x + (e.clientX - r.left) / zoom, y: view.y + (e.clientY - r.top) / zoom };
 }
 const unitAt = (p) => patch.modules.slice().reverse()
   .find((m) => p.x >= m.x && p.x < m.x + NODE && p.y >= m.y && p.y < m.y + NODE);
 
 // Follow a drag to its end.  The pointer is captured by an element that outlives the
 // drag: draw() rebuilds the desk's contents, and a touch (iPad) whose element is gone
-// stops delivering moves, so a drag on the desk is held by the desk itself.
-function track(e, move, up) {
+// stops delivering moves, so a drag on the desk is held by the desk itself.  A second
+// finger turns any drag into a pinch: abort() undoes what the drag had done.
+let current = null;              // the drag under way: {stop, abort}
+function track(e, move, up, abort) {
   const holder = (e.currentTarget.closest && e.currentTarget.closest("#desk")) || e.currentTarget;
   try { holder.setPointerCapture(e.pointerId); } catch (_) {}
   const id = e.pointerId;
   const onMove = (ev) => { if (ev.pointerId === id) move(ev); };
   const onUp = (ev) => {
     if (ev.pointerId !== id) return;
+    stop();
+    up(ev);
+  };
+  const stop = () => {
     window.removeEventListener("pointermove", onMove);
     window.removeEventListener("pointerup", onUp);
     window.removeEventListener("pointercancel", onUp);
-    up(ev);
+    if (current && current.stop === stop) current = null;
   };
   window.addEventListener("pointermove", onMove);
   window.addEventListener("pointerup", onUp);
   window.addEventListener("pointercancel", onUp);
+  current = { stop, abort };
 }
 
 function startMove(e, m) {
@@ -431,7 +443,11 @@ function startMove(e, m) {
     if (!moved) { remember(); moved = true; }
     moving.forEach((u, i) => { u.x = orig[i][0] + dx; u.y = orig[i][1] + dy; });
     draw();
-  }, () => { if (moved) changed(); });
+  }, () => { if (moved) changed(); }, () => {
+    moving.forEach((u, i) => { u.x = orig[i][0]; u.y = orig[i][1]; });
+    if (moved) undoStack.pop();
+    draw();
+  });
 }
 
 function startCord(e, m) {
@@ -451,6 +467,10 @@ function startCord(e, m) {
     dragCord = null;
     if (dst && dst !== m) connect(m, dst);
     else draw();
+  }, () => {
+    clearInterval(timer);
+    dragCord = null;
+    draw();
   });
 }
 
@@ -471,30 +491,184 @@ function connect(src, dst) {
   changed();
 }
 
-$("desk").addEventListener("pointerdown", (e) => {
-  // empty desk: rubber-band selection
-  if (e.button !== 0) return;
-  const p = toPatch(e);
-  const additive = e.shiftKey || e.metaKey;
-  const before = additive ? new Set(selection) : new Set();
+// Rubber-band selection
+let rubberBefore = null;
+function beginRubber(p, additive) {
+  rubberBefore = additive ? new Set(selection) : new Set();
   rubber = { x0: p.x, y0: p.y, x1: p.x, y1: p.y };
   selLink = null;
-  selection = new Set(before);
+  selection = new Set(rubberBefore);
+  draw();
+}
+function updateRubber(q) {
+  rubber.x1 = q.x;
+  rubber.y1 = q.y;
+  const [lx, hx] = [Math.min(rubber.x0, q.x), Math.max(rubber.x0, q.x)];
+  const [ly, hy] = [Math.min(rubber.y0, q.y), Math.max(rubber.y0, q.y)];
+  selection = new Set(rubberBefore);
+  for (const m of patch.modules)
+    if (m.x + NODE > lx && m.x < hx && m.y + NODE > ly && m.y < hy) selection.add(m);
+  draw();
+}
+function endRubber(abort) {
+  if (abort) selection = rubberBefore;
+  rubber = null;
+  draw();
+  inspect();
+}
+
+// Empty desk: with a mouse, drag a selection rectangle; with a finger, pan, or press
+// and hold to start a selection rectangle
+$("desk").addEventListener("pointerdown", (e) => {
+  if (e.button !== 0) return;
+  const p = toPatch(e);
+  if (e.pointerType !== "touch") {
+    beginRubber(p, e.shiftKey || e.metaKey);
+    track(e, (ev) => updateRubber(toPatch(ev)), () => endRubber(), () => endRubber(true));
+    return;
+  }
+  let mode = "pending", lx = e.clientX, ly = e.clientY;
+  const sx = e.clientX, sy = e.clientY;
+  const hold = setTimeout(() => {
+    if (mode !== "pending") return;
+    mode = "rubber";
+    if (navigator.vibrate) navigator.vibrate(10);
+    beginRubber(p, false);
+  }, 450);
   track(e, (ev) => {
-    const q = toPatch(ev);
-    rubber.x1 = q.x;
-    rubber.y1 = q.y;
-    const [lx, hx] = [Math.min(rubber.x0, q.x), Math.max(rubber.x0, q.x)];
-    const [ly, hy] = [Math.min(rubber.y0, q.y), Math.max(rubber.y0, q.y)];
-    selection = new Set(before);
-    for (const m of patch.modules)
-      if (m.x + NODE > lx && m.x < hx && m.y + NODE > ly && m.y < hy) selection.add(m);
-    draw();
+    if (mode === "pending" && Math.hypot(ev.clientX - sx, ev.clientY - sy) > 6) { mode = "pan"; clearTimeout(hold); }
+    if (mode === "pan") { panBy(ev.clientX - lx, ev.clientY - ly); }
+    else if (mode === "rubber") updateRubber(toPatch(ev));
+    lx = ev.clientX;
+    ly = ev.clientY;
   }, () => {
-    rubber = null;
-    draw();
-    inspect();
+    clearTimeout(hold);
+    if (mode === "rubber") endRubber();
+    else if (mode === "pending" && (selection.size || selLink)) {   // a tap: deselect
+      selection.clear();
+      selLink = null;
+      draw();
+      inspect();
+    }
+  }, () => {
+    clearTimeout(hold);
+    if (mode === "rubber") endRubber(true);
   });
+});
+
+// ---- panning and zooming --------------------------------------------------------------
+//
+// Touch: one finger on empty desk pans; two fingers anywhere pinch-zoom and pan.
+// Mouse: Option-drag, Space-drag or middle-drag pans; the wheel or a two-finger trackpad
+// swipe pans; ⌘/Ctrl-wheel or a trackpad pinch zooms around the pointer.
+
+let drawPending = false;
+function drawSoon() {
+  if (drawPending) return;
+  drawPending = true;
+  requestAnimationFrame(() => { drawPending = false; draw(); });
+}
+function panBy(dx, dy) {           // in screen pixels
+  autoFit = false;
+  view.x -= dx / zoom;
+  view.y -= dy / zoom;
+  drawSoon();
+}
+const clampZoom = (z) => Math.max(0.2, Math.min(6, z));
+function zoomAt(cx, cy, factor) {  // keep the patch point under (cx, cy) in place
+  autoFit = false;
+  const p = toPatch({ clientX: cx, clientY: cy }), r = $("desk").getBoundingClientRect();
+  zoom = clampZoom(zoom * factor);
+  view.x = p.x - (cx - r.left) / zoom;
+  view.y = p.y - (cy - r.top) / zoom;
+  drawSoon();
+}
+function zoomCentre(factor) {
+  const r = $("deskWrap").getBoundingClientRect();
+  zoomAt(r.left + r.width / 2, r.top + r.height / 2, factor);
+}
+
+const touches = new Map();       // fingers on the desk: pointerId -> {x, y}
+let pinch = null;
+let spaceDown = false;
+
+function startPinch() {
+  const [a, b] = [...touches.values()];
+  const mid = { clientX: (a.x + b.x) / 2, clientY: (a.y + b.y) / 2 };
+  pinch = { d0: Math.max(10, Math.hypot(a.x - b.x, a.y - b.y)), z0: zoom, anchor: toPatch(mid) };
+  autoFit = false;
+}
+
+// Capture phase, so a pan or pinch wins over the unit and cord under the pointer
+$("deskWrap").addEventListener("pointerdown", (e) => {
+  if (e.target.closest("#zoom")) return;
+  if (e.pointerType === "touch") {
+    touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    try { $("desk").setPointerCapture(e.pointerId); } catch (_) {}
+    if (touches.size >= 2) {
+      e.stopPropagation();
+      e.preventDefault();
+      if (current) {
+        const c = current;
+        c.stop();
+        c.abort && c.abort();
+      }
+      if (touches.size === 2) startPinch();
+    }
+    return;
+  }
+  if (e.button === 1 || (e.button === 0 && (e.altKey || spaceDown))) {
+    e.stopPropagation();
+    e.preventDefault();
+    let lx = e.clientX, ly = e.clientY;
+    $("deskWrap").classList.add("grabbing");
+    track(e, (ev) => {
+      panBy(ev.clientX - lx, ev.clientY - ly);
+      lx = ev.clientX;
+      ly = ev.clientY;
+    }, () => $("deskWrap").classList.remove("grabbing"), () => $("deskWrap").classList.remove("grabbing"));
+  }
+}, true);
+
+window.addEventListener("pointermove", (e) => {
+  if (!touches.has(e.pointerId)) return;
+  touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (!pinch || touches.size < 2) return;
+  const [a, b] = [...touches.values()], r = $("desk").getBoundingClientRect();
+  zoom = clampZoom(pinch.z0 * Math.hypot(a.x - b.x, a.y - b.y) / pinch.d0);
+  view.x = pinch.anchor.x - ((a.x + b.x) / 2 - r.left) / zoom;
+  view.y = pinch.anchor.y - ((a.y + b.y) / 2 - r.top) / zoom;
+  drawSoon();
+});
+const fingerUp = (e) => {
+  if (!touches.delete(e.pointerId)) return;
+  if (pinch && touches.size < 2) pinch = null;   // the finger left behind does nothing
+};
+window.addEventListener("pointerup", fingerUp);
+window.addEventListener("pointercancel", fingerUp);
+
+$("deskWrap").addEventListener("wheel", (e) => {
+  e.preventDefault();
+  let dx = e.deltaX, dy = e.deltaY;
+  if (e.deltaMode === 1) { dx *= 16; dy *= 16; }
+  if (e.ctrlKey || e.metaKey) {
+    // a trackpad pinch arrives as Ctrl-wheel with small deltas; a mouse wheel's are big
+    zoomAt(e.clientX, e.clientY, Math.exp(-Math.max(-50, Math.min(50, dy)) * 0.01));
+  } else {
+    if (e.shiftKey && !dx) { dx = dy; dy = 0; }
+    panBy(-dx, -dy);
+  }
+}, { passive: false });
+
+// Safari on a Mac reports a trackpad pinch as gesture events (on an iPad the fingers
+// are already handled as touches)
+let gestureZoom = 1;
+$("deskWrap").addEventListener("gesturestart", (e) => { e.preventDefault(); gestureZoom = 1; });
+$("deskWrap").addEventListener("gesturechange", (e) => {
+  e.preventDefault();
+  if (touches.size) return;
+  zoomAt(e.clientX, e.clientY, e.scale / gestureZoom);
+  gestureZoom = e.scale;
 });
 
 function deleteSelection() {
@@ -572,7 +746,7 @@ function startPaletteDrag(e, type) {
     selection = new Set([m]);
     selLink = null;
     changed();
-  });
+  }, () => ghost.remove());
 }
 
 // ---- the inspector -------------------------------------------------------------------
@@ -724,7 +898,8 @@ function inspect() {
   }
   box.appendChild(h("div", { className: "hint" },
     h("p", { text: "Drag a unit from the palette onto the desk. Drag from a unit's right edge to patch it into another. Click a unit or cord to edit it; drag on the desk to select several." }),
-    h("p", {}, h("kbd", { text: "Delete" }), " removes the selection, ", h("kbd", { text: "⌘Z" }), " undoes, ", h("kbd", { text: "⌘↵" }), " previews.")));
+    h("p", {}, h("kbd", { text: "Delete" }), " removes the selection, ", h("kbd", { text: "⌘Z" }), " undoes, ", h("kbd", { text: "⌘↵" }), " previews."),
+    h("p", { text: "Pan: scroll, or drag with Option, Space or the middle button held. Zoom: pinch, or ⌘-scroll. On a touch screen, drag the empty desk to pan, pinch with two fingers to zoom, and press and hold to select several." })));
 }
 
 function focusFirstField() {
@@ -767,12 +942,15 @@ $("applySource").onclick = () => {
 
 function fit() {
   autoFit = true;
-  const b = bounds(), wrap = $("deskWrap");
-  zoom = Math.max(0.5, Math.min(2.5, (wrap.clientWidth - 30) / (b.x1 - b.x0), (wrap.clientHeight - 30) / (b.y1 - b.y0)));
+  const b = bounds(), wrap = $("deskWrap"), W = wrap.clientWidth, H = wrap.clientHeight;
+  if (!W || !H) return;
+  zoom = Math.max(0.3, Math.min(2.5, (W - 40) / (b.x1 - b.x0), (H - 40) / (b.y1 - b.y0)));
+  view.x = (b.x0 + b.x1) / 2 - W / zoom / 2;
+  view.y = (b.y0 + b.y1) / 2 - H / zoom / 2;
   draw();
 }
-$("zoomIn").onclick = () => { autoFit = false; zoom = Math.min(4, zoom * 1.25); draw(); };
-$("zoomOut").onclick = () => { autoFit = false; zoom = Math.max(0.3, zoom / 1.25); draw(); };
+$("zoomIn").onclick = () => zoomCentre(1.25);
+$("zoomOut").onclick = () => zoomCentre(1 / 1.25);
 $("zoomFit").onclick = fit;
 $("namesBtn").onclick = () => {
   showNames = !showNames;
@@ -871,8 +1049,19 @@ $("saveBtn").onclick = () => {
 $("undoBtn").onclick = undo;
 $("redoBtn").onclick = redo;
 
+document.addEventListener("keyup", (e) => {
+  if (e.key === " ") { spaceDown = false; $("deskWrap").classList.remove("grab"); }
+});
+window.addEventListener("blur", () => { spaceDown = false; $("deskWrap").classList.remove("grab"); });
 document.addEventListener("keydown", (e) => {
   const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName);
+  // Space held pans (but still presses a focused button)
+  if (e.key === " " && !typing && document.activeElement.tagName !== "BUTTON" && tab === "patch") {
+    e.preventDefault();
+    spaceDown = true;
+    $("deskWrap").classList.add("grab");
+    return;
+  }
   const mod = e.metaKey || e.ctrlKey;
   if (mod && e.key === "Enter") { e.preventDefault(); document.activeElement.blur(); startRender(true); return; }
   if (typing) return;
