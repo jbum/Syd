@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSyd</title>
+<style>
+  :root {
+    --bg: #faf8f4; --panel: #ffffff; --ink: #1f1d1a; --muted: #6b665e; --line: #e2ddd3;
+    --accent: #2f6f5e; --accent-ink: #ffffff; --bar: #e9e4da; --error: #a33a2a;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #171614; --panel: #201f1c; --ink: #ece8e1; --muted: #a29c91; --line: #353330;
+      --accent: #5fb39a; --accent-ink: #10201b; --bar: #2c2a27; --error: #e07a68;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #171614; --panel: #201f1c; --ink: #ece8e1; --muted: #a29c91; --line: #353330;
+    --accent: #5fb39a; --accent-ink: #10201b; --bar: #2c2a27; --error: #e07a68;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  }
+  main { max-width: 760px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 { font-size: 28px; margin: 0; letter-spacing: -0.01em; }
+  .sub { color: var(--muted); margin: 4px 0 28px; }
+  section {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 18px; margin-bottom: 16px;
+  }
+  label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  select, input[type=number], textarea {
+    width: 100%; font: inherit; color: var(--ink); background: var(--bg);
+    border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px;
+  }
+  textarea { font: 13px/1.45 var(--mono); height: 220px; resize: vertical; white-space: pre; }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+  .row > * { flex: 1 1 160px; }
+  .desc { color: var(--muted); font-size: 14px; margin: 10px 0 0; min-height: 1.5em; }
+  .or { color: var(--muted); font-size: 13px; margin: 12px 0 6px; }
+  button {
+    font: inherit; font-weight: 600; border: 0; border-radius: 6px; padding: 10px 18px;
+    background: var(--accent); color: var(--accent-ink); cursor: pointer;
+  }
+  button.secondary { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+  button:disabled { opacity: 0.5; cursor: default; }
+  .bar { height: 8px; background: var(--bar); border-radius: 4px; overflow: hidden; margin: 14px 0 6px; }
+  .bar > div { height: 100%; width: 0; background: var(--accent); transition: width 0.15s; }
+  .status { font-size: 14px; color: var(--muted); }
+  .status.error { color: var(--error); }
+  audio { width: 100%; margin-top: 14px; }
+  a.download { display: inline-block; margin-top: 10px; color: var(--accent); font-weight: 600; }
+  details { margin-top: 10px; font-size: 13px; color: var(--muted); }
+  details pre { font: 12px/1.4 var(--mono); white-space: pre-wrap; max-height: 200px; overflow: auto; }
+  .hidden { display: none; }
+  .file { font-size: 14px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>CSyd</h1>
+  <p class="sub">Software synthesis in your browser. Patches render on your own computer; nothing is uploaded.
+    <a href="../" style="color: var(--accent); font-weight: 600">Open the patch editor</a></p>
+
+  <section>
+    <label for="example">Example patch</label>
+    <select id="example"></select>
+    <p class="desc" id="desc"></p>
+    <p class="or">or open your own: a .syd patch, plus any score or sample files it reads</p>
+    <input class="file" type="file" id="files" multiple>
+  </section>
+
+  <section>
+    <label for="patch">Patch <span id="patchName"></span></label>
+    <textarea id="patch" spellcheck="false"></textarea>
+    <div class="row" style="margin-top: 12px">
+      <div>
+        <label for="seconds">Length in seconds (at most <span id="maxLabel"></span>)</label>
+        <input type="number" id="seconds" min="0.1" step="0.1">
+      </div>
+      <div>
+        <label for="seed">Random seed (optional)</label>
+        <input type="number" id="seed" min="1" step="1" placeholder="patch's own">
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="row">
+      <div style="flex: 0 0 auto"><button id="render">Render</button></div>
+      <div style="flex: 0 0 auto"><button id="cancel" class="secondary" disabled>Cancel</button></div>
+    </div>
+    <div class="bar"><div id="progress"></div></div>
+    <div class="status" id="status">Ready.</div>
+    <div id="result" class="hidden">
+      <audio id="player" controls></audio>
+      <a class="download" id="download">Download WAV</a>
+    </div>
+    <details id="logBox" class="hidden"><summary>CSyd's output</summary><pre id="log"></pre></details>
+  </section>
+</main>
+
+<script>
+const MAX_SECONDS = 600;
+const $ = (id) => document.getElementById(id);
+let examples = [], dataFiles = [], userFiles = [], worker = null, wavURL = null, started = 0;
+
+$("maxLabel").textContent = MAX_SECONDS / 60 + " minutes";
+
+// The patch's own length, from its output line (as SSOutput::Load reads it)
+function patchSeconds(text) {
+  for (const raw of text.split(/\r\n|\r|\n/)) {
+    const f = raw.trim().split(/\s+/);
+    if (f[0] === "OUT" || f[0] === "OUTPUT") return parseFloat(f[1]);
+    if (f[0] === "OUTS") return parseFloat(f[2]);
+  }
+  return NaN;
+}
+
+function setPatch(name, text) {
+  $("patchName").textContent = "(" + name + ")";
+  $("patch").value = text;
+  $("patch").dataset.name = name;
+  const s = patchSeconds(text);
+  $("seconds").value = isFinite(s) ? Math.min(s, MAX_SECONDS) : 10;
+}
+
+async function loadExample(i) {
+  const ex = examples[i];
+  $("desc").textContent = ex.description || "";
+  userFiles = [];
+  $("files").value = "";
+  setPatch(ex.file, await (await fetch("../examples/" + ex.file)).text());
+}
+
+async function init() {
+  const manifest = await (await fetch("../examples/examples.json")).json();
+  examples = manifest.patches;
+  dataFiles = manifest.files;
+  for (const [i, ex] of examples.entries()) {
+    const o = document.createElement("option");
+    o.value = i;
+    o.textContent = ex.name;
+    $("example").appendChild(o);
+  }
+  const first = Math.max(0, examples.findIndex((e) => e.name === "WhitneyChromaticPluck"));
+  $("example").value = first;
+  loadExample(first);
+}
+
+$("example").onchange = () => loadExample(+$("example").value);
+
+$("files").onchange = async () => {
+  const chosen = [...$("files").files];
+  const patch = chosen.find((f) => /\.syd$/i.test(f.name));
+  if (!patch) {
+    status("Choose a .syd patch (with any files it reads).", true);
+    return;
+  }
+  userFiles = await Promise.all(chosen.filter((f) => f !== patch)
+    .map(async (f) => ({ name: f.name, data: await f.arrayBuffer() })));
+  $("desc").textContent = "";
+  setPatch(patch.name, await patch.text());
+};
+
+function status(text, isError) {
+  $("status").textContent = text;
+  $("status").classList.toggle("error", !!isError);
+}
+
+function finish() {
+  worker && worker.terminate();
+  worker = null;
+  $("render").disabled = false;
+  $("cancel").disabled = true;
+}
+
+$("cancel").onclick = () => {
+  finish();
+  $("progress").style.width = "0";
+  status("Cancelled.");
+};
+
+$("render").onclick = async () => {
+  const seconds = Math.min(parseFloat($("seconds").value) || 0, MAX_SECONDS);
+  if (!(seconds > 0)) {
+    status("Give a length in seconds.", true);
+    return;
+  }
+  // The example's data files (scores, samples) unless the user opened their own
+  const files = userFiles.length ? userFiles : await Promise.all(dataFiles.map(async (name) => ({
+    name, data: await (await fetch("../examples/" + name)).arrayBuffer() })));
+
+  $("render").disabled = true;
+  $("cancel").disabled = false;
+  $("result").classList.add("hidden");
+  $("logBox").classList.add("hidden");
+  $("progress").style.width = "0";
+  status("Rendering…");
+  started = performance.now();
+
+  worker = new Worker("../worker.js");
+  worker.onmessage = (e) => {
+    const m = e.data;
+    if (m.type === "progress") {
+      $("progress").style.width = (m.value * 100).toFixed(1) + "%";
+      const elapsed = (performance.now() - started) / 1000;
+      const left = m.value > 0.02 ? elapsed / m.value - elapsed : NaN;
+      status("Rendering… " + Math.round(m.value * 100) + "%" +
+             (isFinite(left) ? ", about " + Math.ceil(left) + " s left" : ""));
+      return;
+    }
+    finish();
+    if (m.log) {
+      $("log").textContent = m.log;
+      $("logBox").classList.remove("hidden");
+    }
+    if (m.type === "error") {
+      status(m.message, true);
+      return;
+    }
+    const took = (performance.now() - started) / 1000;
+    if (wavURL) URL.revokeObjectURL(wavURL);
+    wavURL = URL.createObjectURL(new Blob([m.wav], { type: "audio/wav" }));
+    $("player").src = wavURL;
+    $("download").href = wavURL;
+    $("download").download = $("patch").dataset.name.replace(/\.syd$/i, "") + ".wav";
+    $("result").classList.remove("hidden");
+    $("progress").style.width = "100%";
+    status(`Rendered ${seconds} s in ${took.toFixed(1)} s (${(seconds / took).toFixed(1)}× real time), ` +
+           `${(m.wav.byteLength / 1048576).toFixed(1)} MB.`);
+  };
+  worker.onerror = (e) => { finish(); status("The renderer failed: " + e.message, true); };
+  worker.postMessage({
+    patch: { name: $("patch").dataset.name, text: $("patch").value },
+    files, seconds, maxSeconds: MAX_SECONDS, seed: parseInt($("seed").value) || 0,
+  });
+};
+
+init().catch((err) => status("Couldn't load the examples: " + err, true));
+</script>
+</body>
+</html>

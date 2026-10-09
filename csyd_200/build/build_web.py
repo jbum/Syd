@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Assemble the browser version in build/web: the renderer and patch editor pages, the worker, csyd.js and csyd.wasm
+"""Assemble the browser version in build/web: the patch editor (index.html), the plain renderer (csyd/), the worker, csyd.js and csyd.wasm
 (build/build_wasm.sh web), and example patches with the score files they read.
 Serve build/web with any static file server; everything renders in the visitor's browser."""
 import json, os, re, shutil, subprocess
@@ -16,8 +16,15 @@ DATA = ["csyd_102/patches/prelude.sco", "csyd_102/patches/stars.skini", "csyd_10
 subprocess.run([os.path.join(HERE, "build_wasm.sh"), "web"], check=True)
 shutil.rmtree(OUT, ignore_errors=True)
 os.makedirs(os.path.join(OUT, "examples"))
-for f in ("index.html", "editor.html", "syd.js", "worker.js"):
+# the patch editor at the root, the plain renderer in csyd/
+for f in ("index.html", "syd.js", "worker.js"):
     shutil.copy(os.path.join(SRC, "web", f), OUT)
+os.makedirs(os.path.join(OUT, "csyd"))
+shutil.copy(os.path.join(SRC, "web", "csyd.html"), os.path.join(OUT, "csyd", "index.html"))
+# the editor's first address, kept working
+with open(os.path.join(OUT, "editor.html"), "w") as f:
+    f.write('<!doctype html><meta charset="utf-8"><title>Syd</title>'
+            '<meta http-equiv="refresh" content="0; url=./"><a href="./">Syd patch editor</a>\n')
 shutil.copytree(os.path.join(SRC, "web", "assets"), os.path.join(OUT, "assets"))
 for f in ("csyd.js", "csyd.wasm"):
     shutil.copy(os.path.join(HERE, "wasm-web", f), OUT)
