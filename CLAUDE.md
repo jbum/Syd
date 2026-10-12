@@ -59,7 +59,7 @@ What changed vs 1.5.2 (commits f22f079..e91dc61):
   MEMFS. Browser threads would need COOP/COEP headers (not done).
 - `build/build_web.py` → `build/web/` (gitignored): rebuilds wasm, copies pages, examples
   (from the corpus, with descriptions from `csyd_102/patches/aaa_read.me.txt`) and score files.
-- `build/deploy_web.sh` → rsync `--delete` to `jbum@mibbles:syd.jbum.com/`.
+- `build/deploy_web.sh` → rsync `--delete` to `$DEPLOY_DEST` or the destination in `build/deploy.dest` (not committed).
 - Full publish: `source ~/emsdk/emsdk_env.sh && python3 build/build_web.py && build/deploy_web.sh`.
 
 ### Pages (source in `csyd_200/web/`)
@@ -88,12 +88,9 @@ What changed vs 1.5.2 (commits f22f079..e91dc61):
   Preview = first N s, Render all = whole patch (cap 600 s). Waveform panel `showWav`.
 - Synthesis is **always** csyd.wasm — never JSyd's Java engine (jbum's requirement).
 
-### Hosting (mibbles, Ubuntu, Apache)
-- Public static site (jbum chose public, no auth).
-- Vhost `/etc/apache2/sites-available/025-syd.conf` + certbot's `025-syd-le-ssl.conf`;
-  `/var/www/syd.jbum.com -> /home/jbum/syd.jbum.com`; logs `/var/log/apache2/syd/`;
-  html/js/json/wasm served `Cache-Control: no-cache`. `*.jbum.com` DNS already points at mibbles.
-  certbot.timer renews.
+### Hosting
+- Public static site (jbum chose public, no auth). Server details (host, vhost, paths, logs) are in
+  the uncommitted `CLAUDE.local.md`: the repo is public, so they stay out of it.
 
 ### Social card
 - Tags (og:* + twitter summary_large_image) in both pages; image `assets/card.png?v=3`

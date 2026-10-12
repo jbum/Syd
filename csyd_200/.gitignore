@@ -6,3 +6,4 @@ tests/ref/
 tests/listen/
 build/wasm-*/
 build/web/
+build/deploy.dest
