@@ -17,7 +17,7 @@ subprocess.run([os.path.join(HERE, "build_wasm.sh"), "web"], check=True)
 shutil.rmtree(OUT, ignore_errors=True)
 os.makedirs(os.path.join(OUT, "examples"))
 # the patch editor at the root, the plain renderer in csyd/
-for f in ("index.html", "syd.js", "worker.js"):
+for f in ("index.html", "about.html", "syd.js", "worker.js"):
     shutil.copy(os.path.join(SRC, "web", f), OUT)
 os.makedirs(os.path.join(OUT, "csyd"))
 shutil.copy(os.path.join(SRC, "web", "csyd.html"), os.path.join(OUT, "csyd", "index.html"))

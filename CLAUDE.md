@@ -65,6 +65,8 @@ What changed vs 1.5.2 (commits f22f079..e91dc61):
 ### Pages (source in `csyd_200/web/`)
 - `index.html` — **the patch editor** (site root). First visit (nothing in localStorage
   `syd-editor`) opens `shepard.syd`; afterwards reopens the last patch.
+- `about.html` — project history (1997 → 2.0), the Whitney Music Box and its video, the GitHub link.
+  Linked from the editor's header and the renderer.
 - `csyd.html` — the plain renderer, served at `/csyd/` (shared files referenced as `../`).
 - `editor.html` on the site is a generated redirect stub (the editor's first address).
 - `syd.js` — .syd parse/serialize + module catalog (types, fields, inputs, JSyd link colours,

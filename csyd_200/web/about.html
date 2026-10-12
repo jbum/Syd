@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>About Syd</title>
+<meta name="description" content="Syd, Jim Bumgardner's software synthesizer: from a 1997 Macintosh program to the browser, by way of Windows, Java and the Whitney Music Box.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Syd">
+<meta property="og:title" content="About Syd">
+<meta property="og:description" content="Syd, Jim Bumgardner's software synthesizer: from a 1997 Macintosh program to the browser, by way of Windows, Java and the Whitney Music Box.">
+<meta property="og:url" content="https://syd.jbum.com/about.html">
+<meta property="og:image" content="https://syd.jbum.com/assets/card.png?v=3">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="The Shepard patch as the Syd editor draws it: expressions driving four oscillators into a mixer and the output">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://syd.jbum.com/assets/card.png?v=3">
+<style>
+  :root {
+    --bg: #faf8f4; --panel: #ffffff; --ink: #1f1d1a; --muted: #6b665e; --line: #e2ddd3;
+    --accent: #2f6f5e;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #171614; --panel: #201f1c; --ink: #ece8e1; --muted: #a29c91; --line: #353330;
+      --accent: #5fb39a;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #171614; --panel: #201f1c; --ink: #ece8e1; --muted: #a29c91; --line: #353330;
+    --accent: #5fb39a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  }
+  main { max-width: 760px; margin: 0 auto; padding: 32px 16px 64px; }
+  .top { display: flex; align-items: baseline; gap: 18px; flex-wrap: wrap; }
+  h1 { font-size: 28px; margin: 0; letter-spacing: -0.01em; }
+  .top nav { display: flex; gap: 16px; flex-wrap: wrap; }
+  a { color: var(--accent); }
+  .top nav a { font-weight: 600; text-decoration: none; }
+  .sub { color: var(--muted); margin: 4px 0 28px; }
+  h2 { font-size: 19px; margin: 36px 0 8px; }
+  .video { position: relative; aspect-ratio: 16 / 9; border-radius: 10px; overflow: hidden;
+    background: var(--panel); border: 1px solid var(--line); margin: 14px 0 6px; }
+  .video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .caption { color: var(--muted); font-size: 14px; margin: 0 0 16px; }
+  dl.history { display: grid; grid-template-columns: 4.5em 1fr; gap: 6px 14px; margin: 12px 0; }
+  dl.history dt { font-weight: 600; font-variant-numeric: tabular-nums; }
+  dl.history dd { margin: 0; }
+  ul { padding-left: 1.2em; }
+  code { font: 14px var(--mono); }
+  footer { color: var(--muted); font-size: 14px; margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; }
+</style>
+</head>
+<body>
+<main>
+  <div class="top">
+    <h1>About Syd</h1>
+    <nav><a href="./">Patch editor</a> <a href="csyd/">Renderer</a> <a href="https://github.com/jbum/Syd">GitHub</a></nav>
+  </div>
+  <p class="sub">An instrument editor and software synthesizer by Jim Bumgardner, since 1997.</p>
+
+  <p>Syd builds sounds from units wired together with patch cords: oscillators, envelopes, filters, mixers,
+  delays, samples, plucked strings, and scores that play a patch as notes. Almost every setting can be an
+  expression, so a single score unit can make a whole polyphonic piece. It has always been a good way to
+  teach computer music, and it has been used in introductory classes at a few schools.</p>
+
+  <p>Jim wrote Syd to reproduce some of the sounds of the Buchla 200 analog synthesizer he played at CalArts in
+  the early 1980s. It soon became a computer-music tool in its own right.</p>
+
+  <h2>The Whitney Music Box</h2>
+  <p>Syd's best-known use is the <a href="https://whitneymusicbox.org/">Whitney Music Box</a>, a visual and musical
+  toy after John Whitney's ideas about differential motion. Syd rendered its variations that use harmonics and
+  non-standard tunings. The patch behind it is a good example of Syd's unusual way of making polyphony from one
+  score unit. In this video Jim talks about both the Music Box and Syd:</p>
+  <div class="video">
+    <iframe src="https://www.youtube-nocookie.com/embed/iqGd_BRqyuE" title="Behind the Whitney Music Box"
+      loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+  </div>
+  <p class="caption"><a href="https://youtu.be/iqGd_BRqyuE">Behind the Whitney Music Box</a>, on YouTube.</p>
+
+  <h2>History</h2>
+  <dl class="history">
+    <dt>1997</dt><dd>Syd, first called SoftSynth, written in C++ for the Macintosh (version 1.0.6).</dd>
+    <dt>1998</dt><dd>Ported to Windows as Syd 1.0.7, with built-in help.</dd>
+    <dt>2006</dt><dd><b>JSyd</b>, a rewrite in Java, so Syd ran on modern Macs, Windows and Unix, with a new
+      patch-cord interface. Alongside it, <b>CSyd</b>, a command-line renderer ported from the Windows version,
+      and much faster.</dd>
+    <dt>2009</dt><dd>Version 1.5.1: stereo and panning in both.</dd>
+    <dt>2011</dt><dd>JSyd and CSyd published on <a href="https://github.com/jbum/Syd">GitHub</a>.</dd>
+    <dt>2026</dt><dd><b>CSyd 2.0</b> and this site. CSyd's 64-bit bugs were fixed, then it was made several times
+      faster: expressions compiled once, notes rendered in blocks across all cores. It carries its own math
+      library, so every machine, and the WebAssembly build that runs in your browser, renders the same bits. The
+      old patches were checked against 1.5 one by one. The patch editor here follows JSyd's design and uses its
+      original icons, and it renders with CSyd itself.</dd>
+  </dl>
+
+  <h2>Source code</h2>
+  <p>Syd is on GitHub at <a href="https://github.com/jbum/Syd">github.com/jbum/Syd</a>. The original JSyd and CSyd
+  are on its <code>master</code> branch; CSyd 2.0 and this site are on the
+  <a href="https://github.com/jbum/Syd/tree/csyd2"><code>csyd2</code></a> branch.</p>
+
+  <h2>Related</h2>
+  <p><a href="https://qts.jbum.com/">QTS</a> and <a href="https://fragtime.jbum.com/">Fragtime</a> are its visual
+  counterparts from the same years: a formula for every pixel, plus time, with the same kind of expressions.</p>
+
+  <footer>Jim Bumgardner — <a href="https://krazydad.com/about">krazydad.com/about</a></footer>
+</main>
+</body>
+</html>
