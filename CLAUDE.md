@@ -1,8 +1,8 @@
 # Syd / CSyd 2.0 — working notes
 
 Context for continuing the CSyd 2.0 and syd.jbum.com work (started 2026-10-08/09).
-Owner: Jim Bumgardner (jbum). Branch **`csyd2`** (off `master`), pushed to the public
-github.com/jbum/Syd (2026-10-09); not merged. The repo is public — keep server details out of it.
+Owner: Jim Bumgardner (jbum). The 2.0 work (branch `csyd2`) was merged into `master`
+of the public github.com/jbum/Syd on 2026-10-12. The repo is public — keep server details out of it.
 
 ## Layout
 
@@ -108,7 +108,6 @@ What changed vs 1.5.2 (commits f22f079..e91dc61):
 - Folder units: editing the sub-patch a folder loads (only its filename is editable now).
 - Expression-language help/reference beside fields (variables, functions, `?`, `p1..pn`, `sig`, `ctl`…).
 - Browser multi-threading (COOP/COEP + pthreads build).
-- Decide merge/release of `csyd2` (README history, version 2.0).
 - jbum may still listen to the A/B pairs in `csyd_200/tests/listen/`.
 
 ## Working style jbum likes
